@@ -203,7 +203,7 @@ func main() {
 		if len(kv) != 2 {
 			continue
 		}
-		apiKeyMap[kv[0]] = kv[1]
+		apiKeyMap[kv[0]] = strings.TrimSpace(kv[1])
 	}
 	log.Printf("Loaded %d API keys", len(apiKeyMap))
 
