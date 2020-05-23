@@ -26,9 +26,13 @@ import (
 	"net/url"
 )
 
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 type fortiTokenClient struct {
 	tgt url.URL
-	hc  *http.Client
+	hc  HTTPClient
 	ctx context.Context
 	tok string
 }
@@ -71,6 +75,6 @@ func (c *fortiTokenClient) String() string {
 	return c.tgt.String()
 }
 
-func newFortiTokenClient(ctx context.Context, tgt url.URL, hc *http.Client, token string) (*fortiTokenClient, error) {
+func newFortiTokenClient(ctx context.Context, tgt url.URL, hc HTTPClient, token string) (*fortiTokenClient, error) {
 	return &fortiTokenClient{tgt, hc, ctx, token}, nil
 }
