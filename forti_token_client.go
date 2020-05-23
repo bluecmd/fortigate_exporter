@@ -30,13 +30,23 @@ type fortiTokenClient struct {
 	tgt url.URL
 	hc  *http.Client
 	ctx context.Context
+	tok string
+}
+
+func (c *fortiTokenClient) newGetRequest(url string) (*http.Request, error) {
+	r, err := http.NewRequestWithContext(c.ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.tok))
+	return r, nil
 }
 
 func (c *fortiTokenClient) Get(path string, obj interface{}) error {
 	u := c.tgt
 	u.Path = path
 
-	req, err := http.NewRequest("GET", u.String(), nil)
+	req, err := c.newGetRequest(u.String())
 	if err != nil {
 		return err
 	}
@@ -44,9 +54,7 @@ func (c *fortiTokenClient) Get(path string, obj interface{}) error {
 	req = req.WithContext(c.ctx)
 	resp, err := c.hc.Do(req)
 	if err != nil {
-		// Strip request details to hide sensitive access tokens
-		uerr := err.(*url.Error)
-		return uerr.Err
+		return err
 	}
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("Response code was %d, expected 200", resp.StatusCode)
@@ -59,11 +67,10 @@ func (c *fortiTokenClient) Get(path string, obj interface{}) error {
 	return json.Unmarshal(b, obj)
 }
 
+func (c *fortiTokenClient) String() string {
+	return c.tgt.String()
+}
+
 func newFortiTokenClient(ctx context.Context, tgt url.URL, hc *http.Client, token string) (*fortiTokenClient, error) {
-	// TODO(bluecmd): Switch this to use the "Authorization: Bearer xx" header instead (less likely to be leaked in debug logs)
-	u := tgt
-	q := u.Query()
-	q.Add("access_token", token)
-	u.RawQuery = q.Encode()
-	return &fortiTokenClient{u, hc, ctx}, nil
+	return &fortiTokenClient{tgt, hc, ctx, token}, nil
 }

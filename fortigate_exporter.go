@@ -70,7 +70,7 @@ func probeSystem(c FortiHTTP, registry *prometheus.Registry) bool {
 	var st systemStatus
 
 	if err := c.Get("api/v2/monitor/system/status", &st); err != nil {
-		log.Printf("Probe of %q failed. Metric: system status. Error: %q", c, err)
+		log.Printf("Error: %v", err)
 		return false
 	}
 	probeSystemVersion.WithLabelValues(st.Serial, st.Version, fmt.Sprintf("%d", st.Build)).Set(1)
