@@ -19,88 +19,36 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gopkg.in/yaml.v2"
 )
 
 var (
-	apiKeyFile     = flag.String("api-key-file", "", "file containing the api key map to use when connecting to a Fortigate device")
+	authMapFile    = flag.String("auth-file", "", "file containing the authentication map to use when connecting to a Fortigate device")
 	listen         = flag.String("listen", ":9710", "address to listen on")
 	timeoutSeconds = flag.Int("scrape-timeout", 30, "max seconds to allow a scrape to take")
 
-	apiKeyMap = map[string]string{}
+	authMap = map[string]Auth{}
 )
 
-type fortiApiClient struct {
-	u   url.URL
-	hc  *http.Client
-	ctx context.Context
+type Auth struct {
+	Token string
 }
 
-func (c *fortiApiClient) String() string {
-	u := url.URL{
-		Scheme: c.u.Scheme,
-		Host:   c.u.Host,
-	}
-	return u.String()
+type FortiHTTP interface {
+	Get(path string, obj interface{}) error
 }
 
-func (c *fortiApiClient) Get(path string, obj interface{}) error {
-	u := c.u
-	u.Path = path
-
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return err
-	}
-
-	req = req.WithContext(c.ctx)
-	resp, err := c.hc.Do(req)
-	if err != nil {
-		// Strip request details to hide sensitive access tokens
-		uerr := err.(*url.Error)
-		return uerr.Err
-	}
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Response code was %d, expected 200", resp.StatusCode)
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(b, obj)
-}
-
-func newFortiApiClient(ctx context.Context, tgt *url.URL, hc *http.Client) (*fortiApiClient, error) {
-	u := url.URL{
-		Scheme: tgt.Scheme,
-		Host:   tgt.Host,
-	}
-	q := u.Query()
-	tk := u.String()
-
-	ak, ok := apiKeyMap[tk]
-	if !ok {
-		return nil, fmt.Errorf("No API key registered for %q", tk)
-	}
-
-	q.Add("access_token", ak)
-	u.RawQuery = q.Encode()
-	return &fortiApiClient{u, hc, ctx}, nil
-}
-
-func probeSystem(c *fortiApiClient, registry *prometheus.Registry) bool {
+func probeSystem(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		probeSystemVersion = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -129,6 +77,25 @@ func probeSystem(c *fortiApiClient, registry *prometheus.Registry) bool {
 	return true
 }
 
+func newFortiClient(ctx context.Context, tgt url.URL, hc *http.Client) (FortiHTTP, error) {
+	auth, ok := authMap[tgt.String()]
+	if !ok {
+		return nil, fmt.Errorf("No API authentication registered for %q", tgt.String())
+	}
+
+	if auth.Token != "" {
+		if tgt.Scheme != "https" {
+			return nil, fmt.Errorf("FortiOS only supports token for HTTPS connections")
+		}
+		c, err := newFortiTokenClient(ctx, tgt, hc, auth.Token)
+		if err != nil {
+			return nil, err
+		}
+		return c, nil
+	}
+	return nil, fmt.Errorf("Invalid authentication data for %q", tgt.String())
+}
+
 func probe(ctx context.Context, target string, registry *prometheus.Registry, hc *http.Client) (bool, error) {
 	tgt, err := url.Parse(target)
 	if err != nil {
@@ -139,14 +106,17 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 		return false, fmt.Errorf("Unsupported scheme %q", tgt.Scheme)
 	}
 
-	c, err := newFortiApiClient(ctx, tgt, hc)
+	// Filter anything else than scheme and hostname
+	u := url.URL{
+		Scheme: tgt.Scheme,
+		Host:   tgt.Host,
+	}
+	c, err := newFortiClient(ctx, u, hc)
 	if err != nil {
 		return false, err
 	}
 
-	success :=
-		probeSystem(c, registry) &&
-			true
+	success := probeSystem(c, registry)
 	return success, nil
 }
 
@@ -193,19 +163,16 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 
-	akm, err := ioutil.ReadFile(*apiKeyFile)
+	af, err := ioutil.ReadFile(*authMapFile)
 	if err != nil {
-		log.Fatalf("Failed to read API key file: %v", err)
+		log.Fatalf("Failed to read API authentication map file: %v", err)
 	}
 
-	for _, line := range strings.Split(string(akm), "\n") {
-		kv := strings.SplitN(strings.TrimSpace(line), " ", 2)
-		if len(kv) != 2 {
-			continue
-		}
-		apiKeyMap[kv[0]] = strings.TrimSpace(kv[1])
+	if err := yaml.Unmarshal(af, &authMap); err != nil {
+		log.Fatalf("Failed to parse API authentication map file: %v", err)
 	}
-	log.Printf("Loaded %d API keys", len(apiKeyMap))
+
+	log.Printf("Loaded %d API keys", len(authMap))
 
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/probe", probeHandler)
