@@ -1,5 +1,7 @@
 # fortigate_exporter
 
+![Go](https://github.com/bluecmd/fortigate_exporter/workflows/Go/badge.svg)
+
 Prometheus exporter for Fortigate firewalls.
 
 ## Usage
