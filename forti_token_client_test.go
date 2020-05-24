@@ -55,7 +55,7 @@ func TestGetParse(t *testing.T) {
 	}
 	var v D
 	exp := D{"test"}
-	if err := c.Get("test", &v); err != nil || !reflect.DeepEqual(v, exp) {
+	if err := c.Get("test", "", &v); err != nil || !reflect.DeepEqual(v, exp) {
 		t.Errorf("Get() %v, %v, expected %v, nil", v, err, exp)
 	}
 }
@@ -65,7 +65,7 @@ func TestGetFail(t *testing.T) {
 	type D struct {
 		Data string
 	}
-	err := c.Get("test", &D{})
+	err := c.Get("test", "", &D{})
 	if err == nil {
 		t.Errorf("Get() expected non-nil error, got nil error")
 	}

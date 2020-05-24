@@ -46,9 +46,10 @@ func (c *fortiTokenClient) newGetRequest(url string) (*http.Request, error) {
 	return r, nil
 }
 
-func (c *fortiTokenClient) Get(path string, obj interface{}) error {
+func (c *fortiTokenClient) Get(path string, query string, obj interface{}) error {
 	u := c.tgt
 	u.Path = path
+	u.RawQuery = query
 
 	req, err := c.newGetRequest(u.String())
 	if err != nil {

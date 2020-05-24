@@ -45,36 +45,7 @@ type Auth struct {
 }
 
 type FortiHTTP interface {
-	Get(path string, obj interface{}) error
-}
-
-func probeSystem(c FortiHTTP, registry *prometheus.Registry) bool {
-	var (
-		probeSystemVersion = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_system_version",
-				Help: "Contains the system version and build information",
-			},
-			[]string{"serial", "version", "build"},
-		)
-	)
-
-	registry.MustRegister(probeSystemVersion)
-
-	type systemStatus struct {
-		Status  string
-		Serial  string
-		Version string
-		Build   int
-	}
-	var st systemStatus
-
-	if err := c.Get("api/v2/monitor/system/status", &st); err != nil {
-		log.Printf("Error: %v", err)
-		return false
-	}
-	probeSystemVersion.WithLabelValues(st.Serial, st.Version, fmt.Sprintf("%d", st.Build)).Set(1)
-	return true
+	Get(path string, query string, obj interface{}) error
 }
 
 func newFortiClient(ctx context.Context, tgt url.URL, hc *http.Client) (FortiHTTP, error) {
@@ -94,30 +65,6 @@ func newFortiClient(ctx context.Context, tgt url.URL, hc *http.Client) (FortiHTT
 		return c, nil
 	}
 	return nil, fmt.Errorf("Invalid authentication data for %q", tgt.String())
-}
-
-func probe(ctx context.Context, target string, registry *prometheus.Registry, hc *http.Client) (bool, error) {
-	tgt, err := url.Parse(target)
-	if err != nil {
-		return false, fmt.Errorf("url.Parse failed: %v", err)
-	}
-
-	if tgt.Scheme != "https" && tgt.Scheme != "http" {
-		return false, fmt.Errorf("Unsupported scheme %q", tgt.Scheme)
-	}
-
-	// Filter anything else than scheme and hostname
-	u := url.URL{
-		Scheme: tgt.Scheme,
-		Host:   tgt.Host,
-	}
-	c, err := newFortiClient(ctx, u, hc)
-	if err != nil {
-		return false, err
-	}
-
-	success := probeSystem(c, registry)
-	return success, nil
 }
 
 func probeHandler(w http.ResponseWriter, r *http.Request) {
