@@ -1,0 +1,35 @@
+# api/v2/monitor/router/statistics/select/?vdom=*
+[
+  {
+    "http_method":"GET",
+    "results":{
+      "total_lines":1,
+      "total_lines_ipv4":0,
+      "total_lines_ipv6":1
+    },
+    "vdom":"FG-traffic",
+    "path":"router",
+    "name":"statistics",
+    "action":"select",
+    "status":"success",
+    "serial":"FGVMEVZFNTS3OAC8",
+    "version":"v6.2.4",
+    "build":1112
+  },
+  {
+    "http_method":"GET",
+    "results":{
+      "total_lines":5,
+      "total_lines_ipv4":2,
+      "total_lines_ipv6":3
+    },
+    "vdom":"root",
+    "path":"router",
+    "name":"statistics",
+    "action":"select",
+    "status":"success",
+    "serial":"FGVMEVZFNTS3OAC8",
+    "version":"v6.2.4",
+    "build":1112
+  }
+]

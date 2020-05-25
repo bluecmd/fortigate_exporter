@@ -1,0 +1,39 @@
+# api/v2/monitor/system/config-revision
+{
+  "http_method":"GET",
+  "results":{
+    "revisions":[
+      {
+        "id":2,
+        "time":1590345408,
+        "version_id":"1",
+        "admin":"bluecmd",
+        "comment":"Test SNMP"
+      },
+      {
+        "id":1,
+        "time":1590259051,
+        "version_id":"1",
+        "admin":"bluecmd",
+        "comment":""
+      }
+    ],
+    "categories":{
+      "1":{
+        "major_version":6,
+        "minor_version":2,
+        "patch_number":4,
+        "build_number":1112,
+        "release_number":0
+      }
+    },
+    "current_config_unsaved":true
+  },
+  "vdom":"main",
+  "path":"system",
+  "name":"config-revision",
+  "status":"success",
+  "serial":"FGT61FT000000000",
+  "version":"v6.2.4",
+  "build":1112
+}
