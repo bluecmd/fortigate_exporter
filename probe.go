@@ -75,8 +75,8 @@ func probeSystemResources(c FortiHTTP, registry *prometheus.Registry) bool {
 		)
 		mResSession = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_system_sessions_total",
-				Help: "Current amount of system sessions, per IP version",
+				Name: "fortigate_current_sessions",
+				Help: "Current amount of sessions, per IP version",
 			},
 			[]string{"protocol"},
 		)
@@ -131,21 +131,21 @@ func probeSystemVDOMResources(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		mResCPU = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_system_vdom_cpu_usage_ratio",
+				Name: "fortigate_vdom_system_cpu_usage_ratio",
 				Help: "Current resource usage ratio of CPU, per VDOM",
 			},
 			[]string{"vdom"},
 		)
 		mResMemory = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_system_vdom_memory_usage_ratio",
+				Name: "fortigate_vdom_system_memory_usage_ratio",
 				Help: "Current resource usage ratio of memory, per VDOM",
 			},
 			[]string{"vdom"},
 		)
 		mResSession = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_system_vdom_sessions_total",
+				Name: "fortigate_vdom_current_sessions",
 				Help: "Current amount of sessions, per VDOM and IP version",
 			},
 			[]string{"vdom", "protocol"},

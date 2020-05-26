@@ -4,7 +4,7 @@
   "results":{
     "cpu":[
       {
-        "current":0,
+        "current":32,
         "historical":{
           "1-min":{
             "values":[
@@ -525,7 +525,7 @@
         }
       },
       {
-        "current":0,
+        "current":32,
         "historical":{
           "1-min":{
             "values":[
