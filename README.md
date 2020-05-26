@@ -13,15 +13,15 @@ Supported metrics right now as follows.
 
 Global:
 
- * `fortigate_system_cpu_usage_ratio`
- * `fortigate_system_memory_usage_ratio`
+ * `fortigate_cpu_usage_ratio`
+ * `fortigate_memory_usage_ratio`
  * `fortigate_current_sessions`
 
 Per-VDOM:
 
- * `fortigate_vdom_system_cpu_usage_ratio`
- * `fortigate_vdom_system_memory_usage_ratio`
- * `fortigate_vdom_system_current_sessions`
+ * `fortigate_vdom_cpu_usage_ratio`
+ * `fortigate_vdom_memory_usage_ratio`
+ * `fortigate_vdom_current_sessions`
 
 ## Usage
 
