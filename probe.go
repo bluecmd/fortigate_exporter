@@ -358,7 +358,8 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 	success :=
 		probeSystemStatus(c, registry) &&
 			probeSystemResources(c, registry) &&
-			probeSystemVDOMResources(c, registry)
+			probeSystemVDOMResources(c, registry) &&
+			probeFirewallPolicies(c, registry)
 
 	// TODO(bluecmd): log/current-disk-usage
 	return success, nil
