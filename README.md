@@ -9,14 +9,19 @@ Prometheus exporter for Fortigate firewalls.
 Right now the exporter supports a quite limited set of metrics, but it is very easy to add!
 Open an issue if your favorite metric is missing.
 
-Supported metrics right now:
+Supported metrics right now as follows.
+
+Global:
 
  * `fortigate_system_cpu_usage_ratio`
  * `fortigate_system_memory_usage_ratio`
- * `fortigate_system_sessions_total`
- * `fortigate_system_vdom_cpu_usage_ratio`
- * `fortigate_system_vdom_memory_usage_ratio`
- * `fortigate_system_vdom_sessions_total`
+ * `fortigate_current_sessions`
+
+Per-VDOM:
+
+ * `fortigate_vdom_system_cpu_usage_ratio`
+ * `fortigate_vdom_system_memory_usage_ratio`
+ * `fortigate_vdom_system_current_sessions`
 
 ## Usage
 
