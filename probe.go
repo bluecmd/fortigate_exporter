@@ -191,6 +191,130 @@ func probeSystemVDOMResources(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
+func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
+	var (
+		mHitCount = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_policy_hit_count_total",
+				Help: "Number of times a policy has been hit",
+			},
+			[]string{"vdom", "protocol", "name", "uuid", "id"},
+		)
+	)
+
+	registry.MustRegister(mHitCount)
+
+	type pStats struct {
+		ID               int `json:"policyid"`
+		UUID             string
+		ActiveSessions   int `json:"active_sessions"`
+		Bytes            int
+		Packets          int
+		SoftwareBytes    int `json:"software_bytes"`
+		SoftwarePackets  int `json:"software_packets"`
+		ASICBytes        int `json:"asic_bytes"`
+		ASICPackets      int `json:"asic_packets"`
+		NTurboBytes      int `json:"nturbo_bytes"`
+		NTurboPackets    int `json:"nturbo_packets"`
+		HitCount         int `json:"hit_count"`
+		SessionCount     int `json:"session_count"`
+		SessionLastUsed  int `json:"session_last_used"`
+		SessionFirstUsed int `json:"session_first_used"`
+		LastUsed         int `json:"last_used"`
+		FirstUsed        int `json:"first_used"`
+	}
+	type policyStats struct {
+		Results []pStats
+		VDOM    string
+	}
+	var ps4 []policyStats
+	var ps6 []policyStats
+
+	if err := c.Get("api/v2/monitor/firewall/policy/select", "vdom=*", &ps4); err != nil {
+		log.Printf("Error: %v", err)
+		return false
+	}
+	if err := c.Get("api/v2/monitor/firewall/policy6/select", "vdom=*", &ps6); err != nil {
+		log.Printf("Error: %v", err)
+		return false
+	}
+
+	type pConfig struct {
+		ID     int `json:"policyid"`
+		Name   string
+		UUID   string
+		Action string
+		Status string
+	}
+
+	type policyConfig struct {
+		Results []pConfig
+		VDOM    string
+	}
+	var pc4 []policyConfig
+	var pc6 []policyConfig
+
+	query := "vdom=*&policyid|name|uuid|action|status"
+
+	if err := c.Get("api/v2/cmdb/firewall/policy", query, &pc4); err != nil {
+		log.Printf("Error: %v", err)
+		return false
+	}
+	if err := c.Get("api/v2/cmdb/firewall/policy6", query, &pc6); err != nil {
+		log.Printf("Error: %v", err)
+		return false
+	}
+
+	pc4Map := map[string]pConfig{}
+	pc6Map := map[string]pConfig{}
+	for _, pc := range pc4 {
+		for _, c := range pc.Results {
+			pc4Map[c.UUID] = c
+		}
+	}
+	for _, pc := range pc6 {
+		for _, c := range pc.Results {
+			pc6Map[c.UUID] = c
+		}
+	}
+
+	for _, ps := range ps4 {
+		for _, s := range ps.Results {
+			id := fmt.Sprintf("%d", s.ID)
+			name := "Implicit Deny"
+			if s.ID > 0 {
+				c, ok := pc4Map[s.UUID]
+				if !ok {
+					log.Printf("Warning: Failed to map %q to policy name - this should not happen", s.UUID)
+					name = "<UNKNOWN>"
+				} else {
+					name = c.Name
+				}
+			}
+			mHitCount.WithLabelValues(ps.VDOM, "ipv4", name, s.UUID, id).Set(float64(s.HitCount))
+		}
+	}
+
+	for _, ps := range ps6 {
+		for _, s := range ps.Results {
+			id := fmt.Sprintf("%d", s.ID)
+			name := "Implicit Deny"
+			if s.ID > 0 {
+				c, ok := pc6Map[s.UUID]
+				if !ok {
+					log.Printf("Warning: Failed to map %q to policy name - this should not happen", s.UUID)
+					name = "<UNKNOWN>"
+				} else {
+					name = c.Name
+				}
+			}
+			mHitCount.WithLabelValues(ps.VDOM, "ipv6", name, s.UUID, id).Set(float64(s.HitCount))
+		}
+	}
+
+	return true
+}
+
 func probe(ctx context.Context, target string, registry *prometheus.Registry, hc *http.Client) (bool, error) {
 	tgt, err := url.Parse(target)
 	if err != nil {

@@ -47,17 +47,18 @@ func (c *fakeClient) prepare(path string, jfile string) {
 }
 
 func (c *fakeClient) Get(path string, query string, obj interface{}) error {
-	if query != "" {
-		query = "?" + query
+	d, ok := c.data[path]
+	if !ok {
+		log.Fatalf("Tried to get unprepared URL %q", path)
 	}
-	return json.Unmarshal(c.data[path+query], obj)
+	return json.Unmarshal(d, obj)
 }
 
 func newFakeClient() *fakeClient {
 	return &fakeClient{data: map[string][]byte{}}
 }
 
-func TestProbeSystemStatus(t *testing.T) {
+func TestSystemStatus(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/status", "testdata/status.jsonnet")
 	r := prometheus.NewPedanticRegistry()
@@ -76,12 +77,9 @@ func TestProbeSystemStatus(t *testing.T) {
 	}
 }
 
-func TestProbeSystemResources(t *testing.T) {
+func TestSystemResources(t *testing.T) {
 	c := newFakeClient()
-	c.prepare(
-		"api/v2/monitor/system/resource/usage?interval=1-min&scope=global",
-		"testdata/usage.jsonnet",
-	)
+	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	if !probeSystemResources(c, r) {
 		t.Errorf("probeSystemResources() returned non-success")
@@ -104,13 +102,9 @@ func TestProbeSystemResources(t *testing.T) {
 	}
 }
 
-func TestProbeSystemVDOMResources(t *testing.T) {
+func TestSystemVDOMResources(t *testing.T) {
 	c := newFakeClient()
-	c.prepare(
-		"api/v2/monitor/system/resource/usage?interval=1-min&vdom=*",
-		"testdata/usage-vdom.jsonnet",
-	)
-
+	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage-vdom.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	if !probeSystemVDOMResources(c, r) {
 		t.Errorf("probeSystemVDOMResources() returned non-success")
@@ -131,6 +125,33 @@ func TestProbeSystemVDOMResources(t *testing.T) {
 	fortigate_vdom_current_sessions{protocol="ipv4",vdom="root"} 18
 	fortigate_vdom_current_sessions{protocol="ipv6",vdom="FG-traffic"} 7
 	fortigate_vdom_current_sessions{protocol="ipv6",vdom="root"} 7
+	`
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
+
+func TestFirewallPolicies(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/firewall/policy/select", "testdata/fw-policy.jsonnet")
+	c.prepare("api/v2/monitor/firewall/policy6/select", "testdata/fw-policy6.jsonnet")
+	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config.jsonnet")
+	c.prepare("api/v2/cmdb/firewall/policy6", "testdata/fw-policy6-config.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !probeFirewallPolicies(c, r) {
+		t.Errorf("probeFirewallPolicies() returned non-success")
+	}
+
+	em := `
+	# HELP fortigate_policy_hit_count_total Number of times a policy has been hit
+	# TYPE fortigate_policy_hit_count_total gauge
+	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
+	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
+	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 0
+	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="root"} 8
+	fortigate_policy_hit_count_total{id="1",name="",protocol="ipv4",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 4662
+	fortigate_policy_hit_count_total{id="1",name="ipv6 policy",protocol="ipv6",uuid="4a2e2fe4-9e9d-51ea-75b1-b5b486b12192",vdom="FG-traffic"} 0
+	fortigate_policy_hit_count_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	`
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
 		t.Fatalf("metric compare: err %v", err)
