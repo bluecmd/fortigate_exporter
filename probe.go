@@ -292,13 +292,13 @@ func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 	pc4Map := map[string]*pConfig{}
 	pc6Map := map[string]*pConfig{}
 	for _, pc := range pc4 {
-		for _, c := range pc.Results {
-			pc4Map[c.UUID] = &c
+		for i, c := range pc.Results {
+			pc4Map[c.UUID] = &pc.Results[i]
 		}
 	}
 	for _, pc := range pc6 {
-		for _, c := range pc.Results {
-			pc6Map[c.UUID] = &c
+		for i, c := range pc.Results {
+			pc6Map[c.UUID] = &pc.Results[i]
 		}
 	}
 
