@@ -200,9 +200,33 @@ func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 			},
 			[]string{"vdom", "protocol", "name", "uuid", "id"},
 		)
+		mBytes = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_policy_bytes_total",
+				Help: "Number of bytes that has passed through a policy",
+			},
+			[]string{"vdom", "protocol", "name", "uuid", "id"},
+		)
+		mPackets = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_policy_packets_total",
+				Help: "Number of packets that has passed through a policy",
+			},
+			[]string{"vdom", "protocol", "name", "uuid", "id"},
+		)
+		mActiveSessions = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_policy_active_sessions",
+				Help: "Number of active sessions for a policy",
+			},
+			[]string{"vdom", "protocol", "name", "uuid", "id"},
+		)
 	)
 
 	registry.MustRegister(mHitCount)
+	registry.MustRegister(mBytes)
+	registry.MustRegister(mPackets)
+	registry.MustRegister(mActiveSessions)
 
 	type pStats struct {
 		ID               int `json:"policyid"`
@@ -265,50 +289,46 @@ func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 		return false
 	}
 
-	pc4Map := map[string]pConfig{}
-	pc6Map := map[string]pConfig{}
+	pc4Map := map[string]*pConfig{}
+	pc6Map := map[string]*pConfig{}
 	for _, pc := range pc4 {
 		for _, c := range pc.Results {
-			pc4Map[c.UUID] = c
+			pc4Map[c.UUID] = &c
 		}
 	}
 	for _, pc := range pc6 {
 		for _, c := range pc.Results {
-			pc6Map[c.UUID] = c
+			pc6Map[c.UUID] = &c
 		}
+	}
+
+	process := func(ps *policyStats, s *pStats, pcMap map[string]*pConfig, proto string) {
+		id := fmt.Sprintf("%d", s.ID)
+		name := "Implicit Deny"
+		if s.ID > 0 {
+			c, ok := pcMap[s.UUID]
+			if !ok {
+				log.Printf("Warning: Failed to map %q to policy name - this should not happen", s.UUID)
+				name = "<UNKNOWN>"
+			} else {
+				name = c.Name
+			}
+		}
+		mHitCount.WithLabelValues(ps.VDOM, proto, name, s.UUID, id).Set(float64(s.HitCount))
+		mBytes.WithLabelValues(ps.VDOM, proto, name, s.UUID, id).Set(float64(s.Bytes))
+		mPackets.WithLabelValues(ps.VDOM, proto, name, s.UUID, id).Set(float64(s.Packets))
+		mActiveSessions.WithLabelValues(ps.VDOM, proto, name, s.UUID, id).Set(float64(s.ActiveSessions))
 	}
 
 	for _, ps := range ps4 {
 		for _, s := range ps.Results {
-			id := fmt.Sprintf("%d", s.ID)
-			name := "Implicit Deny"
-			if s.ID > 0 {
-				c, ok := pc4Map[s.UUID]
-				if !ok {
-					log.Printf("Warning: Failed to map %q to policy name - this should not happen", s.UUID)
-					name = "<UNKNOWN>"
-				} else {
-					name = c.Name
-				}
-			}
-			mHitCount.WithLabelValues(ps.VDOM, "ipv4", name, s.UUID, id).Set(float64(s.HitCount))
+			process(&ps, &s, pc4Map, "ipv4")
 		}
 	}
 
 	for _, ps := range ps6 {
 		for _, s := range ps.Results {
-			id := fmt.Sprintf("%d", s.ID)
-			name := "Implicit Deny"
-			if s.ID > 0 {
-				c, ok := pc6Map[s.UUID]
-				if !ok {
-					log.Printf("Warning: Failed to map %q to policy name - this should not happen", s.UUID)
-					name = "<UNKNOWN>"
-				} else {
-					name = c.Name
-				}
-			}
-			mHitCount.WithLabelValues(ps.VDOM, "ipv6", name, s.UUID, id).Set(float64(s.HitCount))
+			process(&ps, &s, pc6Map, "ipv6")
 		}
 	}
 
