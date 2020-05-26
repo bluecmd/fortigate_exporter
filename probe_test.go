@@ -66,9 +66,9 @@ func TestProbeSystemStatus(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_system_version_info System version and build information
-	# TYPE fortigate_system_version_info gauge
-	fortigate_system_version_info{build="1112",serial="FGVMEVZFNTS3OAC8",version="v6.2.4"} 1
+	# HELP fortigate_version_info System version and build information
+	# TYPE fortigate_version_info gauge
+	fortigate_version_info{build="1112",serial="FGVMEVZFNTS3OAC8",version="v6.2.4"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
@@ -88,12 +88,12 @@ func TestProbeSystemResources(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_system_cpu_usage_ratio Current resource usage ratio of system CPU, per core
-	# TYPE fortigate_system_cpu_usage_ratio gauge
-	fortigate_system_cpu_usage_ratio{processor="0"} 0.32
-	# HELP fortigate_system_memory_usage_ratio Current resource usage ratio of system memory
-	# TYPE fortigate_system_memory_usage_ratio gauge
-	fortigate_system_memory_usage_ratio 0.76
+	# HELP fortigate_cpu_usage_ratio Current resource usage ratio of system CPU, per core
+	# TYPE fortigate_cpu_usage_ratio gauge
+	fortigate_cpu_usage_ratio{processor="0"} 0.32
+	# HELP fortigate_memory_usage_ratio Current resource usage ratio of system memory
+	# TYPE fortigate_memory_usage_ratio gauge
+	fortigate_memory_usage_ratio 0.76
 	# HELP fortigate_current_sessions Current amount of sessions, per IP version
 	# TYPE fortigate_current_sessions gauge
 	fortigate_current_sessions{protocol="ipv4"} 5
@@ -117,14 +117,14 @@ func TestProbeSystemVDOMResources(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_vdom_system_cpu_usage_ratio Current resource usage ratio of CPU, per VDOM
-	# TYPE fortigate_vdom_system_cpu_usage_ratio gauge
-	fortigate_vdom_system_cpu_usage_ratio{vdom="FG-traffic"} 0
-	fortigate_vdom_system_cpu_usage_ratio{vdom="root"} 0.01
-	# HELP fortigate_vdom_system_memory_usage_ratio Current resource usage ratio of memory, per VDOM
-	# TYPE fortigate_vdom_system_memory_usage_ratio gauge
-	fortigate_vdom_system_memory_usage_ratio{vdom="FG-traffic"} 0
-	fortigate_vdom_system_memory_usage_ratio{vdom="root"} 0.78
+	# HELP fortigate_vdom_cpu_usage_ratio Current resource usage ratio of CPU, per VDOM
+	# TYPE fortigate_vdom_cpu_usage_ratio gauge
+	fortigate_vdom_cpu_usage_ratio{vdom="FG-traffic"} 0
+	fortigate_vdom_cpu_usage_ratio{vdom="root"} 0.01
+	# HELP fortigate_vdom_memory_usage_ratio Current resource usage ratio of memory, per VDOM
+	# TYPE fortigate_vdom_memory_usage_ratio gauge
+	fortigate_vdom_memory_usage_ratio{vdom="FG-traffic"} 0
+	fortigate_vdom_memory_usage_ratio{vdom="root"} 0.78
 	# HELP fortigate_vdom_current_sessions Current amount of sessions, per VDOM and IP version
 	# TYPE fortigate_vdom_current_sessions gauge
 	fortigate_vdom_current_sessions{protocol="ipv4",vdom="FG-traffic"} 0

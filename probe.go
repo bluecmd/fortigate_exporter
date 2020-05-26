@@ -31,7 +31,7 @@ func probeSystemStatus(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		mVersion = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_system_version_info",
+				Name: "fortigate_version_info",
 				Help: "System version and build information",
 			},
 			[]string{"serial", "version", "build"},
@@ -61,14 +61,14 @@ func probeSystemResources(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		mResCPU = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_system_cpu_usage_ratio",
+				Name: "fortigate_cpu_usage_ratio",
 				Help: "Current resource usage ratio of system CPU, per core",
 			},
 			[]string{"processor"},
 		)
 		mResMemory = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_system_memory_usage_ratio",
+				Name: "fortigate_memory_usage_ratio",
 				Help: "Current resource usage ratio of system memory",
 			},
 			[]string{},
@@ -131,14 +131,14 @@ func probeSystemVDOMResources(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		mResCPU = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_vdom_system_cpu_usage_ratio",
+				Name: "fortigate_vdom_cpu_usage_ratio",
 				Help: "Current resource usage ratio of CPU, per VDOM",
 			},
 			[]string{"vdom"},
 		)
 		mResMemory = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_vdom_system_memory_usage_ratio",
+				Name: "fortigate_vdom_memory_usage_ratio",
 				Help: "Current resource usage ratio of memory, per VDOM",
 			},
 			[]string{"vdom"},
