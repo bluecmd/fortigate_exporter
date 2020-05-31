@@ -26,6 +26,14 @@ Per-VDOM:
  * `fortigate_policy_bytes_total`
  * `fortigate_policy_hit_count_total`
  * `fortigate_policy_packets_total`
+ * `fortigate_interface_link_up`
+ * `fortigate_interface_speed`
+ * `fortigate_interface_transmit_packets_total`
+ * `fortigate_interface_receive_packets_total`
+ * `fortigate_interface_transmit_bytes_total`
+ * `fortigate_interface_receive_bytes_total`
+ * `fortigate_interface_transmit_errors_total`
+ * `fortigate_interface_receive_errors_total`
 
 ## Usage
 

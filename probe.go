@@ -335,6 +335,119 @@ func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
+func probeInterfaces(c FortiHTTP, registry *prometheus.Registry) bool {
+	var (
+		mLink = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_interface_link_up",
+				Help: "Whether the link is up or not",
+			},
+			[]string{"vdom", "name", "alias", "parent"},
+		)
+		mSpeed = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_interface_speed",
+				Help: "Speed negotiated on the port in bits/s",
+			},
+			[]string{"vdom", "name", "alias", "parent"},
+		)
+		mTxPkts = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_interface_transmit_packets_total",
+				Help: "Number of packets transmitted on the interface",
+			},
+			[]string{"vdom", "name", "alias", "parent"},
+		)
+		mRxPkts = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_interface_receive_packets_total",
+				Help: "Number of packets received on the interface",
+			},
+			[]string{"vdom", "name", "alias", "parent"},
+		)
+		mTxB = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_interface_transmit_bytes_total",
+				Help: "Number of bytes transmitted on the interface",
+			},
+			[]string{"vdom", "name", "alias", "parent"},
+		)
+		mRxB = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_interface_receive_bytes_total",
+				Help: "Number of bytes received on the interface",
+			},
+			[]string{"vdom", "name", "alias", "parent"},
+		)
+		mTxErr = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_interface_transmit_errors_total",
+				Help: "Number of transmission errors detected on the interface",
+			},
+			[]string{"vdom", "name", "alias", "parent"},
+		)
+		mRxErr = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_interface_receive_errors_total",
+				Help: "Number of reception errors detected on the interface",
+			},
+			[]string{"vdom", "name", "alias", "parent"},
+		)
+	)
+
+	registry.MustRegister(mLink)
+	registry.MustRegister(mSpeed)
+	registry.MustRegister(mTxPkts)
+	registry.MustRegister(mRxPkts)
+	registry.MustRegister(mTxB)
+	registry.MustRegister(mRxB)
+	registry.MustRegister(mTxErr)
+	registry.MustRegister(mRxErr)
+
+	type ifResult struct {
+		Id        string
+		Name      string
+		Alias     string
+		Link      bool
+		Speed     int
+		Duplex    int
+		TxPackets int64 `json:"tx_packets"`
+		RxPackets int64 `json:"rx_packets"`
+		TxBytes   int64 `json:"tx_bytes"`
+		RxBytes   int64 `json:"rx_bytes"`
+		TxErrors  int64 `json:"tx_errors"`
+		RxErrors  int64 `json:"rx_errors"`
+		Interface string
+	}
+	type ifResponse struct {
+		Results map[string]ifResult
+		VDOM    string
+	}
+	var r []ifResponse
+
+	if err := c.Get("api/v2/monitor/system/interface/select", "vdom=*&include_vlan=true&include_aggregate=true", &r); err != nil {
+		log.Printf("Error: %v", err)
+		return false
+	}
+	for _, v := range r {
+		for _, ir := range v.Results {
+			linkf := 0.0
+			if ir.Link {
+				linkf = 1.0
+			}
+			mLink.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Set(linkf)
+			mSpeed.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Set(float64(ir.Speed) * 1000 * 1000)
+			mTxPkts.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.TxPackets))
+			mRxPkts.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.RxPackets))
+			mTxB.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.TxBytes))
+			mRxB.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.RxBytes))
+			mTxErr.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.TxErrors))
+			mRxErr.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.RxErrors))
+		}
+	}
+	return true
+}
+
 func probe(ctx context.Context, target string, registry *prometheus.Registry, hc *http.Client) (bool, error) {
 	tgt, err := url.Parse(target)
 	if err != nil {
@@ -355,11 +468,13 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 		return false, err
 	}
 
+	// TODO: Make parallel
 	success :=
 		probeSystemStatus(c, registry) &&
 			probeSystemResources(c, registry) &&
 			probeSystemVDOMResources(c, registry) &&
-			probeFirewallPolicies(c, registry)
+			probeFirewallPolicies(c, registry) &&
+			probeInterfaces(c, registry)
 
 	// TODO(bluecmd): log/current-disk-usage
 	return success, nil
