@@ -346,7 +346,7 @@ func probeInterfaces(c FortiHTTP, registry *prometheus.Registry) bool {
 		)
 		mSpeed = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "fortigate_interface_speed",
+				Name: "fortigate_interface_speed_bps",
 				Help: "Speed negotiated on the port in bits/s",
 			},
 			[]string{"vdom", "name", "alias", "parent"},

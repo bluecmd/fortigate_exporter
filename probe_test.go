@@ -266,24 +266,24 @@ func TestInterfaces(t *testing.T) {
 	fortigate_interface_receive_packets_total{alias="(mgmt)",name="dmz",parent="",vdom="root"} 6.376122e+06
 	fortigate_interface_receive_packets_total{alias="(ocp-mgmt)",name="a",parent="",vdom="main"} 1.43943096e+08
 	fortigate_interface_receive_packets_total{alias="(vlan-infra-mgmt)",name="downlink",parent="",vdom="infra"} 1.0787347e+08
-	# HELP fortigate_interface_speed Speed negotiated on the port in bits/s
-	# TYPE fortigate_interface_speed gauge
-	fortigate_interface_speed{alias="",name="b",parent="",vdom="root"} 0
-	fortigate_interface_speed{alias="",name="internal1",parent="",vdom="infra"} 1e+09
-	fortigate_interface_speed{alias="",name="internal2",parent="",vdom="infra"} 1e+09
-	fortigate_interface_speed{alias="",name="internal3",parent="",vdom="root"} 0
-	fortigate_interface_speed{alias="",name="internal4",parent="",vdom="root"} 0
-	fortigate_interface_speed{alias="",name="internal5",parent="",vdom="root"} 0
-	fortigate_interface_speed{alias="",name="modem",parent="",vdom="root"} 0
-	fortigate_interface_speed{alias="",name="npu0_vlink0",parent="",vdom="root"} 1e+09
-	fortigate_interface_speed{alias="",name="npu0_vlink1",parent="",vdom="root"} 1e+09
-	fortigate_interface_speed{alias="",name="vlan-knx",parent="downlink",vdom="knx"} 2e+09
-	fortigate_interface_speed{alias="",name="vlan-ocp-knx",parent="a",vdom="knx"} 1e+09
-	fortigate_interface_speed{alias="",name="wan1",parent="",vdom="main"} 1e+09
-	fortigate_interface_speed{alias="",name="wan2",parent="",vdom="root"} 0
-	fortigate_interface_speed{alias="(mgmt)",name="dmz",parent="",vdom="root"} 1e+09
-	fortigate_interface_speed{alias="(ocp-mgmt)",name="a",parent="",vdom="main"} 1e+09
-	fortigate_interface_speed{alias="(vlan-infra-mgmt)",name="downlink",parent="",vdom="infra"} 2e+09
+	# HELP fortigate_interface_speed_bps Speed negotiated on the port in bits/s
+	# TYPE fortigate_interface_speed_bps gauge
+	fortigate_interface_speed_bps{alias="",name="b",parent="",vdom="root"} 0
+	fortigate_interface_speed_bps{alias="",name="internal1",parent="",vdom="infra"} 1e+09
+	fortigate_interface_speed_bps{alias="",name="internal2",parent="",vdom="infra"} 1e+09
+	fortigate_interface_speed_bps{alias="",name="internal3",parent="",vdom="root"} 0
+	fortigate_interface_speed_bps{alias="",name="internal4",parent="",vdom="root"} 0
+	fortigate_interface_speed_bps{alias="",name="internal5",parent="",vdom="root"} 0
+	fortigate_interface_speed_bps{alias="",name="modem",parent="",vdom="root"} 0
+	fortigate_interface_speed_bps{alias="",name="npu0_vlink0",parent="",vdom="root"} 1e+09
+	fortigate_interface_speed_bps{alias="",name="npu0_vlink1",parent="",vdom="root"} 1e+09
+	fortigate_interface_speed_bps{alias="",name="vlan-knx",parent="downlink",vdom="knx"} 2e+09
+	fortigate_interface_speed_bps{alias="",name="vlan-ocp-knx",parent="a",vdom="knx"} 1e+09
+	fortigate_interface_speed_bps{alias="",name="wan1",parent="",vdom="main"} 1e+09
+	fortigate_interface_speed_bps{alias="",name="wan2",parent="",vdom="root"} 0
+	fortigate_interface_speed_bps{alias="(mgmt)",name="dmz",parent="",vdom="root"} 1e+09
+	fortigate_interface_speed_bps{alias="(ocp-mgmt)",name="a",parent="",vdom="main"} 1e+09
+	fortigate_interface_speed_bps{alias="(vlan-infra-mgmt)",name="downlink",parent="",vdom="infra"} 2e+09
 	# HELP fortigate_interface_transmit_bytes_total Number of bytes transmitted on the interface
 	# TYPE fortigate_interface_transmit_bytes_total counter
 	fortigate_interface_transmit_bytes_total{alias="",name="b",parent="",vdom="root"} 0
