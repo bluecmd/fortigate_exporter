@@ -13,6 +13,7 @@ Supported metrics right now as follows.
 
 Global:
 
+ * `fortigate_version_info`
  * `fortigate_cpu_usage_ratio`
  * `fortigate_memory_usage_ratio`
  * `fortigate_current_sessions`
