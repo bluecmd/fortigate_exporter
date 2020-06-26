@@ -78,3 +78,13 @@ An example configuration for Prometheus looks something like this:
       - target_label: __address__
         replacement: '[::1]:9710'
 ```
+
+## Missing Metrics?
+
+Please [file an issue](https://github.com/bluecmd/fortigate_exporter/issues/new) describing what metrics you'd like to see.
+Include as much details as possible please, e.g. how the perfect Prometheus metric would look for your use-case.
+
+An alternative to using this exporter is to use generic SNMP polling, e.g. using a Prometheus SNMP exporter
+([official](https://github.com/prometheus/snmp_exporter), [alternative](https://github.com/dhtech/snmpexporter)).
+Note that there are limitations (e.g. [1](https://kb.fortinet.com/kb/documentLink.do?externalID=FD47703))
+in what Fortigate supports querying via SNMP.
