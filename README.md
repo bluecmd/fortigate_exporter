@@ -74,7 +74,7 @@ An example configuration for Prometheus looks something like this:
       - source_labels: [__param_target]
         target_label: instance
         # Drop the https:// and port (if specified) for the 'instance=' label
-        regex: '(?:.+)(?::\/\/)([^:]*)'
+        regex: '(?:.+)(?::\/\/)([^:]*).*'
       - target_label: __address__
         replacement: '[::1]:9710'
 ```
