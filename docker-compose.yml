@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  prometheus_fortigate_exporter:
+    build: ./
+    ports:
+      - 9710:9710
+    volumes:
+      - /path/to/fortigate-key.yaml:/opt/fortigate-key.yaml
+    restart: unless-stopped
