@@ -81,14 +81,14 @@ An example configuration for Prometheus looks something like this:
 
 ## Docker
 
-```
+```bash
 docker build -t fortigate_exporter .
 docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/opt/fortigate-key.yaml fortigate_exporter
 ```
 
 ### docker-compose
 
-```
+```yaml
 prometheus_fortigate_exporter:
   build: ./
   ports:
