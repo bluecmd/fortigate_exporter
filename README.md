@@ -79,6 +79,25 @@ An example configuration for Prometheus looks something like this:
         replacement: '[::1]:9710'
 ```
 
+## Docker
+
+```bash
+docker build -t fortigate_exporter .
+docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/opt/fortigate-key.yaml fortigate_exporter
+```
+
+### docker-compose
+
+```yaml
+prometheus_fortigate_exporter:
+  build: ./
+  ports:
+    - 9710:9710
+  volumes:
+    - /path/to/fortigate-key.yaml:/opt/fortigate-key.yaml
+  restart: unless-stopped
+```
+
 ## Missing Metrics?
 
 Please [file an issue](https://github.com/bluecmd/fortigate_exporter/issues/new) describing what metrics you'd like to see.
