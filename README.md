@@ -2,6 +2,8 @@
 
 ![Go](https://github.com/bluecmd/fortigate_exporter/workflows/Go/badge.svg)
 
+![Docker](https://github.com/bluecmd/fortigate_exporter/workflows/Docker/badge.svg)
+
 Prometheus exporter for Fortigate firewalls.
 
 ## Supported Metrics
