@@ -36,6 +36,8 @@ var (
 	authMapFile    = flag.String("auth-file", "", "file containing the authentication map to use when connecting to a Fortigate device")
 	listen         = flag.String("listen", ":9710", "address to listen on")
 	timeoutSeconds = flag.Int("scrape-timeout", 30, "max seconds to allow a scrape to take")
+	tlstimeout     = flag.Int("https-timeout", 10, "TLS Handshake timeout")
+	insecure       = flag.Bool("insecure", false, "Allow insecure certificates")
 
 	authMap = map[string]Auth{}
 )

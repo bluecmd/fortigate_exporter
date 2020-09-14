@@ -120,7 +120,6 @@ func TestIPSec(t *testing.T) {
 	}
 }
 
-
 func TestSystemResources(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage.jsonnet")

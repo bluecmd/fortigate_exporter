@@ -44,7 +44,7 @@
     "path":"vpn",
     "name":"ipsec",
     "status":"success",
-    "serial":"FGVMEVZFNTS3OAC8",
+    "serial":"FGT61FT000000000",
     "version":"v6.0.10",
     "build":365
   },

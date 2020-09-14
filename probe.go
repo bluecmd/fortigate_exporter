@@ -219,12 +219,11 @@ func probeVPNStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 
 	return true
 
-
 }
 func probeIPSec(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		status = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{ // change type?
+			prometheus.GaugeOpts{
 				Name: "fortigate_ipsec_tunnel_up",
 				Help: "Status of Ipsec tunnel",
 			}, []string{"vdom", "name", "parent"},
@@ -243,7 +242,6 @@ func probeIPSec(c FortiHTTP, registry *prometheus.Registry) bool {
 			},
 			[]string{"vdom", "name", "parent"},
 		)
-
 	)
 
 	registry.MustRegister(status)
@@ -251,14 +249,14 @@ func probeIPSec(c FortiHTTP, registry *prometheus.Registry) bool {
 	registry.MustRegister(received)
 
 	type proxyid struct {
-		Name    string `json:"p2name"`
-		Status    string `json:"status"`
-		Incoming int `json:"incoming_bytes"`
-		Outgoing int `json:"outgoing_bytes"`
+		Name     string `json:"p2name"`
+		Status   string `json:"status"`
+		Incoming int    `json:"incoming_bytes"`
+		Outgoing int    `json:"outgoing_bytes"`
 	}
 	type tunnel struct {
-		Name    string `json:"name"`
-		Type string `json:"type"`
+		Name    string    `json:"name"`
+		Type    string    `json:"type"`
 		ProxyID []proxyid `json:"proxyid"`
 	}
 	type ipsecResult struct {
@@ -272,10 +270,14 @@ func probeIPSec(c FortiHTTP, registry *prometheus.Registry) bool {
 	}
 	for _, v := range res {
 		for _, i := range v.Results {
+			/*
+			  type 'dialup' seems to be client vpn.
+			  Not sure exactly what the difference is between probeVPNStatistics
+			*/
 			if i.Type == "dialup" {
 				continue
 			}
-			for _,t := range i.ProxyID {
+			for _, t := range i.ProxyID {
 				s := 0.0
 				if t.Status == "up" {
 					s = 1.0
@@ -288,9 +290,7 @@ func probeIPSec(c FortiHTTP, registry *prometheus.Registry) bool {
 	}
 	return true
 
-
 }
-
 
 func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (

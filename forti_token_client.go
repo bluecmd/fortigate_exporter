@@ -19,12 +19,12 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"crypto/tls"
 	"time"
 )
 
@@ -40,8 +40,10 @@ type fortiTokenClient struct {
 }
 
 func (c *fortiTokenClient) newGetRequest(url string) (*http.Request, error) {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	http.DefaultTransport.(*http.Transport).TLSHandshakeTimeout = 30 * time.Second
+	if *insecure {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+	http.DefaultTransport.(*http.Transport).TLSHandshakeTimeout = time.Duration(*tlstimeout) * time.Second
 	r, err := http.NewRequestWithContext(c.ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
