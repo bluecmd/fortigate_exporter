@@ -12,7 +12,7 @@
         "ip":"0.0.0.0",
         "mask":0,
         "link":true,
-        "speed":1000,
+        "speed":1000.00, /* some versions uses float */
         "duplex":1,
         "tx_packets":63722042,
         "rx_packets":52781120,

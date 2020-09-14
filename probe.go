@@ -191,6 +191,107 @@ func probeSystemVDOMResources(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
+func probeVPNStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
+	var (
+		vpncon = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_vpn_connections_count_total",
+				Help: "Number of VPN connections",
+			},
+			[]string{"vdom"},
+		)
+	)
+	registry.MustRegister(vpncon)
+	type result struct {
+		Results []map[string]interface{}
+		VDOM    string
+	}
+	var res []result
+	if err := c.Get("api/v2/monitor/vpn/ssl", "vdom=*", &res); err != nil {
+		log.Printf("Error: %v", err)
+		return false
+	}
+
+	for _, v := range res {
+		count := len(v.Results)
+		vpncon.WithLabelValues(v.VDOM).Set(float64(count))
+	}
+
+	return true
+
+}
+func probeIPSec(c FortiHTTP, registry *prometheus.Registry) bool {
+	var (
+		status = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ipsec_tunnel_up",
+				Help: "Status of Ipsec tunnel",
+			}, []string{"vdom", "name", "parent"},
+		)
+		transmitted = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ipsec_tunnel_transmit_bytes_total",
+				Help: "Status of Ipsec tunnel",
+			},
+			[]string{"vdom", "name", "parent"},
+		)
+		received = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ipsec_tunnel_receive_bytes_total",
+				Help: "Status of Ipsec tunnel",
+			},
+			[]string{"vdom", "name", "parent"},
+		)
+	)
+
+	registry.MustRegister(status)
+	registry.MustRegister(transmitted)
+	registry.MustRegister(received)
+
+	type proxyid struct {
+		Name     string `json:"p2name"`
+		Status   string `json:"status"`
+		Incoming int    `json:"incoming_bytes"`
+		Outgoing int    `json:"outgoing_bytes"`
+	}
+	type tunnel struct {
+		Name    string    `json:"name"`
+		Type    string    `json:"type"`
+		ProxyID []proxyid `json:"proxyid"`
+	}
+	type ipsecResult struct {
+		Results []tunnel `json:"results"`
+		VDOM    string
+	}
+	var res []ipsecResult
+	if err := c.Get("api/v2/monitor/vpn/ipsec", "vdom=*", &res); err != nil {
+		log.Printf("Error: %v", err)
+		return false
+	}
+	for _, v := range res {
+		for _, i := range v.Results {
+			/*
+			  type 'dialup' seems to be client vpn.
+			  Not sure exactly what the difference is between probeVPNStatistics
+			*/
+			if i.Type == "dialup" {
+				continue
+			}
+			for _, t := range i.ProxyID {
+				s := 0.0
+				if t.Status == "up" {
+					s = 1.0
+				}
+				status.WithLabelValues(v.VDOM, t.Name, i.Name).Set(s)
+				transmitted.WithLabelValues(v.VDOM, t.Name, i.Name).Set(float64(t.Outgoing))
+				received.WithLabelValues(v.VDOM, t.Name, i.Name).Set(float64(t.Incoming))
+			}
+		}
+	}
+	return true
+
+}
+
 func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		mHitCount = prometheus.NewGaugeVec(
@@ -409,7 +510,7 @@ func probeInterfaces(c FortiHTTP, registry *prometheus.Registry) bool {
 		Name      string
 		Alias     string
 		Link      bool
-		Speed     int
+		Speed     float64
 		Duplex    int
 		TxPackets int64 `json:"tx_packets"`
 		RxPackets int64 `json:"rx_packets"`
@@ -436,7 +537,7 @@ func probeInterfaces(c FortiHTTP, registry *prometheus.Registry) bool {
 				linkf = 1.0
 			}
 			mLink.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Set(linkf)
-			mSpeed.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Set(float64(ir.Speed) * 1000 * 1000)
+			mSpeed.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Set(ir.Speed * 1000 * 1000)
 			mTxPkts.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.TxPackets))
 			mRxPkts.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.RxPackets))
 			mTxB.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.TxBytes))
@@ -474,7 +575,9 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 			probeSystemResources(c, registry) &&
 			probeSystemVDOMResources(c, registry) &&
 			probeFirewallPolicies(c, registry) &&
-			probeInterfaces(c, registry)
+			probeInterfaces(c, registry) &&
+			probeVPNStatistics(c, registry) &&
+			probeIPSec(c, registry)
 
 	// TODO(bluecmd): log/current-disk-usage
 	return success, nil

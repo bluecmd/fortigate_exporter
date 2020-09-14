@@ -36,6 +36,10 @@ Per-VDOM:
  * `fortigate_interface_receive_bytes_total`
  * `fortigate_interface_transmit_errors_total`
  * `fortigate_interface_receive_errors_total`
+ * `fortigate_vpn_connections_count_total`
+ * `fortigate_ipsec_tunnel_receive_bytes_total`
+ * `fortigate_ipsec_tunnel_transmit_bytes_total`
+ * `fortigate_ipsec_tunnel_up`
 
 ## Usage
 
