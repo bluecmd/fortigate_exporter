@@ -1,0 +1,36 @@
+# api/v2/monitor/vpn/ssl?vom=*
+[
+  {
+    "http_method":"GET",
+    "results":[
+    {
+        "index":620,
+        "user_name":"user1",
+        "remote_host":"1.2.3.4",
+        "last_login_time":"Thu Sep 10 10:13:55 2020",
+        "last_login_timestamp":1599725635,
+        "subsessions":[
+          {
+            "index":621,
+            "parent_index":620,
+            "mode":"Tunnel",
+            "type":"Unknown",
+            "aip":"2.3.4.5",
+            "in_bytes":1632413,
+            "out_bytes":9684145,
+            "desthost":""
+          }
+        ],
+        "subsession_type":"Unknown",
+        "subsession_desc":"aip:2.3.4.5"
+      }
+    ],
+    "vdom":"root",
+    "path":"vpn",
+    "name":"ssl",
+    "status":"success",
+    "serial":"FGVMEVZFNTS3OAC8",
+    "version":"v6.0.10",
+    "build":365
+  },
+]

@@ -76,6 +76,50 @@ func TestSystemStatus(t *testing.T) {
 		t.Fatalf("metric compare: err %v", err)
 	}
 }
+func TestVPNConnection(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/vpn/ssl", "testdata/vpn.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !probeVPNStatistics(c, r) {
+		t.Errorf("probeSystemStatus() returned non-success")
+	}
+
+	em := `
+	# HELP fortigate_vpn_connections_count_total Number of VPN connections
+	# TYPE fortigate_vpn_connections_count_total gauge
+	fortigate_vpn_connections_count_total{vdom="root"} 1
+	`
+
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
+func TestIPSec(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/vpn/ipsec", "testdata/ipsec.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !probeIPSec(c, r) {
+		t.Errorf("probeSystemStatus() returned non-success")
+	}
+
+	em := `
+	# HELP fortigate_ipsec_tunnel_receive_bytes_total Status of Ipsec tunnel
+	# TYPE fortigate_ipsec_tunnel_receive_bytes_total gauge
+	fortigate_ipsec_tunnel_receive_bytes_total{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1.429824e+07
+	# HELP fortigate_ipsec_tunnel_transmit_bytes_total Status of Ipsec tunnel
+	# TYPE fortigate_ipsec_tunnel_transmit_bytes_total gauge
+	fortigate_ipsec_tunnel_transmit_bytes_total{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1.424856e+07
+	# HELP fortigate_ipsec_tunnel_up Status of Ipsec tunnel
+	# TYPE fortigate_ipsec_tunnel_up gauge
+	fortigate_ipsec_tunnel_up{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1
+
+	`
+
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
+
 
 func TestSystemResources(t *testing.T) {
 	c := newFakeClient()
