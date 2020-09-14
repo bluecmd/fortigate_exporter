@@ -10,7 +10,7 @@ FROM scratch
 WORKDIR /opt/fortigate_exporter
 
 COPY --from=builder /build/main .
-COPY ca-certificates.crt .
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt .
 ENV SSL_CERT_DIR=/opt/fortigate_exporter
 
 EXPOSE 9710
