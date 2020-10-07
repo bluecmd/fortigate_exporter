@@ -14,4 +14,4 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt .
 ENV SSL_CERT_DIR=/opt/fortigate_exporter
 
 EXPOSE 9710
-CMD ["./main", "-auth-file", "/opt/fortigate-key.yaml"]
+CMD ["./main", "-auth-file", "/config/fortigate-key.yaml"]
