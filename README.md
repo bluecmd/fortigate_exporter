@@ -88,7 +88,7 @@ An example configuration for Prometheus looks something like this:
 
 ```bash
 docker build -t fortigate_exporter .
-docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/opt/fortigate-key.yaml fortigate_exporter
+docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/config/fortigate-key.yaml fortigate_exporter
 ```
 
 ### docker-compose
@@ -99,7 +99,7 @@ prometheus_fortigate_exporter:
   ports:
     - 9710:9710
   volumes:
-    - /path/to/fortigate-key.yaml:/opt/fortigate-key.yaml
+    - /path/to/fortigate-key.yaml:/config/fortigate-key.yaml
   restart: unless-stopped
 ```
 

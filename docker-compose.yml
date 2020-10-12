@@ -6,5 +6,5 @@ services:
     ports:
       - 9710:9710
     volumes:
-      - /path/to/fortigate-key.yaml:/opt/fortigate-key.yaml
+      - /path/to/fortigate-key.yaml:/config/fortigate-key.yaml
     restart: unless-stopped
