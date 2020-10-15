@@ -63,6 +63,15 @@ which means that currently you need HTTPS to be configured properly.
 
 To probe a Fortigate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
+## Available CLI parameters
+| flag  | default value  |  description  |
+|---|---|---|
+| -auth-file  | /config/fortigate-key.yaml  | path to the location of the key file |
+| -listen | :9710  | address to listen for incoming requests  |
+| -scrape-timeout  | 30  | timeout in seconds  |
+| -https-timeout  | 10  | timeout in seconds for establishment of HTTPS connections  |
+| -insecure  | false  | allows to turn off security validation of TLS certificates  |
+
 ## Prometheus Configuration
 
 An example configuration for Prometheus looks something like this:
