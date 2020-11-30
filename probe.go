@@ -577,8 +577,131 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 			probeFirewallPolicies(c, registry) &&
 			probeInterfaces(c, registry) &&
 			probeVPNStatistics(c, registry) &&
-			probeIPSec(c, registry)
+			probeIPSec(c, registry) &&
+			probeHaStatistics(c, registry)
 
 	// TODO(bluecmd): log/current-disk-usage
 	return success, nil
+}
+
+func probeHaStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
+	var (
+		memberInfo = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ha_member_info",
+				Help: "Info metric regarding cluster members",
+			},
+			[]string{"vdom", "hostname", "serial"},
+		)
+		memberSessions = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ha_member_sessions",
+				Help: "Sessions which are handled by this HA member",
+			},
+			[]string{"vdom", "hostname"},
+		)
+		memberPackets = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ha_member_packets_total",
+				Help: "Packets which are handled by this HA member",
+			},
+			[]string{"vdom", "hostname"},
+		)
+		memberVirusEvents = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_ha_member_virus_events_total",
+				Help: "Virus events which are detected by this HA member",
+			},
+			[]string{"vdom", "hostname"},
+		)
+		memberNetworkUsage = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ha_member_network_usage_ratio",
+				Help: "Network usage by HA member",
+			},
+			[]string{"vdom", "hostname"},
+		)
+		memberBytesTotal = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_ha_member_bytes_total",
+				Help: "Bytes transferred by HA member",
+			},
+			[]string{"vdom", "hostname"},
+		)
+		memberIpsEvents = prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "fortigate_ha_member_ips_events_total",
+				Help: "IPS events processed by HA member",
+			},
+			[]string{"vdom", "hostname"},
+		)
+		memberCpuUsage = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ha_member_cpu_usage_ratio",
+				Help: "CPU usage by HA member",
+			},
+			[]string{"vdom", "hostname"},
+		)
+		memberMemoryUsage = prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "fortigate_ha_member_memory_usage_ratio",
+				Help: "Memory usage by HA member",
+			},
+			[]string{"vdom", "hostname"},
+		)
+	)
+
+	registry.MustRegister(memberInfo)
+	registry.MustRegister(memberSessions)
+	registry.MustRegister(memberPackets)
+	registry.MustRegister(memberVirusEvents)
+	registry.MustRegister(memberNetworkUsage)
+	registry.MustRegister(memberBytesTotal)
+	registry.MustRegister(memberIpsEvents)
+	registry.MustRegister(memberCpuUsage)
+	registry.MustRegister(memberMemoryUsage)
+
+	type HaResults struct {
+		Hostname         string  `json:"hostname"`
+		SerialNo         string  `json:"serial_no"`
+		Tnow             float64 `json:"tnow"`
+		Sessions         float64 `json:"sessions"`
+		Tpacket          float64 `json:"tpacket"`
+		VirEvents        float64 `json:"vir_usage"`
+		NetUsage         float64 `json:"net_usage"`
+		TransferredBytes float64 `json:"tbyte"`
+		IpsEvents        float64 `json:"intr_usage"`
+		CpuUsage         float64 `json:"cpu_usage"`
+		MemUsage         float64 `json:"mem_usage"`
+	}
+
+	type HaResponse struct {
+		HTTPMethod string      `json:"http_method"`
+		Results    []HaResults `json:"results"`
+		VDOM       string      `json:"vdom"`
+		Path       string      `json:"path"`
+		Name       string      `json:"name"`
+		Status     string      `json:"status"`
+		Serial     string      `json:"serial"`
+		Version    string      `json:"version"`
+		Build      int64       `json:"build"`
+	}
+	var r HaResponse
+
+	if err := c.Get("api/v2/monitor/system/ha-statistics", "", &r); err != nil {
+		log.Printf("Error: %v", err)
+		return false
+	}
+	for _, result := range r.Results {
+		memberInfo.WithLabelValues(r.VDOM, result.Hostname, result.SerialNo).Set(1)
+		memberSessions.WithLabelValues(r.VDOM, result.Hostname).Set(result.Sessions)
+		memberPackets.WithLabelValues(r.VDOM, result.Hostname).Set(result.Tpacket)
+		memberVirusEvents.WithLabelValues(r.VDOM, result.Hostname).Add(result.VirEvents)
+		memberNetworkUsage.WithLabelValues(r.VDOM, result.Hostname).Add(result.NetUsage / 100)
+		memberBytesTotal.WithLabelValues(r.VDOM, result.Hostname).Add(result.TransferredBytes)
+		memberIpsEvents.WithLabelValues(r.VDOM, result.Hostname).Add(result.IpsEvents)
+		memberCpuUsage.WithLabelValues(r.VDOM, result.Hostname).Add(result.CpuUsage / 100)
+		memberMemoryUsage.WithLabelValues(r.VDOM, result.Hostname).Set(result.MemUsage / 100)
+	}
+	return true
 }
