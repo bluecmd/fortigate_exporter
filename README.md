@@ -40,6 +40,17 @@ Per-VDOM:
  * `fortigate_ipsec_tunnel_receive_bytes_total`
  * `fortigate_ipsec_tunnel_transmit_bytes_total`
  * `fortigate_ipsec_tunnel_up`
+ 
+ Per-HA-Member and VDOM:
+ * `fortigate_ha_member_info`
+ * `fortigate_ha_member_cpu_usage_ratio`
+ * `fortigate_ha_member_memory_usage_ratio`
+ * `fortigate_ha_member_network_usage_ratio`
+ * `fortigate_ha_member_sessions`
+ * `fortigate_ha_member_packets_total`
+ * `fortigate_ha_member_virus_events_total`
+ * `fortigate_ha_member_bytes_total`
+ * `fortigate_ha_member_ips_events_total`
 
 ## Usage
 
