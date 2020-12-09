@@ -1,3 +1,4 @@
+# api/v2/monitor/system/ha-statistics
 {
   "http_method":"GET",
   "results":[
