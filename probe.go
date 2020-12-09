@@ -578,13 +578,13 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 			probeInterfaces(c, registry) &&
 			probeVPNStatistics(c, registry) &&
 			probeIPSec(c, registry) &&
-			probeHaStatistics(c, registry)
+			probeHAStatistics(c, registry)
 
 	// TODO(bluecmd): log/current-disk-usage
 	return success, nil
 }
 
-func probeHaStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
+func probeHAStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		memberInfo = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -661,7 +661,7 @@ func probeHaStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 	registry.MustRegister(memberCpuUsage)
 	registry.MustRegister(memberMemoryUsage)
 
-	type HaResults struct {
+	type HAResults struct {
 		Hostname         string  `json:"hostname"`
 		SerialNo         string  `json:"serial_no"`
 		Tnow             float64 `json:"tnow"`
@@ -675,9 +675,9 @@ func probeHaStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 		MemUsage         float64 `json:"mem_usage"`
 	}
 
-	type HaResponse struct {
+	type HAResponse struct {
 		HTTPMethod string      `json:"http_method"`
-		Results    []HaResults `json:"results"`
+		Results    []HAResults `json:"results"`
 		VDOM       string      `json:"vdom"`
 		Path       string      `json:"path"`
 		Name       string      `json:"name"`
@@ -686,7 +686,7 @@ func probeHaStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 		Version    string      `json:"version"`
 		Build      int64       `json:"build"`
 	}
-	var r HaResponse
+	var r HAResponse
 
 	if err := c.Get("api/v2/monitor/system/ha-statistics", "", &r); err != nil {
 		log.Printf("Error: %v", err)
