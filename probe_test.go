@@ -391,8 +391,8 @@ func TestHaStatistics(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/ha-statistics", "testdata/ha-statistics.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeHaStatistics(c, r) {
-		t.Errorf("probeHaStatistics() returned non-success")
+	if !probeHAStatistics(c, r) {
+		t.Errorf("probeHAStatistics() returned non-success")
 	}
 
 	em := `
