@@ -33,18 +33,6 @@
             "q_origin_key":"all"
           }
         ],
-        "srcaddr6":[
-          {
-            "name":"all",
-            "q_origin_key":"all"
-          }
-        ],
-        "dstaddr6":[
-          {
-            "name":"all",
-            "q_origin_key":"all"
-          }
-        ],
         "internet-service":"disable",
         "internet-service-id":[
         ],
@@ -231,8 +219,6 @@
             "q_origin_key":"gmail.com"
           }
         ],
-        "srcaddr6":[],
-        "dstaddr6":[],
         "internet-service":"disable",
         "internet-service-id":[
         ],
@@ -419,8 +405,6 @@
             "q_origin_key":"gmail.com"
           }
         ],
-        "srcaddr6":[],
-        "dstaddr6":[],
         "internet-service":"disable",
         "internet-service-id":[
         ],

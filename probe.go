@@ -351,17 +351,38 @@ func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 	type policyStats struct {
 		Results []pStats
 		VDOM    string
+		Version string
 	}
 	var ps4 []policyStats
 	var ps6 []policyStats
 
-	if err := c.Get("api/v2/monitor/firewall/policy/select", "vdom=*", &ps4); err != nil {
+	// NOTE: ip_version=ipv4 is a no-op if combined policies are not active
+	if err := c.Get("api/v2/monitor/firewall/policy/select", "vdom=*&ip_version=ipv4", &ps4); err != nil {
 		log.Printf("Error: %v", err)
 		return false
 	}
-	if err := c.Get("api/v2/monitor/firewall/policy6/select", "vdom=*", &ps6); err != nil {
-		log.Printf("Error: %v", err)
+
+	combined := false
+	maj, min, ok := ParseVersion(ps4[0].Version)
+	if !ok {
+		log.Printf("Could not parse version number %q", ps4[0].Version)
 		return false
+	}
+	// If we are at 6.4 or later we use combined policies
+	if maj > 6 || (maj == 6 && min >= 4) {
+		combined = true
+	}
+
+	if !combined {
+		if err := c.Get("api/v2/monitor/firewall/policy6/select", "vdom=*", &ps6); err != nil {
+			log.Printf("Error: %v", err)
+			return false
+		}
+	} else {
+		if err := c.Get("api/v2/monitor/firewall/policy/select", "vdom=*&ip_version=ipv6", &ps6); err != nil {
+			log.Printf("Error: %v", err)
+			return false
+		}
 	}
 
 	type pConfig struct {
@@ -376,31 +397,37 @@ func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 		Results []pConfig
 		VDOM    string
 	}
-	var pc4 []policyConfig
+	var pc []policyConfig
 	var pc6 []policyConfig
 
 	query := "vdom=*&policyid|name|uuid|action|status"
 
-	if err := c.Get("api/v2/cmdb/firewall/policy", query, &pc4); err != nil {
+	if err := c.Get("api/v2/cmdb/firewall/policy", query, &pc); err != nil {
 		log.Printf("Error: %v", err)
 		return false
 	}
-	if err := c.Get("api/v2/cmdb/firewall/policy6", query, &pc6); err != nil {
-		log.Printf("Error: %v", err)
-		return false
+	if !combined {
+		if err := c.Get("api/v2/cmdb/firewall/policy6", query, &pc6); err != nil {
+			log.Printf("Error: %v", err)
+			return false
+		}
 	}
 
 	pc4Map := map[string]*pConfig{}
 	pc6Map := map[string]*pConfig{}
-	for _, pc := range pc4 {
+	for _, pc := range pc {
 		for i, c := range pc.Results {
 			pc4Map[c.UUID] = &pc.Results[i]
 		}
 	}
-	for _, pc := range pc6 {
-		for i, c := range pc.Results {
-			pc6Map[c.UUID] = &pc.Results[i]
+	if !combined {
+		for _, pc := range pc6 {
+			for i, c := range pc.Results {
+				pc6Map[c.UUID] = &pc.Results[i]
+			}
 		}
+	} else {
+		pc6Map = pc4Map
 	}
 
 	process := func(ps *policyStats, s *pStats, pcMap map[string]*pConfig, proto string) {

@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -29,11 +30,20 @@ import (
 	"github.com/prometheus/client_golang/prometheus/testutil"
 )
 
+type preparedResp struct {
+	d []byte
+	q url.Values
+}
+
 type fakeClient struct {
-	data map[string][]byte
+	data map[string][]preparedResp
 }
 
 func (c *fakeClient) prepare(path string, jfile string) {
+	u, err := url.Parse(path)
+	if err != nil {
+		panic(err)
+	}
 	vm := jsonnet.MakeVM()
 	b, err := ioutil.ReadFile(jfile)
 	if err != nil {
@@ -43,19 +53,36 @@ func (c *fakeClient) prepare(path string, jfile string) {
 	if err != nil {
 		log.Fatalf("Failed to evaluate jsonnet %q: %v", jfile, err)
 	}
-	c.data[path] = []byte(output)
+	c.data[u.Path] = append(c.data[u.Path], preparedResp{
+		d: []byte(output),
+		q: u.Query(),
+	})
 }
 
 func (c *fakeClient) Get(path string, query string, obj interface{}) error {
-	d, ok := c.data[path]
+	rs, ok := c.data[path]
 	if !ok {
 		log.Fatalf("Tried to get unprepared URL %q", path)
 	}
-	return json.Unmarshal(d, obj)
+	q, err := url.ParseQuery(query)
+	if err != nil {
+		log.Fatalf("Unable to parse DUT query: %v", err)
+	}
+alt:
+	for _, r := range rs {
+		for k, v := range r.q {
+			if q[k][0] != v[0] {
+				continue alt
+			}
+		}
+		return json.Unmarshal(r.d, obj)
+	}
+	log.Fatalf("No prepared response matched URL %q, query %q", path, query)
+	return nil
 }
 
 func newFakeClient() *fakeClient {
-	return &fakeClient{data: map[string][]byte{}}
+	return &fakeClient{data: map[string][]preparedResp{}}
 }
 
 func TestSystemStatus(t *testing.T) {
@@ -174,12 +201,12 @@ func TestSystemVDOMResources(t *testing.T) {
 	}
 }
 
-func TestFirewallPolicies(t *testing.T) {
+func TestFirewallPoliciesPre64(t *testing.T) {
 	c := newFakeClient()
-	c.prepare("api/v2/monitor/firewall/policy/select", "testdata/fw-policy.jsonnet")
-	c.prepare("api/v2/monitor/firewall/policy6/select", "testdata/fw-policy6.jsonnet")
-	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config.jsonnet")
-	c.prepare("api/v2/cmdb/firewall/policy6", "testdata/fw-policy6-config.jsonnet")
+	c.prepare("api/v2/monitor/firewall/policy/select", "testdata/fw-policy-pre64.jsonnet")
+	c.prepare("api/v2/monitor/firewall/policy6/select", "testdata/fw-policy6-pre64.jsonnet")
+	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config-pre64.jsonnet")
+	c.prepare("api/v2/cmdb/firewall/policy6", "testdata/fw-policy6-config-pre64.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	if !probeFirewallPolicies(c, r) {
 		t.Errorf("probeFirewallPolicies() returned non-success")
@@ -222,6 +249,63 @@ func TestFirewallPolicies(t *testing.T) {
 	fortigate_policy_packets_total{id="1",name="",protocol="ipv4",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 792806
 	fortigate_policy_packets_total{id="1",name="ipv6 policy",protocol="ipv6",uuid="4a2e2fe4-9e9d-51ea-75b1-b5b486b12192",vdom="FG-traffic"} 0
 	fortigate_policy_packets_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
+	`
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
+
+func TestFirewallPolicies(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/firewall/policy/select?ip_version=ipv4", "testdata/fw-policy-v4.jsonnet")
+	c.prepare("api/v2/monitor/firewall/policy/select?ip_version=ipv6", "testdata/fw-policy-v6.jsonnet")
+	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !probeFirewallPolicies(c, r) {
+		t.Errorf("probeFirewallPolicies() returned non-success")
+	}
+
+	em := `
+	# HELP fortigate_policy_active_sessions Number of active sessions for a policy
+	# TYPE fortigate_policy_active_sessions gauge
+	fortigate_policy_active_sessions{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
+	fortigate_policy_active_sessions{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
+	fortigate_policy_active_sessions{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 1
+	fortigate_policy_active_sessions{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="root"} 0
+	fortigate_policy_active_sessions{id="1",name="",protocol="ipv4",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 2
+	fortigate_policy_active_sessions{id="1",name="",protocol="ipv6",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 10
+	fortigate_policy_active_sessions{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
+	fortigate_policy_active_sessions{id="2",name="ping",protocol="ipv6",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 1
+	# HELP fortigate_policy_bytes_total Number of bytes that has passed through a policy
+	# TYPE fortigate_policy_bytes_total gauge
+	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
+	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
+	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 1
+	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="root"} 0
+	fortigate_policy_bytes_total{id="1",name="",protocol="ipv4",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 5.34459022e+08
+	fortigate_policy_bytes_total{id="1",name="",protocol="ipv6",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 1000
+	fortigate_policy_bytes_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
+	fortigate_policy_bytes_total{id="2",name="ping",protocol="ipv6",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 2
+	# HELP fortigate_policy_hit_count_total Number of times a policy has been hit
+	# TYPE fortigate_policy_hit_count_total gauge
+	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
+	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
+	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 1
+	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="root"} 0
+	fortigate_policy_hit_count_total{id="1",name="",protocol="ipv4",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 4662
+	fortigate_policy_hit_count_total{id="1",name="",protocol="ipv6",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 11000
+	fortigate_policy_hit_count_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
+	fortigate_policy_hit_count_total{id="2",name="ping",protocol="ipv6",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
+	# HELP fortigate_policy_packets_total Number of packets that has passed through a policy
+	# TYPE fortigate_policy_packets_total gauge
+	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
+	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
+	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 1
+	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="root"} 0
+	fortigate_policy_packets_total{id="1",name="",protocol="ipv4",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 792806
+	fortigate_policy_packets_total{id="1",name="",protocol="ipv6",uuid="078f184c-9e9d-51ea-9fbb-66c20957b9c0",vdom="FG-traffic"} 2000
+	fortigate_policy_packets_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
+	fortigate_policy_packets_total{id="2",name="ping",protocol="ipv6",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 3
 	`
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
 		t.Fatalf("metric compare: err %v", err)
