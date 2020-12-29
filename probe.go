@@ -570,15 +570,15 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 	}
 
 	// TODO: Make parallel
-	success :=
-		probeSystemStatus(c, registry) &&
-			probeSystemResources(c, registry) &&
-			probeSystemVDOMResources(c, registry) &&
-			probeFirewallPolicies(c, registry) &&
-			probeInterfaces(c, registry) &&
-			probeVPNStatistics(c, registry) &&
-			probeIPSec(c, registry) &&
-			probeHAStatistics(c, registry)
+	var success bool
+	success = probeSystemStatus(c, registry) && success
+	success = probeSystemResources(c, registry) && success
+	success = probeSystemVDOMResources(c, registry) && success
+	success = probeFirewallPolicies(c, registry) && success
+	success = probeInterfaces(c, registry) && success
+	success = probeVPNStatistics(c, registry) && success
+	success = probeIPSec(c, registry) && success
+	success = probeHAStatistics(c, registry) && success
 
 	// TODO(bluecmd): log/current-disk-usage
 	return success, nil
