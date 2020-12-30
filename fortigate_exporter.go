@@ -90,7 +90,9 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 	registry.MustRegister(probeSuccessGauge)
 	registry.MustRegister(probeDurationGauge)
 	start := time.Now()
-	success, err := probe(ctx, target, registry, &http.Client{})
+	pc := &ProbeCollector{}
+	registry.MustRegister(pc)
+	success, err := pc.Probe(ctx, target, &http.Client{})
 	if err != nil {
 		log.Printf("Probe request rejected; error is: %v", err)
 		http.Error(w, fmt.Sprintf("probe: %v", err), http.StatusBadRequest)
