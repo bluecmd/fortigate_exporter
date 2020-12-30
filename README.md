@@ -83,6 +83,32 @@ To probe a Fortigate, do something like `curl 'localhost:9710/probe?target=https
 | -https-timeout  | 10  | timeout in seconds for establishment of HTTPS connections  |
 | -insecure  | false  | allows to turn off security validation of TLS certificates  |
 
+## Fortigate Configuration
+
+The following example Admin Profile describes the permissions that needs to be granted
+to the monitor user in order for all metrics to be available.
+If you omit to grant some of these permissions you will receive log messages warning about
+403 errors and relevant metrics will be unavailable, but other metrics will still work.
+
+```
+config system accprofile
+    edit "monitor"
+        set scope global
+        set secfabgrp read
+        set netgrp custom
+        set fwgrp custom
+        set vpngrp read
+        set system-diagnostics disable
+        config netgrp-permission
+            set cfg read
+        end
+        config fwgrp-permission
+            set policy read
+        end
+    next
+end
+```
+
 ## Prometheus Configuration
 
 An example configuration for Prometheus looks something like this:
