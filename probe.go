@@ -549,41 +549,6 @@ func probeInterfaces(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
-func probe(ctx context.Context, target string, registry *prometheus.Registry, hc *http.Client) (bool, error) {
-	tgt, err := url.Parse(target)
-	if err != nil {
-		return false, fmt.Errorf("url.Parse failed: %v", err)
-	}
-
-	if tgt.Scheme != "https" && tgt.Scheme != "http" {
-		return false, fmt.Errorf("Unsupported scheme %q", tgt.Scheme)
-	}
-
-	// Filter anything else than scheme and hostname
-	u := url.URL{
-		Scheme: tgt.Scheme,
-		Host:   tgt.Host,
-	}
-	c, err := newFortiClient(ctx, u, hc)
-	if err != nil {
-		return false, err
-	}
-
-	// TODO: Make parallel
-	var success bool
-	success = probeSystemStatus(c, registry) && success
-	success = probeSystemResources(c, registry) && success
-	success = probeSystemVDOMResources(c, registry) && success
-	success = probeFirewallPolicies(c, registry) && success
-	success = probeInterfaces(c, registry) && success
-	success = probeVPNStatistics(c, registry) && success
-	success = probeIPSec(c, registry) && success
-	success = probeHAStatistics(c, registry) && success
-
-	// TODO(bluecmd): log/current-disk-usage
-	return success, nil
-}
-
 func probeHAStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 	var (
 		memberInfo = prometheus.NewGaugeVec(
@@ -704,4 +669,39 @@ func probeHAStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 		memberMemoryUsage.WithLabelValues(r.VDOM, result.Hostname).Set(result.MemUsage / 100)
 	}
 	return true
+}
+
+func probe(ctx context.Context, target string, registry *prometheus.Registry, hc *http.Client) (bool, error) {
+	tgt, err := url.Parse(target)
+	if err != nil {
+		return false, fmt.Errorf("url.Parse failed: %v", err)
+	}
+
+	if tgt.Scheme != "https" && tgt.Scheme != "http" {
+		return false, fmt.Errorf("Unsupported scheme %q", tgt.Scheme)
+	}
+
+	// Filter anything else than scheme and hostname
+	u := url.URL{
+		Scheme: tgt.Scheme,
+		Host:   tgt.Host,
+	}
+	c, err := newFortiClient(ctx, u, hc)
+	if err != nil {
+		return false, err
+	}
+
+	// TODO: Make parallel
+	success := true
+	success = probeSystemStatus(c, registry) && success
+	success = probeSystemResources(c, registry) && success
+	success = probeSystemVDOMResources(c, registry) && success
+	success = probeFirewallPolicies(c, registry) && success
+	success = probeInterfaces(c, registry) && success
+	success = probeVPNStatistics(c, registry) && success
+	success = probeIPSec(c, registry) && success
+	success = probeHAStatistics(c, registry) && success
+
+	// TODO(bluecmd): log/current-disk-usage
+	return success, nil
 }
