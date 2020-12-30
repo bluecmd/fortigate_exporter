@@ -19,12 +19,15 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -36,8 +39,9 @@ var (
 	authMapFile    = flag.String("auth-file", "", "file containing the authentication map to use when connecting to a Fortigate device")
 	listen         = flag.String("listen", ":9710", "address to listen on")
 	timeoutSeconds = flag.Int("scrape-timeout", 30, "max seconds to allow a scrape to take")
-	tlstimeout     = flag.Int("https-timeout", 10, "TLS Handshake timeout")
+	tlsTimeout     = flag.Int("https-timeout", 10, "TLS Handshake timeout in seconds")
 	insecure       = flag.Bool("insecure", false, "Allow insecure certificates")
+	extraCAs       = flag.String("extra-ca-certs", "", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store")
 
 	authMap = map[string]Auth{}
 )
@@ -90,7 +94,9 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 	registry.MustRegister(probeSuccessGauge)
 	registry.MustRegister(probeDurationGauge)
 	start := time.Now()
-	success, err := probe(ctx, target, registry, &http.Client{})
+	pc := &ProbeCollector{}
+	registry.MustRegister(pc)
+	success, err := pc.Probe(ctx, target, &http.Client{})
 	if err != nil {
 		log.Printf("Probe request rejected; error is: %v", err)
 		http.Error(w, fmt.Sprintf("probe: %v", err), http.StatusBadRequest)
@@ -112,6 +118,30 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 
+	roots, err := x509.SystemCertPool()
+	if err != nil {
+		log.Fatalf("Unable to fetch system CA store: %v", err)
+	}
+	for _, eca := range strings.Split(*extraCAs, ",") {
+		if eca == "" {
+			continue
+		}
+		certs, err := ioutil.ReadFile(eca)
+		if err != nil {
+			log.Fatalf("Failed to read extra CA file %q: %v", eca, err)
+		}
+
+		if ok := roots.AppendCertsFromPEM(certs); !ok {
+			log.Fatalf("Failed to append certs from PEM %q, unknown error", eca)
+		}
+	}
+	tc := &tls.Config{RootCAs: roots}
+	if *insecure {
+		tc.InsecureSkipVerify = true
+	}
+	http.DefaultTransport.(*http.Transport).TLSHandshakeTimeout = time.Duration(*tlsTimeout) * time.Second
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = tc
+
 	af, err := ioutil.ReadFile(*authMapFile)
 	if err != nil {
 		log.Fatalf("Failed to read API authentication map file: %v", err)
@@ -125,7 +155,11 @@ func main() {
 
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/probe", probeHandler)
-	go http.ListenAndServe(*listen, nil)
+	go func() {
+		if err := http.ListenAndServe(*listen, nil); err != nil {
+			log.Fatalf("Unable to serve: %v", err)
+		}
+	}()
 	log.Printf("Fortigate exporter running, listening on %q", *listen)
 	select {}
 }

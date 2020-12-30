@@ -81,6 +81,29 @@ alt:
 	return nil
 }
 
+type testProbeCollector struct {
+	metrics []prometheus.Metric
+}
+
+func (p *testProbeCollector) Collect(c chan<- prometheus.Metric) {
+	for _, m := range p.metrics {
+		c <- m
+	}
+}
+
+func (p *testProbeCollector) Describe(c chan<- *prometheus.Desc) {
+}
+
+func testProbe(pf probeFunc, c FortiHTTP, r Registry) bool {
+	m, ok := pf(c)
+	if !ok {
+		return false
+	}
+	p := &testProbeCollector{metrics: m}
+	r.MustRegister(p)
+	return true
+}
+
 func newFakeClient() *fakeClient {
 	return &fakeClient{data: map[string][]preparedResp{}}
 }
@@ -89,7 +112,7 @@ func TestSystemStatus(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/status", "testdata/status.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeSystemStatus(c, r) {
+	if !testProbe(probeSystemStatus, c, r) {
 		t.Errorf("probeSystemStatus() returned non-success")
 	}
 
@@ -126,7 +149,7 @@ func TestIPSec(t *testing.T) {
 	c.prepare("api/v2/monitor/vpn/ipsec", "testdata/ipsec.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	if !probeIPSec(c, r) {
-		t.Errorf("probeSystemStatus() returned non-success")
+		t.Errorf("probeIPSec() returned non-success")
 	}
 
 	em := `

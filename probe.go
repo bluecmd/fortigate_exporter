@@ -27,18 +27,25 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemStatus(c FortiHTTP, registry *prometheus.Registry) bool {
+type ProbeCollector struct {
+	collectors []prometheus.Collector
+	metrics    []prometheus.Metric
+}
+
+type Registry interface {
+	MustRegister(...prometheus.Collector)
+}
+
+type probeFunc func(FortiHTTP) ([]prometheus.Metric, bool)
+
+func probeSystemStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		mVersion = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_version_info",
-				Help: "System version and build information",
-			},
-			[]string{"serial", "version", "build"},
+		mVersion = prometheus.NewDesc(
+			"fortigate_version_info",
+			"System version and build information",
+			[]string{"serial", "version", "build"}, nil,
 		)
 	)
-
-	registry.MustRegister(mVersion)
 
 	type systemStatus struct {
 		Status  string
@@ -50,14 +57,16 @@ func probeSystemStatus(c FortiHTTP, registry *prometheus.Registry) bool {
 
 	if err := c.Get("api/v2/monitor/system/status", "", &st); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
 
-	mVersion.WithLabelValues(st.Serial, st.Version, fmt.Sprintf("%d", st.Build)).Set(1)
-	return true
+	m := []prometheus.Metric{
+		prometheus.MustNewConstMetric(mVersion, prometheus.GaugeValue, 1.0, st.Serial, st.Version, fmt.Sprintf("%d", st.Build)),
+	}
+	return m, true
 }
 
-func probeSystemResources(c FortiHTTP, registry *prometheus.Registry) bool {
+func probeSystemResources(c FortiHTTP, registry Registry) bool {
 	var (
 		mResCPU = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -127,7 +136,7 @@ func probeSystemResources(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
-func probeSystemVDOMResources(c FortiHTTP, registry *prometheus.Registry) bool {
+func probeSystemVDOMResources(c FortiHTTP, registry Registry) bool {
 	var (
 		mResCPU = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -191,7 +200,7 @@ func probeSystemVDOMResources(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
-func probeVPNStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
+func probeVPNStatistics(c FortiHTTP, registry Registry) bool {
 	var (
 		vpncon = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -220,7 +229,7 @@ func probeVPNStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 
 }
-func probeIPSec(c FortiHTTP, registry *prometheus.Registry) bool {
+func probeIPSec(c FortiHTTP, registry Registry) bool {
 	var (
 		status = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -292,7 +301,7 @@ func probeIPSec(c FortiHTTP, registry *prometheus.Registry) bool {
 
 }
 
-func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
+func probeFirewallPolicies(c FortiHTTP, registry Registry) bool {
 	var (
 		mHitCount = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -463,7 +472,7 @@ func probeFirewallPolicies(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
-func probeInterfaces(c FortiHTTP, registry *prometheus.Registry) bool {
+func probeInterfaces(c FortiHTTP, registry Registry) bool {
 	var (
 		mLink = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -576,7 +585,7 @@ func probeInterfaces(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
-func probeHAStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
+func probeHAStatistics(c FortiHTTP, registry Registry) bool {
 	var (
 		memberInfo = prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
@@ -698,7 +707,11 @@ func probeHAStatistics(c FortiHTTP, registry *prometheus.Registry) bool {
 	return true
 }
 
-func probe(ctx context.Context, target string, registry *prometheus.Registry, hc *http.Client) (bool, error) {
+func (p *ProbeCollector) MustRegister(c ...prometheus.Collector) {
+	p.collectors = append(p.collectors, c...)
+}
+
+func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client) (bool, error) {
 	tgt, err := url.Parse(target)
 	if err != nil {
 		return false, fmt.Errorf("url.Parse failed: %v", err)
@@ -720,7 +733,20 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 
 	// TODO: Make parallel
 	success := true
-	success = probeSystemStatus(c, registry) && success
+	for _, f := range []probeFunc{
+		probeSystemStatus,
+	} {
+		m, ok := f(c)
+		if !ok {
+			success = false
+		}
+		p.metrics = append(p.metrics, m...)
+	}
+
+	// TODO: Until migration to pure collector based is done, use an intermediate
+	// registry implemented by ourselves.
+	// These should be migrated to the above form.
+	registry := p
 	success = probeSystemResources(c, registry) && success
 	success = probeSystemVDOMResources(c, registry) && success
 	success = probeFirewallPolicies(c, registry) && success
@@ -731,4 +757,18 @@ func probe(ctx context.Context, target string, registry *prometheus.Registry, hc
 
 	// TODO(bluecmd): log/current-disk-usage
 	return success, nil
+}
+
+func (p *ProbeCollector) Collect(c chan<- prometheus.Metric) {
+	// Collect result of deprecated probe functions
+	for _, co := range p.collectors {
+		co.Collect(c)
+	}
+	// Collect result of new probe functions
+	for _, m := range p.metrics {
+		c <- m
+	}
+}
+
+func (p *ProbeCollector) Describe(c chan<- *prometheus.Desc) {
 }
