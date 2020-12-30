@@ -71,7 +71,7 @@ func (c *fakeClient) Get(path string, query string, obj interface{}) error {
 alt:
 	for _, r := range rs {
 		for k, v := range r.q {
-			if q[k][0] != v[0] {
+			if len(q[k]) == 0 || q[k][0] != v[0] {
 				continue alt
 			}
 		}
