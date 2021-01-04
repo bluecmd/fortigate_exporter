@@ -81,6 +81,10 @@ alt:
 	return nil
 }
 
+type Registry interface {
+	MustRegister(...prometheus.Collector)
+}
+
 type testProbeCollector struct {
 	metrics []prometheus.Metric
 }
@@ -130,7 +134,7 @@ func TestVPNConnection(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/vpn/ssl", "testdata/vpn.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeVPNStatistics(c, r) {
+	if !testProbe(probeVPNStatistics, c, r) {
 		t.Errorf("probeSystemStatus() returned non-success")
 	}
 
@@ -148,18 +152,18 @@ func TestIPSec(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/vpn/ipsec", "testdata/ipsec.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeIPSec(c, r) {
+	if !testProbe(probeIPSec, c, r) {
 		t.Errorf("probeIPSec() returned non-success")
 	}
 
 	em := `
-	# HELP fortigate_ipsec_tunnel_receive_bytes_total Status of Ipsec tunnel
+	# HELP fortigate_ipsec_tunnel_receive_bytes_total Total number of bytes received over the IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_receive_bytes_total gauge
 	fortigate_ipsec_tunnel_receive_bytes_total{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1.429824e+07
-	# HELP fortigate_ipsec_tunnel_transmit_bytes_total Status of Ipsec tunnel
+	# HELP fortigate_ipsec_tunnel_transmit_bytes_total Total number of bytes transmitted over the IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_transmit_bytes_total gauge
 	fortigate_ipsec_tunnel_transmit_bytes_total{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1.424856e+07
-	# HELP fortigate_ipsec_tunnel_up Status of Ipsec tunnel
+	# HELP fortigate_ipsec_tunnel_up Status of IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_up gauge
 	fortigate_ipsec_tunnel_up{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1
 
@@ -174,7 +178,7 @@ func TestSystemResources(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeSystemResources(c, r) {
+	if !testProbe(probeSystemResources, c, r) {
 		t.Errorf("probeSystemResources() returned non-success")
 	}
 
@@ -199,7 +203,7 @@ func TestSystemVDOMResources(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage-vdom.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeSystemVDOMResources(c, r) {
+	if !testProbe(probeSystemVDOMResources, c, r) {
 		t.Errorf("probeSystemVDOMResources() returned non-success")
 	}
 
@@ -231,7 +235,7 @@ func TestFirewallPoliciesPre64(t *testing.T) {
 	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config-pre64.jsonnet")
 	c.prepare("api/v2/cmdb/firewall/policy6", "testdata/fw-policy6-config-pre64.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeFirewallPolicies(c, r) {
+	if !testProbe(probeFirewallPolicies, c, r) {
 		t.Errorf("probeFirewallPolicies() returned non-success")
 	}
 
@@ -284,7 +288,7 @@ func TestFirewallPolicies(t *testing.T) {
 	c.prepare("api/v2/monitor/firewall/policy/select?ip_version=ipv6", "testdata/fw-policy-v6.jsonnet")
 	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeFirewallPolicies(c, r) {
+	if !testProbe(probeFirewallPolicies, c, r) {
 		t.Errorf("probeFirewallPolicies() returned non-success")
 	}
 
@@ -339,7 +343,7 @@ func TestInterfaces(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/interface/select", "testdata/interface.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeInterfaces(c, r) {
+	if !testProbe(probeInterfaces, c, r) {
 		t.Errorf("probeInterfaces() returned non-success")
 	}
 
@@ -498,7 +502,7 @@ func TestHaStatistics(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/ha-statistics", "testdata/ha-statistics.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !probeHAStatistics(c, r) {
+	if !testProbe(probeHAStatistics, c, r) {
 		t.Errorf("probeHAStatistics() returned non-success")
 	}
 

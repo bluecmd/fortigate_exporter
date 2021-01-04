@@ -28,12 +28,7 @@ import (
 )
 
 type ProbeCollector struct {
-	collectors []prometheus.Collector
-	metrics    []prometheus.Metric
-}
-
-type Registry interface {
-	MustRegister(...prometheus.Collector)
+	metrics []prometheus.Metric
 }
 
 type probeFunc func(FortiHTTP) ([]prometheus.Metric, bool)
@@ -66,34 +61,24 @@ func probeSystemStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 	return m, true
 }
 
-func probeSystemResources(c FortiHTTP, registry Registry) bool {
+func probeSystemResources(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		mResCPU = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_cpu_usage_ratio",
-				Help: "Current resource usage ratio of system CPU, per core",
-			},
-			[]string{"processor"},
+		mResCPU = prometheus.NewDesc(
+			"fortigate_cpu_usage_ratio",
+			"Current resource usage ratio of system CPU, per core",
+			[]string{"processor"}, nil,
 		)
-		mResMemory = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_memory_usage_ratio",
-				Help: "Current resource usage ratio of system memory",
-			},
-			[]string{},
+		mResMemory = prometheus.NewDesc(
+			"fortigate_memory_usage_ratio",
+			"Current resource usage ratio of system memory",
+			[]string{}, nil,
 		)
-		mResSession = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_current_sessions",
-				Help: "Current amount of sessions, per IP version",
-			},
-			[]string{"protocol"},
+		mResSession = prometheus.NewDesc(
+			"fortigate_current_sessions",
+			"Current amount of sessions, per IP version",
+			[]string{"protocol"}, nil,
 		)
 	)
-
-	registry.MustRegister(mResCPU)
-	registry.MustRegister(mResMemory)
-	registry.MustRegister(mResSession)
 
 	type resUsage struct {
 		Current int
@@ -123,47 +108,39 @@ func probeSystemResources(c FortiHTTP, registry Registry) bool {
 
 	if err := c.Get("api/v2/monitor/system/resource/usage", "interval=1-min&scope=global", &sr); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
 
 	// CPU[0] is the average over all cores, ignore it
+	m := []prometheus.Metric{}
 	for i, cpu := range sr.Results.CPU[1:] {
-		mResCPU.WithLabelValues(fmt.Sprintf("%d", i)).Set(float64(cpu.Current) / 100.0)
+		m = append(m, prometheus.MustNewConstMetric(
+			mResCPU, prometheus.GaugeValue, float64(cpu.Current)/100.0, fmt.Sprintf("%d", i)))
 	}
-	mResMemory.WithLabelValues().Set(float64(sr.Results.Mem[0].Current) / 100.0)
-	mResSession.WithLabelValues("ipv4").Set(float64(sr.Results.Session[0].Current))
-	mResSession.WithLabelValues("ipv6").Set(float64(sr.Results.Session6[0].Current))
-	return true
+	m = append(m, prometheus.MustNewConstMetric(mResMemory, prometheus.GaugeValue, float64(sr.Results.Mem[0].Current)/100.0))
+	m = append(m, prometheus.MustNewConstMetric(mResSession, prometheus.GaugeValue, float64(sr.Results.Session[0].Current), "ipv4"))
+	m = append(m, prometheus.MustNewConstMetric(mResSession, prometheus.GaugeValue, float64(sr.Results.Session6[0].Current), "ipv6"))
+	return m, true
 }
 
-func probeSystemVDOMResources(c FortiHTTP, registry Registry) bool {
+func probeSystemVDOMResources(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		mResCPU = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_vdom_cpu_usage_ratio",
-				Help: "Current resource usage ratio of CPU, per VDOM",
-			},
-			[]string{"vdom"},
+		mResCPU = prometheus.NewDesc(
+			"fortigate_vdom_cpu_usage_ratio",
+			"Current resource usage ratio of CPU, per VDOM",
+			[]string{"vdom"}, nil,
 		)
-		mResMemory = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_vdom_memory_usage_ratio",
-				Help: "Current resource usage ratio of memory, per VDOM",
-			},
-			[]string{"vdom"},
+		mResMemory = prometheus.NewDesc(
+			"fortigate_vdom_memory_usage_ratio",
+			"Current resource usage ratio of memory, per VDOM",
+			[]string{"vdom"}, nil,
 		)
-		mResSession = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_vdom_current_sessions",
-				Help: "Current amount of sessions, per VDOM and IP version",
-			},
-			[]string{"vdom", "protocol"},
+		mResSession = prometheus.NewDesc(
+			"fortigate_vdom_current_sessions",
+			"Current amount of sessions, per VDOM and IP version",
+			[]string{"vdom", "protocol"}, nil,
 		)
 	)
-
-	registry.MustRegister(mResCPU)
-	registry.MustRegister(mResMemory)
-	registry.MustRegister(mResSession)
 
 	type resUsage struct {
 		Current int
@@ -189,28 +166,28 @@ func probeSystemVDOMResources(c FortiHTTP, registry Registry) bool {
 
 	if err := c.Get("api/v2/monitor/system/resource/usage", "interval=1-min&vdom=*", &sr); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
+	m := []prometheus.Metric{}
 	for _, s := range sr {
-		mResCPU.WithLabelValues(s.VDOM).Set(float64(s.Results.CPU[0].Current) / 100.0)
-		mResMemory.WithLabelValues(s.VDOM).Set(float64(s.Results.Mem[0].Current) / 100.0)
-		mResSession.WithLabelValues(s.VDOM, "ipv4").Set(float64(s.Results.Session[0].Current))
-		mResSession.WithLabelValues(s.VDOM, "ipv6").Set(float64(s.Results.Session6[0].Current))
+		m = append(m, prometheus.MustNewConstMetric(mResCPU, prometheus.GaugeValue, float64(s.Results.CPU[0].Current)/100.0, s.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(mResMemory, prometheus.GaugeValue, float64(s.Results.Mem[0].Current)/100.0, s.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(mResSession, prometheus.GaugeValue, float64(s.Results.Session[0].Current), s.VDOM, "ipv4"))
+		m = append(m, prometheus.MustNewConstMetric(mResSession, prometheus.GaugeValue, float64(s.Results.Session6[0].Current), s.VDOM, "ipv6"))
 	}
-	return true
+	return m, true
 }
 
-func probeVPNStatistics(c FortiHTTP, registry Registry) bool {
+func probeVPNStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		vpncon = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_vpn_connections_count_total",
-				Help: "Number of VPN connections",
-			},
-			[]string{"vdom"},
+		// TODO(bluecmd): Rename as it is a gauge, issue #5
+		vpncon = prometheus.NewDesc(
+			"fortigate_vpn_connections_count_total",
+			"Number of VPN connections",
+			[]string{"vdom"}, nil,
 		)
 	)
-	registry.MustRegister(vpncon)
+
 	type result struct {
 		Results []map[string]interface{}
 		VDOM    string
@@ -218,44 +195,36 @@ func probeVPNStatistics(c FortiHTTP, registry Registry) bool {
 	var res []result
 	if err := c.Get("api/v2/monitor/vpn/ssl", "vdom=*", &res); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
 
+	m := []prometheus.Metric{}
 	for _, v := range res {
 		count := len(v.Results)
-		vpncon.WithLabelValues(v.VDOM).Set(float64(count))
+		m = append(m, prometheus.MustNewConstMetric(vpncon, prometheus.GaugeValue, float64(count), v.VDOM))
 	}
 
-	return true
+	return m, true
 
 }
-func probeIPSec(c FortiHTTP, registry Registry) bool {
+func probeIPSec(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		status = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ipsec_tunnel_up",
-				Help: "Status of Ipsec tunnel",
-			}, []string{"vdom", "name", "parent"},
+		status = prometheus.NewDesc(
+			"fortigate_ipsec_tunnel_up",
+			"Status of IPsec tunnel",
+			[]string{"vdom", "name", "parent"}, nil,
 		)
-		transmitted = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ipsec_tunnel_transmit_bytes_total",
-				Help: "Status of Ipsec tunnel",
-			},
-			[]string{"vdom", "name", "parent"},
+		transmitted = prometheus.NewDesc(
+			"fortigate_ipsec_tunnel_transmit_bytes_total",
+			"Total number of bytes transmitted over the IPsec tunnel",
+			[]string{"vdom", "name", "parent"}, nil,
 		)
-		received = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ipsec_tunnel_receive_bytes_total",
-				Help: "Status of Ipsec tunnel",
-			},
-			[]string{"vdom", "name", "parent"},
+		received = prometheus.NewDesc(
+			"fortigate_ipsec_tunnel_receive_bytes_total",
+			"Total number of bytes received over the IPsec tunnel",
+			[]string{"vdom", "name", "parent"}, nil,
 		)
 	)
-
-	registry.MustRegister(status)
-	registry.MustRegister(transmitted)
-	registry.MustRegister(received)
 
 	type proxyid struct {
 		Name     string `json:"p2name"`
@@ -275,8 +244,10 @@ func probeIPSec(c FortiHTTP, registry Registry) bool {
 	var res []ipsecResult
 	if err := c.Get("api/v2/monitor/vpn/ipsec", "vdom=*", &res); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
+
+	m := []prometheus.Metric{}
 	for _, v := range res {
 		for _, i := range v.Results {
 			/*
@@ -291,52 +262,39 @@ func probeIPSec(c FortiHTTP, registry Registry) bool {
 				if t.Status == "up" {
 					s = 1.0
 				}
-				status.WithLabelValues(v.VDOM, t.Name, i.Name).Set(s)
-				transmitted.WithLabelValues(v.VDOM, t.Name, i.Name).Set(float64(t.Outgoing))
-				received.WithLabelValues(v.VDOM, t.Name, i.Name).Set(float64(t.Incoming))
+				m = append(m, prometheus.MustNewConstMetric(status, prometheus.GaugeValue, s, v.VDOM, t.Name, i.Name))
+				m = append(m, prometheus.MustNewConstMetric(transmitted, prometheus.GaugeValue, float64(t.Outgoing), v.VDOM, t.Name, i.Name))
+				m = append(m, prometheus.MustNewConstMetric(received, prometheus.GaugeValue, float64(t.Incoming), v.VDOM, t.Name, i.Name))
 			}
 		}
 	}
-	return true
+	return m, true
 
 }
 
-func probeFirewallPolicies(c FortiHTTP, registry Registry) bool {
+func probeFirewallPolicies(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		mHitCount = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_policy_hit_count_total",
-				Help: "Number of times a policy has been hit",
-			},
-			[]string{"vdom", "protocol", "name", "uuid", "id"},
+		mHitCount = prometheus.NewDesc(
+			"fortigate_policy_hit_count_total",
+			"Number of times a policy has been hit",
+			[]string{"vdom", "protocol", "name", "uuid", "id"}, nil,
 		)
-		mBytes = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_policy_bytes_total",
-				Help: "Number of bytes that has passed through a policy",
-			},
-			[]string{"vdom", "protocol", "name", "uuid", "id"},
+		mBytes = prometheus.NewDesc(
+			"fortigate_policy_bytes_total",
+			"Number of bytes that has passed through a policy",
+			[]string{"vdom", "protocol", "name", "uuid", "id"}, nil,
 		)
-		mPackets = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_policy_packets_total",
-				Help: "Number of packets that has passed through a policy",
-			},
-			[]string{"vdom", "protocol", "name", "uuid", "id"},
+		mPackets = prometheus.NewDesc(
+			"fortigate_policy_packets_total",
+			"Number of packets that has passed through a policy",
+			[]string{"vdom", "protocol", "name", "uuid", "id"}, nil,
 		)
-		mActiveSessions = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_policy_active_sessions",
-				Help: "Number of active sessions for a policy",
-			},
-			[]string{"vdom", "protocol", "name", "uuid", "id"},
+		mActiveSessions = prometheus.NewDesc(
+			"fortigate_policy_active_sessions",
+			"Number of active sessions for a policy",
+			[]string{"vdom", "protocol", "name", "uuid", "id"}, nil,
 		)
 	)
-
-	registry.MustRegister(mHitCount)
-	registry.MustRegister(mBytes)
-	registry.MustRegister(mPackets)
-	registry.MustRegister(mActiveSessions)
 
 	type pStats struct {
 		ID               int `json:"policyid"`
@@ -368,14 +326,14 @@ func probeFirewallPolicies(c FortiHTTP, registry Registry) bool {
 	// NOTE: ip_version=ipv4 is a no-op if combined policies are not active
 	if err := c.Get("api/v2/monitor/firewall/policy/select", "vdom=*&ip_version=ipv4", &ps4); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
 
 	combined := false
 	maj, min, ok := ParseVersion(ps4[0].Version)
 	if !ok {
 		log.Printf("Could not parse version number %q", ps4[0].Version)
-		return false
+		return nil, false
 	}
 	// If we are at 6.4 or later we use combined policies
 	if maj > 6 || (maj == 6 && min >= 4) {
@@ -385,12 +343,12 @@ func probeFirewallPolicies(c FortiHTTP, registry Registry) bool {
 	if !combined {
 		if err := c.Get("api/v2/monitor/firewall/policy6/select", "vdom=*", &ps6); err != nil {
 			log.Printf("Error: %v", err)
-			return false
+			return nil, false
 		}
 	} else {
 		if err := c.Get("api/v2/monitor/firewall/policy/select", "vdom=*&ip_version=ipv6", &ps6); err != nil {
 			log.Printf("Error: %v", err)
-			return false
+			return nil, false
 		}
 	}
 
@@ -413,12 +371,12 @@ func probeFirewallPolicies(c FortiHTTP, registry Registry) bool {
 
 	if err := c.Get("api/v2/cmdb/firewall/policy", query, &pc); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
 	if !combined {
 		if err := c.Get("api/v2/cmdb/firewall/policy6", query, &pc6); err != nil {
 			log.Printf("Error: %v", err)
-			return false
+			return nil, false
 		}
 	}
 
@@ -439,107 +397,86 @@ func probeFirewallPolicies(c FortiHTTP, registry Registry) bool {
 		pc6Map = pc4Map
 	}
 
-	process := func(ps *policyStats, s *pStats, pcMap map[string]*pConfig, proto string) {
+	process := func(ps *policyStats, s *pStats, pcMap map[string]*pConfig, proto string) []prometheus.Metric {
 		id := fmt.Sprintf("%d", s.ID)
 		name := "Implicit Deny"
 		if s.ID > 0 {
 			c, ok := pcMap[s.UUID]
 			if !ok {
-				log.Printf("Warning: Failed to map %q to policy name - this should not happen", s.UUID)
+				log.Printf("Warning: Failed to map %q to policy config - this should not happen", s.UUID)
 				name = "<UNKNOWN>"
 			} else {
 				name = c.Name
 			}
 		}
-		mHitCount.WithLabelValues(ps.VDOM, proto, name, s.UUID, id).Set(float64(s.HitCount))
-		mBytes.WithLabelValues(ps.VDOM, proto, name, s.UUID, id).Set(float64(s.Bytes))
-		mPackets.WithLabelValues(ps.VDOM, proto, name, s.UUID, id).Set(float64(s.Packets))
-		mActiveSessions.WithLabelValues(ps.VDOM, proto, name, s.UUID, id).Set(float64(s.ActiveSessions))
+		m := []prometheus.Metric{
+			prometheus.MustNewConstMetric(mHitCount, prometheus.GaugeValue, float64(s.HitCount), ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mBytes, prometheus.GaugeValue, float64(s.Bytes), ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mPackets, prometheus.GaugeValue, float64(s.Packets), ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mActiveSessions, prometheus.GaugeValue, float64(s.ActiveSessions), ps.VDOM, proto, name, s.UUID, id),
+		}
+		return m
 	}
 
+	m := []prometheus.Metric{}
 	for _, ps := range ps4 {
 		for _, s := range ps.Results {
-			process(&ps, &s, pc4Map, "ipv4")
+			m = append(m, process(&ps, &s, pc4Map, "ipv4")...)
 		}
 	}
 
 	for _, ps := range ps6 {
 		for _, s := range ps.Results {
-			process(&ps, &s, pc6Map, "ipv6")
+			m = append(m, process(&ps, &s, pc6Map, "ipv6")...)
 		}
 	}
 
-	return true
+	return m, true
 }
 
-func probeInterfaces(c FortiHTTP, registry Registry) bool {
+func probeInterfaces(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		mLink = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_interface_link_up",
-				Help: "Whether the link is up or not",
-			},
-			[]string{"vdom", "name", "alias", "parent"},
+		mLink = prometheus.NewDesc(
+			"fortigate_interface_link_up",
+			"Whether the link is up or not",
+			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
-		mSpeed = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_interface_speed_bps",
-				Help: "Speed negotiated on the port in bits/s",
-			},
-			[]string{"vdom", "name", "alias", "parent"},
+		mSpeed = prometheus.NewDesc(
+			"fortigate_interface_speed_bps",
+			"Speed negotiated on the port in bits/s",
+			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
-		mTxPkts = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_interface_transmit_packets_total",
-				Help: "Number of packets transmitted on the interface",
-			},
-			[]string{"vdom", "name", "alias", "parent"},
+		mTxPkts = prometheus.NewDesc(
+			"fortigate_interface_transmit_packets_total",
+			"Number of packets transmitted on the interface",
+			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
-		mRxPkts = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_interface_receive_packets_total",
-				Help: "Number of packets received on the interface",
-			},
-			[]string{"vdom", "name", "alias", "parent"},
+		mRxPkts = prometheus.NewDesc(
+			"fortigate_interface_receive_packets_total",
+			"Number of packets received on the interface",
+			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
-		mTxB = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_interface_transmit_bytes_total",
-				Help: "Number of bytes transmitted on the interface",
-			},
-			[]string{"vdom", "name", "alias", "parent"},
+		mTxB = prometheus.NewDesc(
+			"fortigate_interface_transmit_bytes_total",
+			"Number of bytes transmitted on the interface",
+			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
-		mRxB = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_interface_receive_bytes_total",
-				Help: "Number of bytes received on the interface",
-			},
-			[]string{"vdom", "name", "alias", "parent"},
+		mRxB = prometheus.NewDesc(
+			"fortigate_interface_receive_bytes_total",
+			"Number of bytes received on the interface",
+			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
-		mTxErr = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_interface_transmit_errors_total",
-				Help: "Number of transmission errors detected on the interface",
-			},
-			[]string{"vdom", "name", "alias", "parent"},
+		mTxErr = prometheus.NewDesc(
+			"fortigate_interface_transmit_errors_total",
+			"Number of transmission errors detected on the interface",
+			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
-		mRxErr = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_interface_receive_errors_total",
-				Help: "Number of reception errors detected on the interface",
-			},
-			[]string{"vdom", "name", "alias", "parent"},
+		mRxErr = prometheus.NewDesc(
+			"fortigate_interface_receive_errors_total",
+			"Number of reception errors detected on the interface",
+			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
 	)
-
-	registry.MustRegister(mLink)
-	registry.MustRegister(mSpeed)
-	registry.MustRegister(mTxPkts)
-	registry.MustRegister(mRxPkts)
-	registry.MustRegister(mTxB)
-	registry.MustRegister(mRxB)
-	registry.MustRegister(mTxErr)
-	registry.MustRegister(mRxErr)
 
 	type ifResult struct {
 		Id        string
@@ -564,103 +501,76 @@ func probeInterfaces(c FortiHTTP, registry Registry) bool {
 
 	if err := c.Get("api/v2/monitor/system/interface/select", "vdom=*&include_vlan=true&include_aggregate=true", &r); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
+	m := []prometheus.Metric{}
 	for _, v := range r {
 		for _, ir := range v.Results {
 			linkf := 0.0
 			if ir.Link {
 				linkf = 1.0
 			}
-			mLink.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Set(linkf)
-			mSpeed.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Set(ir.Speed * 1000 * 1000)
-			mTxPkts.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.TxPackets))
-			mRxPkts.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.RxPackets))
-			mTxB.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.TxBytes))
-			mRxB.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.RxBytes))
-			mTxErr.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.TxErrors))
-			mRxErr.WithLabelValues(v.VDOM, ir.Name, ir.Alias, ir.Interface).Add(float64(ir.RxErrors))
+			m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, linkf, v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mSpeed, prometheus.GaugeValue, ir.Speed*1000*1000, v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mTxPkts, prometheus.CounterValue, float64(ir.TxPackets), v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mRxPkts, prometheus.CounterValue, float64(ir.RxPackets), v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mTxB, prometheus.CounterValue, float64(ir.TxBytes), v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mRxB, prometheus.CounterValue, float64(ir.RxBytes), v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mTxErr, prometheus.CounterValue, float64(ir.TxErrors), v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mRxErr, prometheus.CounterValue, float64(ir.RxErrors), v.VDOM, ir.Name, ir.Alias, ir.Interface))
 		}
 	}
-	return true
+	return m, true
 }
 
-func probeHAStatistics(c FortiHTTP, registry Registry) bool {
+func probeHAStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		memberInfo = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ha_member_info",
-				Help: "Info metric regarding cluster members",
-			},
-			[]string{"vdom", "hostname", "serial"},
+		memberInfo = prometheus.NewDesc(
+			"fortigate_ha_member_info",
+			"Info metric regarding cluster members",
+			[]string{"vdom", "hostname", "serial"}, nil,
 		)
-		memberSessions = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ha_member_sessions",
-				Help: "Sessions which are handled by this HA member",
-			},
-			[]string{"vdom", "hostname"},
+		memberSessions = prometheus.NewDesc(
+			"fortigate_ha_member_sessions",
+			"Sessions which are handled by this HA member",
+			[]string{"vdom", "hostname"}, nil,
 		)
-		memberPackets = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ha_member_packets_total",
-				Help: "Packets which are handled by this HA member",
-			},
-			[]string{"vdom", "hostname"},
+		memberPackets = prometheus.NewDesc(
+			"fortigate_ha_member_packets_total",
+			"Packets which are handled by this HA member",
+			[]string{"vdom", "hostname"}, nil,
 		)
-		memberVirusEvents = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_ha_member_virus_events_total",
-				Help: "Virus events which are detected by this HA member",
-			},
-			[]string{"vdom", "hostname"},
+		memberVirusEvents = prometheus.NewDesc(
+			"fortigate_ha_member_virus_events_total",
+			"Virus events which are detected by this HA member",
+			[]string{"vdom", "hostname"}, nil,
 		)
-		memberNetworkUsage = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ha_member_network_usage_ratio",
-				Help: "Network usage by HA member",
-			},
-			[]string{"vdom", "hostname"},
+		memberNetworkUsage = prometheus.NewDesc(
+			"fortigate_ha_member_network_usage_ratio",
+			"Network usage by HA member",
+			[]string{"vdom", "hostname"}, nil,
 		)
-		memberBytesTotal = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_ha_member_bytes_total",
-				Help: "Bytes transferred by HA member",
-			},
-			[]string{"vdom", "hostname"},
+		memberBytesTotal = prometheus.NewDesc(
+			"fortigate_ha_member_bytes_total",
+			"Bytes transferred by HA member",
+			[]string{"vdom", "hostname"}, nil,
 		)
-		memberIpsEvents = prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "fortigate_ha_member_ips_events_total",
-				Help: "IPS events processed by HA member",
-			},
-			[]string{"vdom", "hostname"},
+		memberIPSEvents = prometheus.NewDesc(
+			"fortigate_ha_member_ips_events_total",
+			"IPS events processed by HA member",
+			[]string{"vdom", "hostname"}, nil,
 		)
-		memberCpuUsage = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ha_member_cpu_usage_ratio",
-				Help: "CPU usage by HA member",
-			},
-			[]string{"vdom", "hostname"},
+		memberCpuUsage = prometheus.NewDesc(
+			"fortigate_ha_member_cpu_usage_ratio",
+			"CPU usage by HA member",
+			[]string{"vdom", "hostname"}, nil,
 		)
-		memberMemoryUsage = prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: "fortigate_ha_member_memory_usage_ratio",
-				Help: "Memory usage by HA member",
-			},
-			[]string{"vdom", "hostname"},
+		memberMemoryUsage = prometheus.NewDesc(
+			"fortigate_ha_member_memory_usage_ratio",
+			"Memory usage by HA member",
+			[]string{"vdom", "hostname"}, nil,
 		)
 	)
-
-	registry.MustRegister(memberInfo)
-	registry.MustRegister(memberSessions)
-	registry.MustRegister(memberPackets)
-	registry.MustRegister(memberVirusEvents)
-	registry.MustRegister(memberNetworkUsage)
-	registry.MustRegister(memberBytesTotal)
-	registry.MustRegister(memberIpsEvents)
-	registry.MustRegister(memberCpuUsage)
-	registry.MustRegister(memberMemoryUsage)
 
 	type HAResults struct {
 		Hostname         string  `json:"hostname"`
@@ -671,7 +581,7 @@ func probeHAStatistics(c FortiHTTP, registry Registry) bool {
 		VirEvents        float64 `json:"vir_usage"`
 		NetUsage         float64 `json:"net_usage"`
 		TransferredBytes float64 `json:"tbyte"`
-		IpsEvents        float64 `json:"intr_usage"`
+		IPSEvents        float64 `json:"intr_usage"`
 		CpuUsage         float64 `json:"cpu_usage"`
 		MemUsage         float64 `json:"mem_usage"`
 	}
@@ -691,24 +601,22 @@ func probeHAStatistics(c FortiHTTP, registry Registry) bool {
 
 	if err := c.Get("api/v2/monitor/system/ha-statistics", "", &r); err != nil {
 		log.Printf("Error: %v", err)
-		return false
+		return nil, false
 	}
-	for _, result := range r.Results {
-		memberInfo.WithLabelValues(r.VDOM, result.Hostname, result.SerialNo).Set(1)
-		memberSessions.WithLabelValues(r.VDOM, result.Hostname).Set(result.Sessions)
-		memberPackets.WithLabelValues(r.VDOM, result.Hostname).Set(result.Tpacket)
-		memberVirusEvents.WithLabelValues(r.VDOM, result.Hostname).Add(result.VirEvents)
-		memberNetworkUsage.WithLabelValues(r.VDOM, result.Hostname).Add(result.NetUsage / 100)
-		memberBytesTotal.WithLabelValues(r.VDOM, result.Hostname).Add(result.TransferredBytes)
-		memberIpsEvents.WithLabelValues(r.VDOM, result.Hostname).Add(result.IpsEvents)
-		memberCpuUsage.WithLabelValues(r.VDOM, result.Hostname).Add(result.CpuUsage / 100)
-		memberMemoryUsage.WithLabelValues(r.VDOM, result.Hostname).Set(result.MemUsage / 100)
-	}
-	return true
-}
 
-func (p *ProbeCollector) MustRegister(c ...prometheus.Collector) {
-	p.collectors = append(p.collectors, c...)
+	m := []prometheus.Metric{}
+	for _, result := range r.Results {
+		m = append(m, prometheus.MustNewConstMetric(memberInfo, prometheus.GaugeValue, 1, r.VDOM, result.Hostname, result.SerialNo))
+		m = append(m, prometheus.MustNewConstMetric(memberSessions, prometheus.GaugeValue, result.Sessions, r.VDOM, result.Hostname))
+		m = append(m, prometheus.MustNewConstMetric(memberPackets, prometheus.GaugeValue, result.Tpacket, r.VDOM, result.Hostname))
+		m = append(m, prometheus.MustNewConstMetric(memberVirusEvents, prometheus.CounterValue, result.VirEvents, r.VDOM, result.Hostname))
+		m = append(m, prometheus.MustNewConstMetric(memberNetworkUsage, prometheus.GaugeValue, result.NetUsage/100, r.VDOM, result.Hostname))
+		m = append(m, prometheus.MustNewConstMetric(memberBytesTotal, prometheus.CounterValue, result.TransferredBytes, r.VDOM, result.Hostname))
+		m = append(m, prometheus.MustNewConstMetric(memberIPSEvents, prometheus.CounterValue, result.IPSEvents, r.VDOM, result.Hostname))
+		m = append(m, prometheus.MustNewConstMetric(memberCpuUsage, prometheus.GaugeValue, result.CpuUsage/100, r.VDOM, result.Hostname))
+		m = append(m, prometheus.MustNewConstMetric(memberMemoryUsage, prometheus.GaugeValue, result.MemUsage/100, r.VDOM, result.Hostname))
+	}
+	return m, true
 }
 
 func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client) (bool, error) {
@@ -735,6 +643,13 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 	success := true
 	for _, f := range []probeFunc{
 		probeSystemStatus,
+		probeSystemResources,
+		probeSystemVDOMResources,
+		probeFirewallPolicies,
+		probeInterfaces,
+		probeVPNStatistics,
+		probeIPSec,
+		probeHAStatistics,
 	} {
 		m, ok := f(c)
 		if !ok {
@@ -743,27 +658,10 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		p.metrics = append(p.metrics, m...)
 	}
 
-	// TODO: Until migration to pure collector based is done, use an intermediate
-	// registry implemented by ourselves.
-	// These should be migrated to the above form.
-	registry := p
-	success = probeSystemResources(c, registry) && success
-	success = probeSystemVDOMResources(c, registry) && success
-	success = probeFirewallPolicies(c, registry) && success
-	success = probeInterfaces(c, registry) && success
-	success = probeVPNStatistics(c, registry) && success
-	success = probeIPSec(c, registry) && success
-	success = probeHAStatistics(c, registry) && success
-
-	// TODO(bluecmd): log/current-disk-usage
 	return success, nil
 }
 
 func (p *ProbeCollector) Collect(c chan<- prometheus.Metric) {
-	// Collect result of deprecated probe functions
-	for _, co := range p.collectors {
-		co.Collect(c)
-	}
 	// Collect result of new probe functions
 	for _, m := range p.metrics {
 		c <- m
