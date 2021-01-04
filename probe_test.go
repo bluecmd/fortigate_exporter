@@ -139,9 +139,9 @@ func TestVPNConnection(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_vpn_connections_count_total Number of VPN connections
-	# TYPE fortigate_vpn_connections_count_total gauge
-	fortigate_vpn_connections_count_total{vdom="root"} 1
+	# HELP fortigate_vpn_connections Number of VPN connections
+	# TYPE fortigate_vpn_connections gauge
+	fortigate_vpn_connections{vdom="root"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
@@ -158,10 +158,10 @@ func TestIPSec(t *testing.T) {
 
 	em := `
 	# HELP fortigate_ipsec_tunnel_receive_bytes_total Total number of bytes received over the IPsec tunnel
-	# TYPE fortigate_ipsec_tunnel_receive_bytes_total gauge
+	# TYPE fortigate_ipsec_tunnel_receive_bytes_total counter
 	fortigate_ipsec_tunnel_receive_bytes_total{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1.429824e+07
 	# HELP fortigate_ipsec_tunnel_transmit_bytes_total Total number of bytes transmitted over the IPsec tunnel
-	# TYPE fortigate_ipsec_tunnel_transmit_bytes_total gauge
+	# TYPE fortigate_ipsec_tunnel_transmit_bytes_total counter
 	fortigate_ipsec_tunnel_transmit_bytes_total{name="tunnel_1-sub",parent="tunnel_1",vdom="root"} 1.424856e+07
 	# HELP fortigate_ipsec_tunnel_up Status of IPsec tunnel
 	# TYPE fortigate_ipsec_tunnel_up gauge
@@ -250,7 +250,7 @@ func TestFirewallPoliciesPre64(t *testing.T) {
 	fortigate_policy_active_sessions{id="1",name="ipv6 policy",protocol="ipv6",uuid="4a2e2fe4-9e9d-51ea-75b1-b5b486b12192",vdom="FG-traffic"} 0
 	fortigate_policy_active_sessions{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	# HELP fortigate_policy_bytes_total Number of bytes that has passed through a policy
-	# TYPE fortigate_policy_bytes_total gauge
+	# TYPE fortigate_policy_bytes_total counter
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 0
@@ -259,7 +259,7 @@ func TestFirewallPoliciesPre64(t *testing.T) {
 	fortigate_policy_bytes_total{id="1",name="ipv6 policy",protocol="ipv6",uuid="4a2e2fe4-9e9d-51ea-75b1-b5b486b12192",vdom="FG-traffic"} 0
 	fortigate_policy_bytes_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	# HELP fortigate_policy_hit_count_total Number of times a policy has been hit
-	# TYPE fortigate_policy_hit_count_total gauge
+	# TYPE fortigate_policy_hit_count_total counter
 	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
 	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
 	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 0
@@ -268,7 +268,7 @@ func TestFirewallPoliciesPre64(t *testing.T) {
 	fortigate_policy_hit_count_total{id="1",name="ipv6 policy",protocol="ipv6",uuid="4a2e2fe4-9e9d-51ea-75b1-b5b486b12192",vdom="FG-traffic"} 0
 	fortigate_policy_hit_count_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	# HELP fortigate_policy_packets_total Number of packets that has passed through a policy
-	# TYPE fortigate_policy_packets_total gauge
+	# TYPE fortigate_policy_packets_total counter
 	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
 	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
 	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 0
@@ -304,7 +304,7 @@ func TestFirewallPolicies(t *testing.T) {
 	fortigate_policy_active_sessions{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	fortigate_policy_active_sessions{id="2",name="ping",protocol="ipv6",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 1
 	# HELP fortigate_policy_bytes_total Number of bytes that has passed through a policy
-	# TYPE fortigate_policy_bytes_total gauge
+	# TYPE fortigate_policy_bytes_total counter
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 1
@@ -314,7 +314,7 @@ func TestFirewallPolicies(t *testing.T) {
 	fortigate_policy_bytes_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	fortigate_policy_bytes_total{id="2",name="ping",protocol="ipv6",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 2
 	# HELP fortigate_policy_hit_count_total Number of times a policy has been hit
-	# TYPE fortigate_policy_hit_count_total gauge
+	# TYPE fortigate_policy_hit_count_total counter
 	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
 	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
 	fortigate_policy_hit_count_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 1
@@ -324,7 +324,7 @@ func TestFirewallPolicies(t *testing.T) {
 	fortigate_policy_hit_count_total{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	fortigate_policy_hit_count_total{id="2",name="ping",protocol="ipv6",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	# HELP fortigate_policy_packets_total Number of packets that has passed through a policy
-	# TYPE fortigate_policy_packets_total gauge
+	# TYPE fortigate_policy_packets_total counter
 	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
 	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
 	fortigate_policy_packets_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 1
@@ -532,7 +532,7 @@ func TestHaStatistics(t *testing.T) {
         fortigate_ha_member_network_usage_ratio{hostname="member-name-1",vdom="root"} 1.52
         fortigate_ha_member_network_usage_ratio{hostname="member-name-2",vdom="root"} 0.43
         # HELP fortigate_ha_member_packets_total Packets which are handled by this HA member
-        # TYPE fortigate_ha_member_packets_total gauge
+        # TYPE fortigate_ha_member_packets_total counter
         fortigate_ha_member_packets_total{hostname="member-name-1",vdom="root"} 5.49981862e+08
         fortigate_ha_member_packets_total{hostname="member-name-2",vdom="root"} 1
         # HELP fortigate_ha_member_sessions Sessions which are handled by this HA member
