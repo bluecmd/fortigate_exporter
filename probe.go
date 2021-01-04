@@ -180,9 +180,8 @@ func probeSystemVDOMResources(c FortiHTTP) ([]prometheus.Metric, bool) {
 
 func probeVPNStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		// TODO(bluecmd): Rename as it is a gauge, issue #5
 		vpncon = prometheus.NewDesc(
-			"fortigate_vpn_connections_count_total",
+			"fortigate_vpn_connections",
 			"Number of VPN connections",
 			[]string{"vdom"}, nil,
 		)
@@ -263,8 +262,8 @@ func probeIPSec(c FortiHTTP) ([]prometheus.Metric, bool) {
 					s = 1.0
 				}
 				m = append(m, prometheus.MustNewConstMetric(status, prometheus.GaugeValue, s, v.VDOM, t.Name, i.Name))
-				m = append(m, prometheus.MustNewConstMetric(transmitted, prometheus.GaugeValue, float64(t.Outgoing), v.VDOM, t.Name, i.Name))
-				m = append(m, prometheus.MustNewConstMetric(received, prometheus.GaugeValue, float64(t.Incoming), v.VDOM, t.Name, i.Name))
+				m = append(m, prometheus.MustNewConstMetric(transmitted, prometheus.CounterValue, float64(t.Outgoing), v.VDOM, t.Name, i.Name))
+				m = append(m, prometheus.MustNewConstMetric(received, prometheus.CounterValue, float64(t.Incoming), v.VDOM, t.Name, i.Name))
 			}
 		}
 	}
@@ -410,9 +409,9 @@ func probeFirewallPolicies(c FortiHTTP) ([]prometheus.Metric, bool) {
 			}
 		}
 		m := []prometheus.Metric{
-			prometheus.MustNewConstMetric(mHitCount, prometheus.GaugeValue, float64(s.HitCount), ps.VDOM, proto, name, s.UUID, id),
-			prometheus.MustNewConstMetric(mBytes, prometheus.GaugeValue, float64(s.Bytes), ps.VDOM, proto, name, s.UUID, id),
-			prometheus.MustNewConstMetric(mPackets, prometheus.GaugeValue, float64(s.Packets), ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mHitCount, prometheus.CounterValue, float64(s.HitCount), ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mBytes, prometheus.CounterValue, float64(s.Bytes), ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mPackets, prometheus.CounterValue, float64(s.Packets), ps.VDOM, proto, name, s.UUID, id),
 			prometheus.MustNewConstMetric(mActiveSessions, prometheus.GaugeValue, float64(s.ActiveSessions), ps.VDOM, proto, name, s.UUID, id),
 		}
 		return m
@@ -608,7 +607,7 @@ func probeHAStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 	for _, result := range r.Results {
 		m = append(m, prometheus.MustNewConstMetric(memberInfo, prometheus.GaugeValue, 1, r.VDOM, result.Hostname, result.SerialNo))
 		m = append(m, prometheus.MustNewConstMetric(memberSessions, prometheus.GaugeValue, result.Sessions, r.VDOM, result.Hostname))
-		m = append(m, prometheus.MustNewConstMetric(memberPackets, prometheus.GaugeValue, result.Tpacket, r.VDOM, result.Hostname))
+		m = append(m, prometheus.MustNewConstMetric(memberPackets, prometheus.CounterValue, result.Tpacket, r.VDOM, result.Hostname))
 		m = append(m, prometheus.MustNewConstMetric(memberVirusEvents, prometheus.CounterValue, result.VirEvents, r.VDOM, result.Hostname))
 		m = append(m, prometheus.MustNewConstMetric(memberNetworkUsage, prometheus.GaugeValue, result.NetUsage/100, r.VDOM, result.Hostname))
 		m = append(m, prometheus.MustNewConstMetric(memberBytesTotal, prometheus.CounterValue, result.TransferredBytes, r.VDOM, result.Hostname))
