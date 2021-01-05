@@ -103,6 +103,13 @@ config system accprofile
         config netgrp-permission
             set cfg read
         end
+        config sysgrp-permission
+            # Sysgrp.cfg is needed for the following optional functions:
+            # - HA group name
+            # If you do not wish to grant this permission, the relevant
+            # labels/metrics will be absent.
+            set cfg read
+        end
         config fwgrp-permission
             set policy read
         end

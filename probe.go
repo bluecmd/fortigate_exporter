@@ -527,7 +527,7 @@ func probeHAStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 		memberInfo = prometheus.NewDesc(
 			"fortigate_ha_member_info",
 			"Info metric regarding cluster members",
-			[]string{"vdom", "hostname", "serial"}, nil,
+			[]string{"vdom", "hostname", "serial", "group"}, nil,
 		)
 		memberSessions = prometheus.NewDesc(
 			"fortigate_ha_member_sessions",
@@ -603,9 +603,21 @@ func probeHAStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 		return nil, false
 	}
 
+	type HAConfig struct {
+		Result struct {
+			GroupName string `json:"group-name"`
+		} `json:"results"`
+	}
+	var rc HAConfig
+
+	if err := c.Get("api/v2/cmdb/system/ha", "", &rc); err != nil {
+		log.Printf("Error: %v", err)
+		return nil, false
+	}
+
 	m := []prometheus.Metric{}
 	for _, result := range r.Results {
-		m = append(m, prometheus.MustNewConstMetric(memberInfo, prometheus.GaugeValue, 1, r.VDOM, result.Hostname, result.SerialNo))
+		m = append(m, prometheus.MustNewConstMetric(memberInfo, prometheus.GaugeValue, 1, r.VDOM, result.Hostname, result.SerialNo, rc.Result.GroupName))
 		m = append(m, prometheus.MustNewConstMetric(memberSessions, prometheus.GaugeValue, result.Sessions, r.VDOM, result.Hostname))
 		m = append(m, prometheus.MustNewConstMetric(memberPackets, prometheus.CounterValue, result.Tpacket, r.VDOM, result.Hostname))
 		m = append(m, prometheus.MustNewConstMetric(memberVirusEvents, prometheus.CounterValue, result.VirEvents, r.VDOM, result.Hostname))
