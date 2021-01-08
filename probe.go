@@ -34,10 +34,12 @@ type ProbeCollector struct {
 type probeFunc func(FortiHTTP) ([]prometheus.Metric, bool)
 
 func probeSystemStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
-	mVersion := prometheus.NewDesc(
-		"fortigate_version_info",
-		"System version and build information",
-		[]string{"serial", "version", "build"}, nil,
+	var (
+		mVersion = prometheus.NewDesc(
+			"fortigate_version_info",
+			"System version and build information",
+			[]string{"serial", "version", "build"}, nil,
+		)
 	)
 
 	type systemStatus struct {
@@ -177,10 +179,12 @@ func probeSystemVDOMResources(c FortiHTTP) ([]prometheus.Metric, bool) {
 }
 
 func probeVPNStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
-	vpncon := prometheus.NewDesc(
-		"fortigate_vpn_connections",
-		"Number of VPN connections",
-		[]string{"vdom"}, nil,
+	var (
+		vpncon = prometheus.NewDesc(
+			"fortigate_vpn_connections",
+			"Number of VPN connections",
+			[]string{"vdom"}, nil,
+		)
 	)
 
 	type result struct {
@@ -626,10 +630,12 @@ func probeHAStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 }
 
 func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
-	vdomInfo := prometheus.NewDesc(
-		"fortigate_license_vdom_info",
-		"Info metric regarding vdom licenses",
-		[]string{"type"}, nil,
+	var (
+		vdomInfo = prometheus.NewDesc(
+			"fortigate_license_vdom_info",
+			"Info metric regarding vdom licenses",
+			[]string{"type"}, nil,
+		)
 	)
 
 	type LicenseStatus struct {
