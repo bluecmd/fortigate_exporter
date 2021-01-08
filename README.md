@@ -18,6 +18,7 @@ Global:
  * `fortigate_cpu_usage_ratio`
  * `fortigate_memory_usage_ratio`
  * `fortigate_current_sessions`
+ * `fortigate_license_status`
 
 Per-VDOM:
 
