@@ -638,7 +638,7 @@ func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 		)
 		vdomMax = prometheus.NewDesc(
 			"fortigate_license_vdom_max",
-			"The total amount of VDOMs licenses available",
+			"The total amount of VDOM licenses available",
 			[]string{}, nil,
 		)
 	)
