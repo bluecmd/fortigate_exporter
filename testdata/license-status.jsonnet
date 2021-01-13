@@ -1,3 +1,4 @@
+# api/v2/monitor/license/status/select
 {
   "http_method":"GET",
   "results":{

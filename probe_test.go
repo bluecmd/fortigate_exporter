@@ -615,10 +615,12 @@ func TestLicenseStatus(t *testing.T) {
 	}
 
 	em := `
-        # HELP fortigate_license_vdom_info Info metric regarding vdom licenses
-        # TYPE fortigate_license_vdom_info gauge
-        fortigate_license_vdom_info{type="used"} 114
-        fortigate_license_vdom_info{type="max"} 125
+        # HELP fortigate_license_vdom_usage Info metric regarding used vdom licenses
+        # TYPE fortigate_license_vdom_usage gauge
+        fortigate_license_vdom_usage 114
+        # HELP fortigate_license_vdom_max Info metric regarding max vdom licenses
+        # TYPE fortigate_license_vdom_max gauge
+        fortigate_license_vdom_max 125
 	`
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
 		t.Fatalf("metric compare: err %v", err)

@@ -631,15 +631,20 @@ func probeHAStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 
 func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
-		vdomInfo = prometheus.NewDesc(
-			"fortigate_license_vdom_info",
-			"Info metric regarding vdom licenses",
-			[]string{"type"}, nil,
+		vdomUsed = prometheus.NewDesc(
+			"fortigate_license_vdom_usage",
+			"Info metric regarding used vdom licenses",
+			[]string{}, nil,
+		)
+		vdomMax = prometheus.NewDesc(
+			"fortigate_license_vdom_max",
+			"Info metric regarding max vdom licenses",
+			[]string{}, nil,
 		)
 	)
 
 	type LicenseStatus struct {
-		Vdom struct {
+		VDOM struct {
 			Type       string `json:"type"`
 			CanUpgrade bool   `json:"can_upgrade"`
 			Used       int    `json:"used"`
@@ -648,15 +653,7 @@ func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 	}
 
 	type LicenseResponse struct {
-		HTTPMethod string        `json:"http_method"`
-		Results    LicenseStatus `json:"results"`
-		VDOM       string        `json:"vdom"`
-		Path       string        `json:"path"`
-		Name       string        `json:"name"`
-		Status     string        `json:"status"`
-		Serial     string        `json:"serial"`
-		Version    string        `json:"version"`
-		Build      int64         `json:"build"`
+		Results LicenseStatus `json:"results"`
 	}
 	var r LicenseResponse
 
@@ -666,8 +663,8 @@ func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 	}
 
 	m := []prometheus.Metric{
-		prometheus.MustNewConstMetric(vdomInfo, prometheus.GaugeValue, float64(r.Results.Vdom.Used), "used"),
-		prometheus.MustNewConstMetric(vdomInfo, prometheus.GaugeValue, float64(r.Results.Vdom.Max), "max"),
+		prometheus.MustNewConstMetric(vdomUsed, prometheus.GaugeValue, float64(r.Results.VDOM.Used)),
+		prometheus.MustNewConstMetric(vdomMax, prometheus.GaugeValue, float64(r.Results.VDOM.Max)),
 	}
 
 	return m, true
