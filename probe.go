@@ -204,8 +204,8 @@ func probeVPNStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 	}
 
 	return m, true
-
 }
+
 func probeIPSec(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
 		status = prometheus.NewDesc(
@@ -268,7 +268,6 @@ func probeIPSec(c FortiHTTP) ([]prometheus.Metric, bool) {
 		}
 	}
 	return m, true
-
 }
 
 func probeFirewallPolicies(c FortiHTTP) ([]prometheus.Metric, bool) {
@@ -630,6 +629,47 @@ func probeHAStatistics(c FortiHTTP) ([]prometheus.Metric, bool) {
 	return m, true
 }
 
+func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
+	var (
+		vdomUsed = prometheus.NewDesc(
+			"fortigate_license_vdom_usage",
+			"The amount of VDOM licenses currently used",
+			[]string{}, nil,
+		)
+		vdomMax = prometheus.NewDesc(
+			"fortigate_license_vdom_max",
+			"The total amount of VDOM licenses available",
+			[]string{}, nil,
+		)
+	)
+
+	type LicenseStatus struct {
+		VDOM struct {
+			Type       string `json:"type"`
+			CanUpgrade bool   `json:"can_upgrade"`
+			Used       int    `json:"used"`
+			Max        int    `json:"max"`
+		} `json:"vdom"`
+	}
+
+	type LicenseResponse struct {
+		Results LicenseStatus `json:"results"`
+	}
+	var r LicenseResponse
+
+	if err := c.Get("api/v2/monitor/license/status/select", "", &r); err != nil {
+		log.Printf("Error: %v", err)
+		return nil, false
+	}
+
+	m := []prometheus.Metric{
+		prometheus.MustNewConstMetric(vdomUsed, prometheus.GaugeValue, float64(r.Results.VDOM.Used)),
+		prometheus.MustNewConstMetric(vdomMax, prometheus.GaugeValue, float64(r.Results.VDOM.Max)),
+	}
+
+	return m, true
+}
+
 func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client) (bool, error) {
 	tgt, err := url.Parse(target)
 	if err != nil {
@@ -661,6 +701,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		probeVPNStatistics,
 		probeIPSec,
 		probeHAStatistics,
+		probeLicenseStatus,
 	} {
 		m, ok := f(c)
 		if !ok {

@@ -1,0 +1,26 @@
+# api/v2/monitor/license/status/select
+{
+  "http_method":"GET",
+  "results":{
+    "vdom":{
+      "type":"platform",
+      "can_upgrade":true,
+      "used":114,
+      "max":125
+    },
+    "sms":{
+      "type":"other",
+      "status":"no_license",
+      "used":0,
+      "max":0
+    }
+  },
+  "vdom":"root",
+  "path":"license",
+  "name":"status",
+  "action":"select",
+  "status":"success",
+  "serial":"FG1KXXXXXXXXXXXX",
+  "version":"v6.0.9",
+  "build":8661
+}

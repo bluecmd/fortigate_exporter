@@ -130,6 +130,7 @@ func TestSystemStatus(t *testing.T) {
 		t.Fatalf("metric compare: err %v", err)
 	}
 }
+
 func TestVPNConnection(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/vpn/ssl", "testdata/vpn.jsonnet")
@@ -148,6 +149,7 @@ func TestVPNConnection(t *testing.T) {
 		t.Fatalf("metric compare: err %v", err)
 	}
 }
+
 func TestIPSec(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/vpn/ipsec", "testdata/ipsec.jsonnet")
@@ -598,6 +600,27 @@ func TestHAStatisticsNoConfigAccess(t *testing.T) {
         # TYPE fortigate_ha_member_virus_events_total counter
         fortigate_ha_member_virus_events_total{hostname="member-name-1",vdom="root"} 0
         fortigate_ha_member_virus_events_total{hostname="member-name-2",vdom="root"} 0
+	`
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
+
+func TestLicenseStatus(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/license/status/select", "testdata/license-status.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !testProbe(probeLicenseStatus, c, r) {
+		t.Errorf("probeLicenseStatus() returned non-success")
+	}
+
+	em := `
+        # HELP fortigate_license_vdom_usage The amount of VDOM licenses currently used
+        # TYPE fortigate_license_vdom_usage gauge
+        fortigate_license_vdom_usage 114
+        # HELP fortigate_license_vdom_max The total amount of VDOM licenses available
+        # TYPE fortigate_license_vdom_max gauge
+        fortigate_license_vdom_max 125
 	`
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
 		t.Fatalf("metric compare: err %v", err)
