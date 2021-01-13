@@ -633,12 +633,12 @@ func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
 		vdomUsed = prometheus.NewDesc(
 			"fortigate_license_vdom_usage",
-			"Info metric regarding used vdom licenses",
+			"The amount of VDOM licenses currently used",
 			[]string{}, nil,
 		)
 		vdomMax = prometheus.NewDesc(
 			"fortigate_license_vdom_max",
-			"Info metric regarding max vdom licenses",
+			"The total amount of VDOMs licenses available",
 			[]string{}, nil,
 		)
 	)

@@ -615,10 +615,10 @@ func TestLicenseStatus(t *testing.T) {
 	}
 
 	em := `
-        # HELP fortigate_license_vdom_usage Info metric regarding used vdom licenses
+        # HELP fortigate_license_vdom_usage The amount of VDOM licenses currently used
         # TYPE fortigate_license_vdom_usage gauge
         fortigate_license_vdom_usage 114
-        # HELP fortigate_license_vdom_max Info metric regarding max vdom licenses
+        # HELP fortigate_license_vdom_max The total amount of VDOMs licenses available
         # TYPE fortigate_license_vdom_max gauge
         fortigate_license_vdom_max 125
 	`
