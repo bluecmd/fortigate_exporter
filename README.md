@@ -156,6 +156,8 @@ prometheus_fortigate_exporter:
     - 9710:9710
   volumes:
     - /path/to/fortigate-key.yaml:/config/fortigate-key.yaml
+  # Applying multiple parameters
+  command: ["-auth-file", "/config/fortigate-key.yaml", "-insecure", "true"]
   restart: unless-stopped
 ```
 
