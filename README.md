@@ -54,6 +54,18 @@ Per-VDOM:
  * `fortigate_ha_member_bytes_total`
  * `fortigate_ha_member_ips_events_total`
 
+ Per-Link and VDOM: 
+ * `fortigate_link_status`
+ * `fortigate_link_latency_seconds`
+ * `fortigate_link_latency_jitter_seconds`
+ * `fortigate_link_packet_loss_ratio`
+ * `fortigate_link_packet_sent_total`
+ * `fortigate_link_packet_received_total`
+ * `fortigate_link_active_sessions`
+ * `fortigate_link_bandwidth_tx_byte_per_second`
+ * `fortigate_link_bandwidth_rx_byte_per_second`
+ * `fortigate_link_status_change_time_seconds`
+
 ## Usage
 
 Example:

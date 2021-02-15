@@ -670,6 +670,121 @@ func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 	return m, true
 }
 
+func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
+	var (
+		linkStatus = prometheus.NewDesc(
+			"fortigate_link_status",
+			"Signals if the status is up (1) or down (0)",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkLatency = prometheus.NewDesc(
+			"fortigate_link_latency_seconds",
+			"Average latency of this link based on the probe interval set in the monitor in seconds",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkJitter = prometheus.NewDesc(
+			"fortigate_link_latency_jitter_seconds",
+			"Average of the latency jitter  on this link based on the probe interval set in the monitor in seconds",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkPacketLoss = prometheus.NewDesc(
+			"fortigate_link_packet_loss_ratio",
+			"Percentage of packages lost relative all sent",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkPacketSent = prometheus.NewDesc(
+			"fortigate_link_packet_sent_total",
+			"Number of packets sent on this link",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkPacketReceived = prometheus.NewDesc(
+			"fortigate_link_packet_received_total",
+			"Number of packets received on this link",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkSessions = prometheus.NewDesc(
+			"fortigate_link_active_sessions",
+			"Number of sessions active on this link",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkBandwidthTx = prometheus.NewDesc(
+			"fortigate_link_bandwidth_tx_byte_per_second",
+			"Bandwidth available on this link for sending",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkBandwidthRx = prometheus.NewDesc(
+			"fortigate_link_bandwidth_rx_byte_per_second",
+			"Bandwidth available on this link for sending",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+		linkStatusChanged = prometheus.NewDesc(
+			"fortigate_link_status_change_time_seconds",
+			"Unix timestamp describing the time when the last status change has occurred",
+			[]string{"vdom", "monitor", "link"}, nil,
+		)
+	)
+
+	type LinkMonitor struct {
+		Status         string  `json:"status"`
+		Latency        float64 `json:"latency"`
+		Jitter         float64 `json:"jitter"`
+		PacketLoss     float64 `json:"packet_loss"`
+		PacketSent     float64 `json:"packet_sent"`
+		PacketReceived float64 `json:"packet_received"`
+		Session        float64 `json:"session"`
+		TxBandwidth    float64 `json:"tx_bandwidth"`
+		RxBandwidth    float64 `json:"rx_bandwidth"`
+		StateChanged   float64 `json:"state_changed"`
+	}
+
+	type LinkGroup map[string]LinkMonitor
+
+	type linkMonitorResponse struct {
+		HTTPMethod string               `json:"http_method"`
+		Results    map[string]LinkGroup `json:"results"`
+		Vdom       string               `json:"vdom"`
+		Path       string               `json:"path"`
+		Name       string               `json:"name"`
+		Status     string               `json:"status"`
+		Serial     string               `json:"serial"`
+		Version    string               `json:"version"`
+		Build      int                  `json:"build"`
+	}
+
+	var r linkMonitorResponse
+
+	if err := c.Get("api/v2/monitor/system/link-monitor", "", &r); err != nil {
+		log.Printf("Error: %v", err)
+		return nil, false
+	}
+
+	m := []prometheus.Metric{}
+
+	for linkGroupName, linkGroup := range r.Results {
+		for linkName, link := range linkGroup {
+			// prepare values
+			var wanStatus float64
+			if link.Status == "up" {
+				wanStatus = 1
+			} else {
+				wanStatus = 0
+			}
+
+			m = append(m, prometheus.MustNewConstMetric(linkStatus, prometheus.GaugeValue, wanStatus, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkLatency, prometheus.GaugeValue, link.Latency/1000, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkJitter, prometheus.GaugeValue, link.Jitter/1000, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkPacketLoss, prometheus.GaugeValue, link.PacketLoss/100, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkPacketSent, prometheus.CounterValue, link.PacketSent, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkPacketReceived, prometheus.CounterValue, link.PacketReceived, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkSessions, prometheus.GaugeValue, link.Session, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkBandwidthTx, prometheus.GaugeValue, link.TxBandwidth/8, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkBandwidthRx, prometheus.GaugeValue, link.RxBandwidth/8, r.Vdom, linkGroupName, linkName))
+			m = append(m, prometheus.MustNewConstMetric(linkStatusChanged, prometheus.GaugeValue, link.StateChanged, r.Vdom, linkGroupName, linkName))
+		}
+	}
+	return m, true
+}
+
 func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client) (bool, error) {
 	tgt, err := url.Parse(target)
 	if err != nil {
@@ -702,6 +817,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		probeIPSec,
 		probeHAStatistics,
 		probeLicenseStatus,
+		probeLinkMonitor,
 	} {
 		m, ok := f(c)
 		if !ok {
