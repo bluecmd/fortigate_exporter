@@ -742,7 +742,7 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 	type linkMonitorResponse struct {
 		HTTPMethod string               `json:"http_method"`
 		Results    map[string]LinkGroup `json:"results"`
-		Vdom       string               `json:"vdom"`
+		VDOM       string               `json:"vdom"`
 		Path       string               `json:"path"`
 		Name       string               `json:"name"`
 		Status     string               `json:"status"`
@@ -751,35 +751,37 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 		Build      int                  `json:"build"`
 	}
 
-	var r linkMonitorResponse
+	var rs []linkMonitorResponse
 
-	if err := c.Get("api/v2/monitor/system/link-monitor", "", &r); err != nil {
+	if err := c.Get("api/v2/monitor/system/link-monitor", "vdom=*", &rs); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
 
 	m := []prometheus.Metric{}
 
-	for linkGroupName, linkGroup := range r.Results {
-		for linkName, link := range linkGroup {
-			// prepare values
-			var wanStatus float64
-			if link.Status == "up" {
-				wanStatus = 1
-			} else {
-				wanStatus = 0
-			}
+	for _, r := range rs {
+		for linkGroupName, linkGroup := range r.Results {
+			for linkName, link := range linkGroup {
+				// prepare values
+				var wanStatus float64
+				if link.Status == "up" {
+					wanStatus = 1
+				} else {
+					wanStatus = 0
+				}
 
-			m = append(m, prometheus.MustNewConstMetric(linkStatus, prometheus.GaugeValue, wanStatus, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkLatency, prometheus.GaugeValue, link.Latency/1000, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkJitter, prometheus.GaugeValue, link.Jitter/1000, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkPacketLoss, prometheus.GaugeValue, link.PacketLoss/100, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkPacketSent, prometheus.CounterValue, link.PacketSent, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkPacketReceived, prometheus.CounterValue, link.PacketReceived, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkSessions, prometheus.GaugeValue, link.Session, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkBandwidthTx, prometheus.GaugeValue, link.TxBandwidth/8, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkBandwidthRx, prometheus.GaugeValue, link.RxBandwidth/8, r.Vdom, linkGroupName, linkName))
-			m = append(m, prometheus.MustNewConstMetric(linkStatusChanged, prometheus.GaugeValue, link.StateChanged, r.Vdom, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkStatus, prometheus.GaugeValue, wanStatus, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkLatency, prometheus.GaugeValue, link.Latency/1000, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkJitter, prometheus.GaugeValue, link.Jitter/1000, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkPacketLoss, prometheus.GaugeValue, link.PacketLoss/100, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkPacketSent, prometheus.CounterValue, link.PacketSent, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkPacketReceived, prometheus.CounterValue, link.PacketReceived, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkSessions, prometheus.GaugeValue, link.Session, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkBandwidthTx, prometheus.GaugeValue, link.TxBandwidth/8, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkBandwidthRx, prometheus.GaugeValue, link.RxBandwidth/8, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkStatusChanged, prometheus.GaugeValue, link.StateChanged, r.VDOM, linkGroupName, linkName))
+			}
 		}
 	}
 	return m, true
