@@ -626,3 +626,49 @@ func TestLicenseStatus(t *testing.T) {
 		t.Fatalf("metric compare: err %v", err)
 	}
 }
+
+func TestLinkStatus(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !testProbe(probeLinkMonitor, c, r) {
+		t.Errorf("probeLinkMonitor() returned non-success")
+	}
+
+	em := `
+        # HELP fortigate_link_active_sessions Number of sessions active on this link
+        # TYPE fortigate_link_active_sessions gauge
+        fortigate_link_active_sessions{link="wan1",monitor="wan-mon",vdom="root"} 77
+        # HELP fortigate_link_bandwidth_rx_byte_per_second Bandwidth available on this link for sending
+        # TYPE fortigate_link_bandwidth_rx_byte_per_second gauge
+        fortigate_link_bandwidth_rx_byte_per_second{link="wan1",monitor="wan-mon",vdom="root"} 4194.625
+        # HELP fortigate_link_bandwidth_tx_byte_per_second Bandwidth available on this link for sending
+        # TYPE fortigate_link_bandwidth_tx_byte_per_second gauge
+        fortigate_link_bandwidth_tx_byte_per_second{link="wan1",monitor="wan-mon",vdom="root"} 8582.125
+        # HELP fortigate_link_status_change_time_seconds Unix timestamp describing the time when the last status change has occurred
+        # TYPE fortigate_link_status_change_time_seconds gauge
+        fortigate_link_status_change_time_seconds{link="wan1",monitor="wan-mon",vdom="root"} 1.61291602e+09
+        # HELP fortigate_link_latency_jitter_seconds Average of the latency jitter  on this link based on the probe interval set in the monitor in seconds
+        # TYPE fortigate_link_latency_jitter_seconds gauge
+        fortigate_link_latency_jitter_seconds{link="wan1",monitor="wan-mon",vdom="root"} 0.0011268666982650758
+        # HELP fortigate_link_latency_seconds Average latency of this link based on the probe interval set in the monitor in seconds
+        # TYPE fortigate_link_latency_seconds gauge
+        fortigate_link_latency_seconds{link="wan1",monitor="wan-mon",vdom="root"} 0.006810200214385986
+        # HELP fortigate_link_packet_loss_ratio Percentage of packages lost relative all sent
+        # TYPE fortigate_link_packet_loss_ratio gauge
+        fortigate_link_packet_loss_ratio{link="wan1",monitor="wan-mon",vdom="root"} 0
+        # HELP fortigate_link_packet_received_total Number of packets received on this link
+        # TYPE fortigate_link_packet_received_total counter
+        fortigate_link_packet_received_total{link="wan1",monitor="wan-mon",vdom="root"} 278807
+        # HELP fortigate_link_packet_sent_total Number of packets sent on this link
+        # TYPE fortigate_link_packet_sent_total counter
+        fortigate_link_packet_sent_total{link="wan1",monitor="wan-mon",vdom="root"} 278878
+        # HELP fortigate_link_status Signals if the status is up (1) or down (0)
+        # TYPE fortigate_link_status gauge
+        fortigate_link_status{link="wan1",monitor="wan-mon",vdom="root"} 1
+	`
+
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
