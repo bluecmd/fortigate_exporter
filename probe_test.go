@@ -660,11 +660,69 @@ func TestLinkStatus(t *testing.T) {
         # HELP fortigate_link_packet_sent_total Number of packets sent on this link
         # TYPE fortigate_link_packet_sent_total counter
         fortigate_link_packet_sent_total{link="wan1",monitor="wan-mon",vdom="root"} 278878
-        # HELP fortigate_link_status Signals if the status is up (1) or down (0)
+        # HELP fortigate_link_status Signals the status of the link. 1 means that this state is present in every other case the value is 0
         # TYPE fortigate_link_status gauge
-        fortigate_link_status{link="wan1",monitor="wan-mon",vdom="root"} 1
+        fortigate_link_status{link="wan1",monitor="wan-mon",state="down",vdom="root"} 0
+        fortigate_link_status{link="wan1",monitor="wan-mon",state="error",vdom="root"} 0
+        fortigate_link_status{link="wan1",monitor="wan-mon",state="unknown",vdom="root"} 0
+        fortigate_link_status{link="wan1",monitor="wan-mon",state="up",vdom="root"} 1
+        # HELP fortigate_link_status_change_time_seconds Unix timestamp describing the time when the last status change has occurred
+        # TYPE fortigate_link_status_change_time_seconds gauge
+        fortigate_link_status_change_time_seconds{link="wan1",monitor="wan-mon",vdom="root"} 1.61291602e+09
 	`
 
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
+
+// testing status error and empty results
+func TestLinkStatusFailure(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor-error.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !testProbe(probeLinkMonitor, c, r) {
+		t.Errorf("probeLinkMonitor() returned non-success")
+	}
+
+	em := `
+        # HELP fortigate_link_status Signals the status of the link. 1 means that this state is present in every other case the value is 0
+        # TYPE fortigate_link_status gauge
+        fortigate_link_status{link="port3",monitor="google-dns-v4",state="down",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v4",state="error",vdom="bluecmd"} 1
+        fortigate_link_status{link="port3",monitor="google-dns-v4",state="unknown",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v4",state="up",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v6",state="down",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v6",state="error",vdom="bluecmd"} 1
+        fortigate_link_status{link="port3",monitor="google-dns-v6",state="unknown",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v6",state="up",vdom="bluecmd"} 0
+	`
+
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
+
+func TestLinkStatusUnknown(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor-unknown.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !testProbe(probeLinkMonitor, c, r) {
+		t.Errorf("probeLinkMonitor() returned non-success")
+	}
+
+	em := `
+        # HELP fortigate_link_status Signals the status of the link. 1 means that this state is present in every other case the value is 0
+        # TYPE fortigate_link_status gauge
+        fortigate_link_status{link="port3",monitor="google-dns-v4",state="down",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v4",state="error",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v4",state="unknown",vdom="bluecmd"} 1
+        fortigate_link_status{link="port3",monitor="google-dns-v4",state="up",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v6",state="down",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v6",state="error",vdom="bluecmd"} 0
+        fortigate_link_status{link="port3",monitor="google-dns-v6",state="unknown",vdom="bluecmd"} 1
+        fortigate_link_status{link="port3",monitor="google-dns-v6",state="up",vdom="bluecmd"} 0
+	`
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
 		t.Fatalf("metric compare: err %v", err)
 	}

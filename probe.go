@@ -674,8 +674,8 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
 		linkStatus = prometheus.NewDesc(
 			"fortigate_link_status",
-			"Signals if the status is up (1) or down (0)",
-			[]string{"vdom", "monitor", "link"}, nil,
+			"Signals the status of the link. 1 means that this state is present in every other case the value is 0",
+			[]string{"vdom", "monitor", "link", "state"}, nil,
 		)
 		linkLatency = prometheus.NewDesc(
 			"fortigate_link_latency_seconds",
@@ -763,24 +763,38 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 	for _, r := range rs {
 		for linkGroupName, linkGroup := range r.Results {
 			for linkName, link := range linkGroup {
-				// prepare values
-				var wanStatus float64
-				if link.Status == "up" {
-					wanStatus = 1
-				} else {
-					wanStatus = 0
+				wanStatusUp, wanStatusDown, wanStatusError, wanStatusUnknown := 0.0, 0.0, 0.0, 0.0
+				switch link.Status {
+				case "up":
+					wanStatusUp = 1.0
+					break
+				case "down":
+					wanStatusDown = 1.0
+					break
+				case "error":
+					wanStatusError = 1.0
+					break
+				default:
+					wanStatusUnknown = 1.0
 				}
 
-				m = append(m, prometheus.MustNewConstMetric(linkStatus, prometheus.GaugeValue, wanStatus, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkLatency, prometheus.GaugeValue, link.Latency/1000, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkJitter, prometheus.GaugeValue, link.Jitter/1000, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkPacketLoss, prometheus.GaugeValue, link.PacketLoss/100, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkPacketSent, prometheus.CounterValue, link.PacketSent, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkPacketReceived, prometheus.CounterValue, link.PacketReceived, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkSessions, prometheus.GaugeValue, link.Session, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkBandwidthTx, prometheus.GaugeValue, link.TxBandwidth/8, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkBandwidthRx, prometheus.GaugeValue, link.RxBandwidth/8, r.VDOM, linkGroupName, linkName))
-				m = append(m, prometheus.MustNewConstMetric(linkStatusChanged, prometheus.GaugeValue, link.StateChanged, r.VDOM, linkGroupName, linkName))
+				m = append(m, prometheus.MustNewConstMetric(linkStatus, prometheus.GaugeValue, wanStatusUp, r.VDOM, linkGroupName, linkName, "up"))
+				m = append(m, prometheus.MustNewConstMetric(linkStatus, prometheus.GaugeValue, wanStatusDown, r.VDOM, linkGroupName, linkName, "down"))
+				m = append(m, prometheus.MustNewConstMetric(linkStatus, prometheus.GaugeValue, wanStatusError, r.VDOM, linkGroupName, linkName, "error"))
+				m = append(m, prometheus.MustNewConstMetric(linkStatus, prometheus.GaugeValue, wanStatusUnknown, r.VDOM, linkGroupName, linkName, "unknown"))
+
+				// if no error or unknown status is reported, export the metrics
+				if wanStatusError == 0 && wanStatusUnknown == 0 {
+					m = append(m, prometheus.MustNewConstMetric(linkLatency, prometheus.GaugeValue, link.Latency/1000, r.VDOM, linkGroupName, linkName))
+					m = append(m, prometheus.MustNewConstMetric(linkJitter, prometheus.GaugeValue, link.Jitter/1000, r.VDOM, linkGroupName, linkName))
+					m = append(m, prometheus.MustNewConstMetric(linkPacketLoss, prometheus.GaugeValue, link.PacketLoss/100, r.VDOM, linkGroupName, linkName))
+					m = append(m, prometheus.MustNewConstMetric(linkPacketSent, prometheus.CounterValue, link.PacketSent, r.VDOM, linkGroupName, linkName))
+					m = append(m, prometheus.MustNewConstMetric(linkPacketReceived, prometheus.CounterValue, link.PacketReceived, r.VDOM, linkGroupName, linkName))
+					m = append(m, prometheus.MustNewConstMetric(linkSessions, prometheus.GaugeValue, link.Session, r.VDOM, linkGroupName, linkName))
+					m = append(m, prometheus.MustNewConstMetric(linkBandwidthTx, prometheus.GaugeValue, link.TxBandwidth/8, r.VDOM, linkGroupName, linkName))
+					m = append(m, prometheus.MustNewConstMetric(linkBandwidthRx, prometheus.GaugeValue, link.RxBandwidth/8, r.VDOM, linkGroupName, linkName))
+					m = append(m, prometheus.MustNewConstMetric(linkStatusChanged, prometheus.GaugeValue, link.StateChanged, r.VDOM, linkGroupName, linkName))
+				}
 			}
 		}
 	}
