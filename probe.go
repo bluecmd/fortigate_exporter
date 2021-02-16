@@ -679,17 +679,17 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 		)
 		linkLatency = prometheus.NewDesc(
 			"fortigate_link_latency_seconds",
-			"Average latency of this link based on the probe interval set in the monitor in seconds",
+			"Average latency of this link based on the last 30 probes in seconds",
 			[]string{"vdom", "monitor", "link"}, nil,
 		)
 		linkJitter = prometheus.NewDesc(
 			"fortigate_link_latency_jitter_seconds",
-			"Average of the latency jitter  on this link based on the probe interval set in the monitor in seconds",
+			"Average of the latency jitter  on this link based on the last 30 probes in seconds",
 			[]string{"vdom", "monitor", "link"}, nil,
 		)
 		linkPacketLoss = prometheus.NewDesc(
 			"fortigate_link_packet_loss_ratio",
-			"Percentage of packages lost relative all sent",
+			"Percentage of packages lost relative to  all sent based on the last 30 probes",
 			[]string{"vdom", "monitor", "link"}, nil,
 		)
 		linkPacketSent = prometheus.NewDesc(

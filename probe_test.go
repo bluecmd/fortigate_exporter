@@ -645,16 +645,13 @@ func TestLinkStatus(t *testing.T) {
         # HELP fortigate_link_bandwidth_tx_byte_per_second Bandwidth available on this link for sending
         # TYPE fortigate_link_bandwidth_tx_byte_per_second gauge
         fortigate_link_bandwidth_tx_byte_per_second{link="wan1",monitor="wan-mon",vdom="root"} 8582.125
-        # HELP fortigate_link_status_change_time_seconds Unix timestamp describing the time when the last status change has occurred
-        # TYPE fortigate_link_status_change_time_seconds gauge
-        fortigate_link_status_change_time_seconds{link="wan1",monitor="wan-mon",vdom="root"} 1.61291602e+09
-        # HELP fortigate_link_latency_jitter_seconds Average of the latency jitter  on this link based on the probe interval set in the monitor in seconds
+        # HELP fortigate_link_latency_jitter_seconds Average of the latency jitter  on this link based on the last 30 probes in seconds
         # TYPE fortigate_link_latency_jitter_seconds gauge
         fortigate_link_latency_jitter_seconds{link="wan1",monitor="wan-mon",vdom="root"} 0.0011268666982650758
-        # HELP fortigate_link_latency_seconds Average latency of this link based on the probe interval set in the monitor in seconds
+        # HELP fortigate_link_latency_seconds Average latency of this link based on the last 30 probes in seconds
         # TYPE fortigate_link_latency_seconds gauge
         fortigate_link_latency_seconds{link="wan1",monitor="wan-mon",vdom="root"} 0.006810200214385986
-        # HELP fortigate_link_packet_loss_ratio Percentage of packages lost relative all sent
+        # HELP fortigate_link_packet_loss_ratio Percentage of packages lost relative to  all sent based on the last 30 probes
         # TYPE fortigate_link_packet_loss_ratio gauge
         fortigate_link_packet_loss_ratio{link="wan1",monitor="wan-mon",vdom="root"} 0
         # HELP fortigate_link_packet_received_total Number of packets received on this link
