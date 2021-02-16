@@ -1,0 +1,37 @@
+# api/v2/monitor/system/link-monitor?vdom=*
+[
+  {
+    "http_method":"GET",
+    "results":{
+      "google-dns-v4":{
+        "port3":{
+          "status":"error"
+        }
+      },
+      "google-dns-v6":{
+        "port3":{
+          "status":"error"
+        }
+      }
+    },
+    "vdom":"bluecmd",
+    "path":"system",
+    "name":"link-monitor",
+    "status":"success",
+    "serial":"FGVMxxxxxx",
+    "version":"v6.4.4",
+    "build":1803
+  },
+  {
+    "http_method":"GET",
+    "results":{
+    },
+    "vdom":"root",
+    "path":"system",
+    "name":"link-monitor",
+    "status":"success",
+    "serial":"FGVMxxxxxx",
+    "version":"v6.4.4",
+    "build":1803
+  }
+]
