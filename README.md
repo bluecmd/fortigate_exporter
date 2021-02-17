@@ -140,7 +140,8 @@ An example configuration for Prometheus looks something like this:
     metrics_path: /probe
     static_configs:
       - targets:
-        - https://fortigate.s6.network
+        - https://my-fortigate
+        - https://my-other-fortigate:8443
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
