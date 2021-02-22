@@ -66,6 +66,12 @@ Per-VDOM:
  * `fortigate_link_bandwidth_rx_byte_per_second`
  * `fortigate_link_status_change_time_seconds`
 
+  Per-Certificate
+ * `fortigate_certificate_info`
+ * `fortigate_certificate_valid_from_seconds`
+ * `fortigate_certificate_valid_to_seconds`
+ * `fortigate_certificate_cmdb_references`
+
 ## Usage
 
 Example:
