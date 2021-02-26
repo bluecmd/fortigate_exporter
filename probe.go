@@ -801,6 +801,140 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 	return m, true
 }
 
+func probeVirtualWanPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
+	var (
+		mLink = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_status",
+			"Whether the link is up or not",
+			[]string{"vdom","sla", "interface", "state"}, nil,
+		)
+		mLatency = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_latency",
+			"Measured latency",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+		mJitter = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_jitter",
+			"Measured jitter",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+		mPacketLoss = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_packetloss",
+			"Measured packet loss",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+		mPacketSent = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_packetsent",
+			"Number of packets sent for this health check",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+		mPacketReceived = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_packetreceived",
+			"Number of packets received for this health check",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+		mSession = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_session",
+			"Session count for the interface",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+		mTXBandwidth = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_txbandwidth",
+			"Upload bandwidth of the interface",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+		mRXBandwidth = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_rxbandwidth",
+			"Download bandwidth of the interface",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+		mStateChanged = prometheus.NewDesc(
+			"fortigate_virtualwan_healthcheck_statechanged",
+			"Timestamp of the last link state change, in seconds.",
+			[]string{"vdom", "sla", "interface"}, nil,
+		)
+	)
+
+	type SLAMember struct {
+		Status         string  `json:"status"`
+		Latency        float64 `json:"latency"`
+		Jitter         float64 `json:"jitter"`
+		PacketLoss     float64 `json:"packet_loss"`
+		PacketSent     float64 `json:"packet_sent"`
+		PacketReceived float64 `json:"packet_received"`
+		//todo add slatargetmet
+		SLAtargetmet   []string  `json:"sla_targets_met"`
+		Session        float64 `json:"session"`
+		TxBandwidth    float64 `json:"tx_bandwidth"`
+		RxBandwidth    float64 `json:"rx_bandwidth"`
+		StateChanged   float64 `json:"state_changed"`
+	}
+
+	type VirtualWanSLA map[string]SLAMember
+
+	type VirtualWanMonitorResponse struct {
+		HTTPMethod string               `json:"http_method"`
+		Results    map[string]VirtualWanSLA `json:"results"`
+		VDOM       string               `json:"vdom"`
+		Path       string               `json:"path"`
+		Name       string               `json:"name"`
+		Status     string               `json:"status"`
+		Serial     string               `json:"serial"`
+		Version    string               `json:"version"`
+		Build      int                  `json:"build"`
+	}
+
+
+	var rs []VirtualWanMonitorResponse
+
+	if err := c.Get("api/v2/monitor/virtual-wan/health-check","vdom=*", &rs); err != nil {
+		log.Printf("Error: %v", err)
+		return nil, false
+	}
+	m := []prometheus.Metric{}
+	for _, r := range rs {
+		for VirtualWanSLAName, VirtualWanSLA := range r.Results {
+			for MemberName, Member := range VirtualWanSLA {
+				wanStatusUp, wanStatusDown, wanStatusError, wanStatusUnknown := 0.0, 0.0, 0.0, 0.0
+				switch Member.Status {
+				case "up":
+					wanStatusUp = 1.0
+					break
+				case "down":
+					wanStatusDown = 1.0
+					break
+				case "error":
+					wanStatusError = 1.0
+					break
+				case "disable":
+					wanStatusError = 1.0
+					break
+				default:
+					wanStatusUnknown = 1.0
+				}
+
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, wanStatusUp, r.VDOM, VirtualWanSLAName, MemberName, "up"))
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, wanStatusDown, r.VDOM, VirtualWanSLAName, MemberName, "down"))
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, wanStatusError, r.VDOM, VirtualWanSLAName, MemberName, "error"))
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, wanStatusUnknown, r.VDOM, VirtualWanSLAName, MemberName, "unknown"))
+				// if no error or unknown status is reported, export the metrics
+				if wanStatusError == 0 && wanStatusUnknown == 0 {
+					m = append(m, prometheus.MustNewConstMetric(mLatency, prometheus.GaugeValue, Member.Latency/1000, r.VDOM, VirtualWanSLAName, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mJitter, prometheus.GaugeValue, Member.Jitter/1000, r.VDOM, VirtualWanSLAName, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mPacketLoss, prometheus.GaugeValue, Member.PacketLoss/100, r.VDOM, VirtualWanSLAName, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mPacketSent, prometheus.GaugeValue, Member.PacketSent, r.VDOM, VirtualWanSLAName, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mPacketReceived, prometheus.GaugeValue, Member.PacketReceived, r.VDOM, VirtualWanSLAName, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mSession, prometheus.GaugeValue, Member.Session, VirtualWanSLAName, r.VDOM, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mTXBandwidth, prometheus.GaugeValue, Member.TxBandwidth/8, r.VDOM, VirtualWanSLAName, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mRXBandwidth, prometheus.GaugeValue, Member.RxBandwidth/8, r.VDOM, VirtualWanSLAName, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mStateChanged, prometheus.GaugeValue, Member.StateChanged, r.VDOM, VirtualWanSLAName, MemberName,))
+				}
+			}
+		}
+	}
+	return m, true
+}
+
 func probeCertificates(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
 		certificateInfo = prometheus.NewDesc(
@@ -910,6 +1044,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		probeHAStatistics,
 		probeLicenseStatus,
 		probeLinkMonitor,
+		probeVirtualWanPerf,
 		probeCertificates,
 	} {
 		m, ok := f(c)
