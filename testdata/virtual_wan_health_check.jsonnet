@@ -1,3 +1,4 @@
+# api/v2/monitor/virtual-wan/health-check?vdom=*
 [
     {
         "http_method": "GET",
