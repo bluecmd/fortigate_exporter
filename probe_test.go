@@ -728,6 +728,63 @@ func TestLinkStatusUnknown(t *testing.T) {
 	}
 }
 
+func TestVirtualWanHealhCheck(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/virtual-wan/health-check", "testdata/virtual_wan_health_check.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if !testProbe(probeVirtualWanPerf, c, r) {
+		t.Errorf("probeVirtualWanPerf() returned non-success")
+	}
+
+	em := `
+		# HELP fortigate_virtual_wan_healthcheck_active_sessions Active Session count for the health check interface
+		# TYPE fortigate_virtual_wan_healthcheck_active_sessions gauge
+		fortigate_virtual_wan_healthcheck_active_sessions{interface="WAN1_VL300",sla="root",vdom="Internet Check"} 551
+		# HELP fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second Download bandwidth of the health check interface
+		# TYPE fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second gauge
+		fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 23236.75
+		# HELP fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second Upload bandwidth of the health check interface
+		# TYPE fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second gauge
+		fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 10062.125
+		# HELP fortigate_virtual_wan_healthcheck_jitter_seconds Measured latency jitter for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_jitter_seconds gauge
+		fortigate_virtual_wan_healthcheck_jitter_seconds{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 3.503325954079628e-05
+		# HELP fortigate_virtual_wan_healthcheck_latency_seconds Measured latency for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_latency_seconds gauge
+		fortigate_virtual_wan_healthcheck_latency_seconds{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 0.00560099983215332
+		# HELP fortigate_virtual_wan_healthcheck_packetloss_ratio Measured packet loss in percentage for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_packetloss_ratio gauge
+		fortigate_virtual_wan_healthcheck_packetloss_ratio{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 0
+		# HELP fortigate_virtual_wan_healthcheck_packetreceived_total Number of packets received for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_packetreceived_total gauge
+		fortigate_virtual_wan_healthcheck_packetreceived_total{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 307387
+		# HELP fortigate_virtual_wan_healthcheck_packetsent_total Number of packets sent for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_packetsent_total gauge
+		fortigate_virtual_wan_healthcheck_packetsent_total{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 307450
+		# HELP fortigate_virtual_wan_healthcheck_status Status of the health check. If the SD-WAN interface is disabled, disable will be returned. If the interface does not participate in the health check, error will be returned.
+		# TYPE fortigate_virtual_wan_healthcheck_status gauge
+		fortigate_virtual_wan_healthcheck_status{interface="WAN1_VL300",sla="Internet Check",state="disable",vdom="root"} 0
+		fortigate_virtual_wan_healthcheck_status{interface="WAN1_VL300",sla="Internet Check",state="down",vdom="root"} 0
+		fortigate_virtual_wan_healthcheck_status{interface="WAN1_VL300",sla="Internet Check",state="error",vdom="root"} 0
+		fortigate_virtual_wan_healthcheck_status{interface="WAN1_VL300",sla="Internet Check",state="unknown",vdom="root"} 0
+		fortigate_virtual_wan_healthcheck_status{interface="WAN1_VL300",sla="Internet Check",state="up",vdom="root"} 1
+		fortigate_virtual_wan_healthcheck_status{interface="wan2",sla="Internet Check",state="disable",vdom="root"} 1
+		fortigate_virtual_wan_healthcheck_status{interface="wan2",sla="Internet Check",state="down",vdom="root"} 0
+		fortigate_virtual_wan_healthcheck_status{interface="wan2",sla="Internet Check",state="error",vdom="root"} 0
+		fortigate_virtual_wan_healthcheck_status{interface="wan2",sla="Internet Check",state="unknown",vdom="root"} 0
+		fortigate_virtual_wan_healthcheck_status{interface="wan2",sla="Internet Check",state="up",vdom="root"} 0
+		# HELP fortigate_virtual_wan_healthcheck_status_change_time_seconds Unix timestamp describing the time when the last status change has occurred
+		# TYPE fortigate_virtual_wan_healthcheck_status_change_time_seconds gauge
+		fortigate_virtual_wan_healthcheck_status_change_time_seconds{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 1.6141078e+09
+	`
+
+	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
+		t.Fatalf("metric compare: err %v", err)
+	}
+}
+
+
+
 func TestCertificates(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/available-certificates?scope=global", "testdata/available-certificates-scope-global.jsonnet")

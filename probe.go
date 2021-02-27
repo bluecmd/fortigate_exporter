@@ -804,53 +804,53 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 func probeVirtualWanPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
 		mLink = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_status",
-			"Whether the link is up or not",
+			"fortigate_virtual_wan_healthcheck_status",
+			"Status of the health check. If the SD-WAN interface is disabled, disable will be returned. If the interface does not participate in the health check, error will be returned.",
 			[]string{"vdom","sla", "interface", "state"}, nil,
 		)
 		mLatency = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_latency",
-			"Measured latency",
+			"fortigate_virtual_wan_healthcheck_latency_seconds",
+			"Measured latency for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mJitter = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_jitter",
-			"Measured jitter",
+			"fortigate_virtual_wan_healthcheck_jitter_seconds",
+			"Measured latency jitter for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketLoss = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_packetloss",
-			"Measured packet loss",
+			"fortigate_virtual_wan_healthcheck_packetloss_ratio",
+			"Measured packet loss in percentage for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketSent = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_packetsent",
+			"fortigate_virtual_wan_healthcheck_packetsent_total",
 			"Number of packets sent for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketReceived = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_packetreceived",
+			"fortigate_virtual_wan_healthcheck_packetreceived_total",
 			"Number of packets received for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mSession = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_session",
-			"Session count for the interface",
+			"fortigate_virtual_wan_healthcheck_active_sessions",
+			"Active Session count for the health check interface",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mTXBandwidth = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_txbandwidth",
-			"Upload bandwidth of the interface",
+			"fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second",
+			"Upload bandwidth of the health check interface",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mRXBandwidth = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_rxbandwidth",
-			"Download bandwidth of the interface",
+			"fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second",
+			"Download bandwidth of the health check interface",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mStateChanged = prometheus.NewDesc(
-			"fortigate_virtualwan_healthcheck_statechanged",
-			"Timestamp of the last link state change, in seconds.",
+			"fortigate_virtual_wan_healthcheck_status_change_time_seconds",
+			"Unix timestamp describing the time when the last status change has occurred",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 	)
@@ -895,30 +895,31 @@ func probeVirtualWanPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 	for _, r := range rs {
 		for VirtualWanSLAName, VirtualWanSLA := range r.Results {
 			for MemberName, Member := range VirtualWanSLA {
-				wanStatusUp, wanStatusDown, wanStatusError, wanStatusUnknown := 0.0, 0.0, 0.0, 0.0
+				MemberStatusUp, MemberStatusDown, MemberStatusError, MemberStatusDisable, MemberStatusUnknown := 0.0, 0.0, 0.0, 0.0, 0.0
 				switch Member.Status {
 				case "up":
-					wanStatusUp = 1.0
+					MemberStatusUp = 1.0
 					break
 				case "down":
-					wanStatusDown = 1.0
+					MemberStatusDown = 1.0
 					break
 				case "error":
-					wanStatusError = 1.0
+					MemberStatusError = 1.0
 					break
 				case "disable":
-					wanStatusError = 1.0
+					MemberStatusDisable = 1.0
 					break
 				default:
-					wanStatusUnknown = 1.0
+					MemberStatusUnknown = 1.0
 				}
 
-				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, wanStatusUp, r.VDOM, VirtualWanSLAName, MemberName, "up"))
-				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, wanStatusDown, r.VDOM, VirtualWanSLAName, MemberName, "down"))
-				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, wanStatusError, r.VDOM, VirtualWanSLAName, MemberName, "error"))
-				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, wanStatusUnknown, r.VDOM, VirtualWanSLAName, MemberName, "unknown"))
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, MemberStatusUp, r.VDOM, VirtualWanSLAName, MemberName, "up"))
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, MemberStatusDown, r.VDOM, VirtualWanSLAName, MemberName, "down"))
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, MemberStatusError, r.VDOM, VirtualWanSLAName, MemberName, "error"))
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, MemberStatusDisable, r.VDOM, VirtualWanSLAName, MemberName, "disable"))
+				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, MemberStatusUnknown, r.VDOM, VirtualWanSLAName, MemberName, "unknown"))
 				// if no error or unknown status is reported, export the metrics
-				if wanStatusError == 0 && wanStatusUnknown == 0 {
+				if MemberStatusUp == 1 {
 					m = append(m, prometheus.MustNewConstMetric(mLatency, prometheus.GaugeValue, Member.Latency/1000, r.VDOM, VirtualWanSLAName, MemberName,))
 					m = append(m, prometheus.MustNewConstMetric(mJitter, prometheus.GaugeValue, Member.Jitter/1000, r.VDOM, VirtualWanSLAName, MemberName,))
 					m = append(m, prometheus.MustNewConstMetric(mPacketLoss, prometheus.GaugeValue, Member.PacketLoss/100, r.VDOM, VirtualWanSLAName, MemberName,))
