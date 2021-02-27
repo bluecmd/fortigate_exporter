@@ -801,7 +801,7 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 	return m, true
 }
 
-func probeVirtualWanPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
+func probeVirtualWANPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
 		mLink = prometheus.NewDesc(
 			"fortigate_virtual_wan_healthcheck_status",
@@ -863,7 +863,7 @@ func probeVirtualWanPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 		PacketSent     float64 `json:"packet_sent"`
 		PacketReceived float64 `json:"packet_received"`
 		//todo add slatargetmet
-		SLAtargetmet   []string  `json:"sla_targets_met"`
+		SLATargetMet   []string  `json:"sla_targets_met"`
 		Session        float64 `json:"session"`
 		TxBandwidth    float64 `json:"tx_bandwidth"`
 		RxBandwidth    float64 `json:"rx_bandwidth"`
@@ -925,7 +925,7 @@ func probeVirtualWanPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 					m = append(m, prometheus.MustNewConstMetric(mPacketLoss, prometheus.GaugeValue, Member.PacketLoss/100, r.VDOM, VirtualWanSLAName, MemberName,))
 					m = append(m, prometheus.MustNewConstMetric(mPacketSent, prometheus.GaugeValue, Member.PacketSent, r.VDOM, VirtualWanSLAName, MemberName,))
 					m = append(m, prometheus.MustNewConstMetric(mPacketReceived, prometheus.GaugeValue, Member.PacketReceived, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mSession, prometheus.GaugeValue, Member.Session, VirtualWanSLAName, r.VDOM, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mSession, prometheus.GaugeValue, Member.Session, r.VDOM, VirtualWanSLAName, MemberName,))
 					m = append(m, prometheus.MustNewConstMetric(mTXBandwidth, prometheus.GaugeValue, Member.TxBandwidth/8, r.VDOM, VirtualWanSLAName, MemberName,))
 					m = append(m, prometheus.MustNewConstMetric(mRXBandwidth, prometheus.GaugeValue, Member.RxBandwidth/8, r.VDOM, VirtualWanSLAName, MemberName,))
 					m = append(m, prometheus.MustNewConstMetric(mStateChanged, prometheus.GaugeValue, Member.StateChanged, r.VDOM, VirtualWanSLAName, MemberName,))
@@ -1045,7 +1045,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		probeHAStatistics,
 		probeLicenseStatus,
 		probeLinkMonitor,
-		probeVirtualWanPerf,
+		probeVirtualWANPerf,
 		probeCertificates,
 	} {
 		m, ok := f(c)

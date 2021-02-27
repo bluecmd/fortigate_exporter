@@ -728,18 +728,18 @@ func TestLinkStatusUnknown(t *testing.T) {
 	}
 }
 
-func TestVirtualWanHealhCheck(t *testing.T) {
+func TestVirtualWANHealthCheck(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/virtual-wan/health-check", "testdata/virtual_wan_health_check.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeVirtualWanPerf, c, r) {
+	if !testProbe(probeVirtualWANPerf, c, r) {
 		t.Errorf("probeVirtualWanPerf() returned non-success")
 	}
 
 	em := `
 		# HELP fortigate_virtual_wan_healthcheck_active_sessions Active Session count for the health check interface
 		# TYPE fortigate_virtual_wan_healthcheck_active_sessions gauge
-		fortigate_virtual_wan_healthcheck_active_sessions{interface="WAN1_VL300",sla="root",vdom="Internet Check"} 710
+		fortigate_virtual_wan_healthcheck_active_sessions{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 710
 		# HELP fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second Download bandwidth of the health check interface
 		# TYPE fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second gauge
 		fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 32125.375
