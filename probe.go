@@ -804,52 +804,52 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 func probeVirtualWANPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
 		mLink = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_status",
-			"Status of the health check. If the SD-WAN interface is disabled, disable will be returned. If the interface does not participate in the health check, error will be returned.",
+			"fortigate_virtual_wan_status",
+			"Status of the Interface. If the SD-WAN interface is disabled, disable will be returned. If the interface does not participate in the health check, error will be returned.",
 			[]string{"vdom","sla", "interface", "state"}, nil,
 		)
 		mLatency = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_latency_seconds",
-			"Measured latency for this health check",
+			"fortigate_virtual_wan_latency_seconds",
+			"Measured latency for this Health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mJitter = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_latency_jitter_seconds",
-			"Measured latency jitter for this health check",
+			"fortigate_virtual_wan_latency_jitter_seconds",
+			"Measured latency jitter for this Health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketLoss = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_packet_loss_ratio",
-			"Measured packet loss in percentage for this health check",
+			"fortigate_virtual_wan_packet_loss_ratio",
+			"Measured packet loss in percentage for this Health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketSent = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_packet_sent_total",
-			"Number of packets sent for this health check",
+			"fortigate_virtual_wan_packet_sent_total",
+			"Number of packets sent for this Health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketReceived = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_packet_received_total",
-			"Number of packets received for this health check",
+			"fortigate_virtual_wan_packet_received_total",
+			"Number of packets received for this Health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mSession = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_active_sessions",
+			"fortigate_virtual_wan_active_sessions",
 			"Active Session count for the health check interface",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mTXBandwidth = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second",
+			"fortigate_virtual_wan_bandwidth_tx_byte_per_second",
 			"Upload bandwidth of the health check interface",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mRXBandwidth = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second",
+			"fortigate_virtual_wan_bandwidth_rx_byte_per_second",
 			"Download bandwidth of the health check interface",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mStateChanged = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_status_change_time_seconds",
+			"fortigate_virtual_wan_status_change_time_seconds",
 			"Unix timestamp describing the time when the last status change has occurred",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
