@@ -66,6 +66,18 @@ Per-VDOM:
  * `fortigate_link_bandwidth_rx_byte_per_second`
  * `fortigate_link_status_change_time_seconds`
 
+ Per-SDWAN and VDOM:
+ * `fortigate_virtual_wan_status`
+ * `fortigate_virtual_wan_latency_seconds`
+ * `fortigate_virtual_wan_latency_jitter_seconds`
+ * `fortigate_virtual_wan_packet_loss_ratio`
+ * `fortigate_virtual_wan_packet_sent_total`
+ * `fortigate_virtual_wan_packet_received_total`
+ * `fortigate_virtual_wan_active_sessions`
+ * `fortigate_virtual_wan_bandwidth_tx_byte_per_second`
+ * `fortigate_virtual_wan_bandwidth_rx_byte_per_second`
+ * `fortigate_virtual_wan_status_change_time_seconds`
+
   Per-Certificate
  * `fortigate_certificate_info`
  * `fortigate_certificate_valid_from_seconds`
