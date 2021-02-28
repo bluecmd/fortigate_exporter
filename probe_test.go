@@ -746,21 +746,21 @@ func TestVirtualWANHealthCheck(t *testing.T) {
 		# HELP fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second Upload bandwidth of the health check interface
 		# TYPE fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second gauge
 		fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 14662
-		# HELP fortigate_virtual_wan_healthcheck_jitter_seconds Measured latency jitter for this health check
-		# TYPE fortigate_virtual_wan_healthcheck_jitter_seconds gauge
-		fortigate_virtual_wan_healthcheck_jitter_seconds{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 3.116671182215214e-05
+		# HELP fortigate_virtual_wan_healthcheck_latency_jitter_seconds Measured latency jitter for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_latency_jitter_seconds gauge
+		fortigate_virtual_wan_healthcheck_latency_jitter_seconds{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 3.116671182215214e-05
 		# HELP fortigate_virtual_wan_healthcheck_latency_seconds Measured latency for this health check
 		# TYPE fortigate_virtual_wan_healthcheck_latency_seconds gauge
 		fortigate_virtual_wan_healthcheck_latency_seconds{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 0.005611332893371582
-		# HELP fortigate_virtual_wan_healthcheck_packetloss_ratio Measured packet loss in percentage for this health check
-		# TYPE fortigate_virtual_wan_healthcheck_packetloss_ratio gauge
-		fortigate_virtual_wan_healthcheck_packetloss_ratio{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 0
-		# HELP fortigate_virtual_wan_healthcheck_packetreceived_total Number of packets received for this health check
-		# TYPE fortigate_virtual_wan_healthcheck_packetreceived_total gauge
-		fortigate_virtual_wan_healthcheck_packetreceived_total{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 306895
-		# HELP fortigate_virtual_wan_healthcheck_packetsent_total Number of packets sent for this health check
-		# TYPE fortigate_virtual_wan_healthcheck_packetsent_total gauge
-		fortigate_virtual_wan_healthcheck_packetsent_total{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 306958
+		# HELP fortigate_virtual_wan_healthcheck_packet_loss_ratio Measured packet loss in percentage for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_packet_loss_ratio gauge
+		fortigate_virtual_wan_healthcheck_packet_loss_ratio{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 0
+		# HELP fortigate_virtual_wan_healthcheck_packet_received_total Number of packets received for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_packet_received_total gauge
+		fortigate_virtual_wan_healthcheck_packet_received_total{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 306895
+		# HELP fortigate_virtual_wan_healthcheck_packet_sent_total Number of packets sent for this health check
+		# TYPE fortigate_virtual_wan_healthcheck_packet_sent_total gauge
+		fortigate_virtual_wan_healthcheck_packet_sent_total{interface="WAN1_VL300",sla="Internet Check",vdom="root"} 306958
 		# HELP fortigate_virtual_wan_healthcheck_status Status of the health check. If the SD-WAN interface is disabled, disable will be returned. If the interface does not participate in the health check, error will be returned.
 		# TYPE fortigate_virtual_wan_healthcheck_status gauge
 		fortigate_virtual_wan_healthcheck_status{interface="WAN1_VL300",sla="Internet Check",state="disable",vdom="root"} 0

@@ -69,10 +69,10 @@ Per-VDOM:
  Per-SDWAN and VDOM:
  * `fortigate_virtual_wan_healthcheck_status`
  * `fortigate_virtual_wan_healthcheck_latency_seconds`
- * `fortigate_virtual_wan_healthcheck_jitter_seconds`
- * `fortigate_virtual_wan_healthcheck_packetloss_ratio`
- * `fortigate_virtual_wan_healthcheck_packetsent_total`
- * `fortigate_virtual_wan_healthcheck_packetreceived_total`
+ * `fortigate_virtual_wan_healthcheck_latency_jitter_seconds`
+ * `fortigate_virtual_wan_healthcheck_packet_loss_ratio`
+ * `fortigate_virtual_wan_healthcheck_packet_sent_total`
+ * `fortigate_virtual_wan_healthcheck_packet_received_total`
  * `fortigate_virtual_wan_healthcheck_active_sessions`
  * `fortigate_virtual_wan_healthcheck_bandwidth_tx_byte_per_second`
  * `fortigate_virtual_wan_healthcheck_bandwidth_rx_byte_per_second`

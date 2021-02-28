@@ -814,22 +814,22 @@ func probeVirtualWANPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mJitter = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_jitter_seconds",
+			"fortigate_virtual_wan_healthcheck_latency_jitter_seconds",
 			"Measured latency jitter for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketLoss = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_packetloss_ratio",
+			"fortigate_virtual_wan_healthcheck_packet_loss_ratio",
 			"Measured packet loss in percentage for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketSent = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_packetsent_total",
+			"fortigate_virtual_wan_healthcheck_packet_sent_total",
 			"Number of packets sent for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
 		mPacketReceived = prometheus.NewDesc(
-			"fortigate_virtual_wan_healthcheck_packetreceived_total",
+			"fortigate_virtual_wan_healthcheck_packet_received_total",
 			"Number of packets received for this health check",
 			[]string{"vdom", "sla", "interface"}, nil,
 		)
