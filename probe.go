@@ -989,7 +989,7 @@ func probeCertificates(c FortiHTTP) ([]prometheus.Metric, bool) {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
-	for i, _ := range vdomResponses {
+	for i := range vdomResponses {
 		vdomResponses[i].Scope = "vdom"
 	}
 
