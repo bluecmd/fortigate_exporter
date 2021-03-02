@@ -22,6 +22,14 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
+    - name: Ensure that all files are properly formatted
+      run: |
+        FILES=$(gofmt -s -l .)
+        if [ -n "${FILES}" ]; then
+            printf "Following files are not formatted: \n%s" "$FILES"
+            exit 1
+        fi
+
     - name: Get dependencies
       run: |
         go get -v -t -d ./...
