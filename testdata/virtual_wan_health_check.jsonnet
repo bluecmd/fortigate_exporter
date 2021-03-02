@@ -11,7 +11,9 @@
                     "packet_loss": 0,
                     "packet_sent": 306958,
                     "packet_received": 306895,
-                    "sla_targets_met": [],
+                    "sla_targets_met": [
+                        1
+                    ],
                     "session": 710,
                     "tx_bandwidth": 117296,
                     "rx_bandwidth": 257003,

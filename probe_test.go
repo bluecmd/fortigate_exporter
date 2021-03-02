@@ -783,8 +783,6 @@ func TestVirtualWANHealthCheck(t *testing.T) {
 	}
 }
 
-
-
 func TestCertificates(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/available-certificates?scope=global", "testdata/available-certificates-scope-global.jsonnet")
