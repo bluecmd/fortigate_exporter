@@ -92,7 +92,7 @@ Example:
 ```
 $ ./fortigate_exporter -auth-file ~/fortigate-key.yaml
 # or
-$ docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/config/fortigate-key.yaml quay.io/bluecmd/fortigate_exporter
+$ docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/config/fortigate-key.yaml quay.io/bluecmd/fortigate_exporter:master
 ```
 
 Where `fortigate-key.yaml` contains pairs of Fortigate targets and API keys in the following format:
