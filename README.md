@@ -2,6 +2,7 @@
 
 ![Go](https://github.com/bluecmd/fortigate_exporter/workflows/Go/badge.svg)
 ![Docker](https://github.com/bluecmd/fortigate_exporter/workflows/Docker/badge.svg)
+[![Docker Repository on Quay](https://quay.io/repository/bluecmd/fortigate_exporter/status "Docker Repository on Quay")](https://quay.io/repository/bluecmd/fortigate_exporter)
 
 Prometheus exporter for Fortigate firewalls.
 
@@ -89,10 +90,12 @@ Per-VDOM:
 Example:
 
 ```
-./fortigate_exporter -auth-file ~/fortigate-key.yaml
+$ ./fortigate_exporter -auth-file ~/fortigate-key.yaml
+# or
+$ docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/config/fortigate-key.yaml quay.io/bluecmd/fortigate_exporter
 ```
 
-Where `~/fortigate-key.yaml` contains pairs of Fortigate targets and API keys in the following format:
+Where `fortigate-key.yaml` contains pairs of Fortigate targets and API keys in the following format:
 
 ```
 "https://my-fortigate":
@@ -172,6 +175,10 @@ An example configuration for Prometheus looks something like this:
 ```
 
 ## Docker
+
+You can either use the automatic builds on
+[quay.io](https://quay.io/repository/bluecmd/fortigate_exporter) or build yourself
+like this:
 
 ```bash
 docker build -t fortigate_exporter .
