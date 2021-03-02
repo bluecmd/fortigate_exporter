@@ -806,7 +806,7 @@ func probeVirtualWANPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 		mLink = prometheus.NewDesc(
 			"fortigate_virtual_wan_status",
 			"Status of the Interface. If the SD-WAN interface is disabled, disable will be returned. If the interface does not participate in the health check, error will be returned.",
-			[]string{"vdom","sla", "interface", "state"}, nil,
+			[]string{"vdom", "sla", "interface", "state"}, nil,
 		)
 		mLatency = prometheus.NewDesc(
 			"fortigate_virtual_wan_latency_seconds",
@@ -863,31 +863,30 @@ func probeVirtualWANPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 		PacketSent     float64 `json:"packet_sent"`
 		PacketReceived float64 `json:"packet_received"`
 		//todo add slatargetmet
-		SLATargetMet   []string  `json:"sla_targets_met"`
-		Session        float64 `json:"session"`
-		TxBandwidth    float64 `json:"tx_bandwidth"`
-		RxBandwidth    float64 `json:"rx_bandwidth"`
-		StateChanged   float64 `json:"state_changed"`
+		SLATargetMet []float64 `json:"sla_targets_met"`
+		Session      float64   `json:"session"`
+		TxBandwidth  float64   `json:"tx_bandwidth"`
+		RxBandwidth  float64   `json:"rx_bandwidth"`
+		StateChanged float64   `json:"state_changed"`
 	}
 
 	type VirtualWanSLA map[string]SLAMember
 
 	type VirtualWanMonitorResponse struct {
-		HTTPMethod string               `json:"http_method"`
+		HTTPMethod string                   `json:"http_method"`
 		Results    map[string]VirtualWanSLA `json:"results"`
-		VDOM       string               `json:"vdom"`
-		Path       string               `json:"path"`
-		Name       string               `json:"name"`
-		Status     string               `json:"status"`
-		Serial     string               `json:"serial"`
-		Version    string               `json:"version"`
-		Build      int                  `json:"build"`
+		VDOM       string                   `json:"vdom"`
+		Path       string                   `json:"path"`
+		Name       string                   `json:"name"`
+		Status     string                   `json:"status"`
+		Serial     string                   `json:"serial"`
+		Version    string                   `json:"version"`
+		Build      int                      `json:"build"`
 	}
-
 
 	var rs []VirtualWanMonitorResponse
 
-	if err := c.Get("api/v2/monitor/virtual-wan/health-check","vdom=*", &rs); err != nil {
+	if err := c.Get("api/v2/monitor/virtual-wan/health-check", "vdom=*", &rs); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
@@ -920,15 +919,15 @@ func probeVirtualWANPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 				m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, MemberStatusUnknown, r.VDOM, VirtualWanSLAName, MemberName, "unknown"))
 				// if no error or unknown status is reported, export the metrics
 				if MemberStatusUp == 1 {
-					m = append(m, prometheus.MustNewConstMetric(mLatency, prometheus.GaugeValue, Member.Latency/1000, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mJitter, prometheus.GaugeValue, Member.Jitter/1000, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mPacketLoss, prometheus.GaugeValue, Member.PacketLoss/100, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mPacketSent, prometheus.GaugeValue, Member.PacketSent, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mPacketReceived, prometheus.GaugeValue, Member.PacketReceived, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mSession, prometheus.GaugeValue, Member.Session, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mTXBandwidth, prometheus.GaugeValue, Member.TxBandwidth/8, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mRXBandwidth, prometheus.GaugeValue, Member.RxBandwidth/8, r.VDOM, VirtualWanSLAName, MemberName,))
-					m = append(m, prometheus.MustNewConstMetric(mStateChanged, prometheus.GaugeValue, Member.StateChanged, r.VDOM, VirtualWanSLAName, MemberName,))
+					m = append(m, prometheus.MustNewConstMetric(mLatency, prometheus.GaugeValue, Member.Latency/1000, r.VDOM, VirtualWanSLAName, MemberName))
+					m = append(m, prometheus.MustNewConstMetric(mJitter, prometheus.GaugeValue, Member.Jitter/1000, r.VDOM, VirtualWanSLAName, MemberName))
+					m = append(m, prometheus.MustNewConstMetric(mPacketLoss, prometheus.GaugeValue, Member.PacketLoss/100, r.VDOM, VirtualWanSLAName, MemberName))
+					m = append(m, prometheus.MustNewConstMetric(mPacketSent, prometheus.GaugeValue, Member.PacketSent, r.VDOM, VirtualWanSLAName, MemberName))
+					m = append(m, prometheus.MustNewConstMetric(mPacketReceived, prometheus.GaugeValue, Member.PacketReceived, r.VDOM, VirtualWanSLAName, MemberName))
+					m = append(m, prometheus.MustNewConstMetric(mSession, prometheus.GaugeValue, Member.Session, r.VDOM, VirtualWanSLAName, MemberName))
+					m = append(m, prometheus.MustNewConstMetric(mTXBandwidth, prometheus.GaugeValue, Member.TxBandwidth/8, r.VDOM, VirtualWanSLAName, MemberName))
+					m = append(m, prometheus.MustNewConstMetric(mRXBandwidth, prometheus.GaugeValue, Member.RxBandwidth/8, r.VDOM, VirtualWanSLAName, MemberName))
+					m = append(m, prometheus.MustNewConstMetric(mStateChanged, prometheus.GaugeValue, Member.StateChanged, r.VDOM, VirtualWanSLAName, MemberName))
 				}
 			}
 		}
