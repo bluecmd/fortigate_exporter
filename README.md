@@ -79,7 +79,18 @@ Per-VDOM:
  * `fortigate_virtual_wan_bandwidth_rx_byte_per_second`
  * `fortigate_virtual_wan_status_change_time_seconds`
 
-  Per-Certificate
+ Per-VirtualServer and VDOM:
+ * `fortigate_lb_virtual_server_info`
+
+ Per-RealServer for each VirtualServer and VDOM:
+ * `fortigate_lb_real_server_info`
+ * `fortigate_lb_real_server_mode`
+ * `fortigate_lb_real_server_status`
+ * `fortigate_lb_real_server_active_sessions`
+ * `fortigate_lb_real_server_rtt_seconds`
+ * `fortigate_lb_real_server_processed_bytes_total`
+
+ Per-Certificate
  * `fortigate_certificate_info`
  * `fortigate_certificate_valid_from_seconds`
  * `fortigate_certificate_valid_to_seconds`
@@ -132,6 +143,8 @@ config system accprofile
         set scope global
         set secfabgrp read
         set netgrp custom
+        # As of FortiOS 6.2.1 it seems `fwgrp-permissions.other` is removed,
+        # use 'fwgrp read' to get load balance servers metrics
         set fwgrp custom
         set vpngrp read
         set system-diagnostics disable
@@ -147,6 +160,8 @@ config system accprofile
         end
         config fwgrp-permission
             set policy read
+            # fwgrp.other is need for load balance servers
+            # set other read
         end
     next
 end
