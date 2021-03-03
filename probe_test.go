@@ -18,68 +18,23 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"io/ioutil"
-	"log"
+	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"gopkg.in/h2non/gock.v1"
 
 	"github.com/google/go-jsonnet"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 )
 
-type preparedResp struct {
-	d []byte
-	q url.Values
-}
-
-type fakeClient struct {
-	data map[string][]preparedResp
-}
-
-func (c *fakeClient) prepare(path string, jfile string) {
-	u, err := url.Parse(path)
-	if err != nil {
-		panic(err)
-	}
-	vm := jsonnet.MakeVM()
-	b, err := ioutil.ReadFile(jfile)
-	if err != nil {
-		log.Fatalf("Failed to read jsonnet %q: %v", jfile, err)
-	}
-	output, err := vm.EvaluateSnippet(jfile, string(b))
-	if err != nil {
-		log.Fatalf("Failed to evaluate jsonnet %q: %v", jfile, err)
-	}
-	c.data[u.Path] = append(c.data[u.Path], preparedResp{
-		d: []byte(output),
-		q: u.Query(),
-	})
-}
-
-func (c *fakeClient) Get(path string, query string, obj interface{}) error {
-	rs, ok := c.data[path]
-	if !ok {
-		log.Fatalf("Tried to get unprepared URL %q", path)
-	}
-	q, err := url.ParseQuery(query)
-	if err != nil {
-		log.Fatalf("Unable to parse DUT query: %v", err)
-	}
-alt:
-	for _, r := range rs {
-		for k, v := range r.q {
-			if len(q[k]) == 0 || q[k][0] != v[0] {
-				continue alt
-			}
-		}
-		return json.Unmarshal(r.d, obj)
-	}
-	log.Fatalf("No prepared response matched URL %q, query %q", path, query)
-	return nil
-}
+const (
+	DefaultLocalFortigateURI string = "https://fortigate.local/"
+)
 
 type Registry interface {
 	MustRegister(...prometheus.Collector)
@@ -98,8 +53,8 @@ func (p *testProbeCollector) Collect(c chan<- prometheus.Metric) {
 func (p *testProbeCollector) Describe(c chan<- *prometheus.Desc) {
 }
 
-func testProbe(pf probeFunc, c FortiHTTP, r Registry) bool {
-	m, ok := pf(c)
+func testProbe(pf probeFunc, c *FortiHTTP, r Registry) bool {
+	m, ok := pf(*c)
 	if !ok {
 		return false
 	}
@@ -108,16 +63,57 @@ func testProbe(pf probeFunc, c FortiHTTP, r Registry) bool {
 	return true
 }
 
-func newFakeClient() *fakeClient {
-	return &fakeClient{data: map[string][]preparedResp{}}
+func newTestClient(t *testing.T) *FortiHTTP {
+	t.Helper()
+
+	tgt, err := url.Parse(DefaultLocalFortigateURI)
+	if err != nil {
+		t.Fatalf("Failed to parse url '%s': %v", DefaultLocalFortigateURI, err)
+	}
+
+	authMap[tgt.String()] = Auth{Token: "test"}
+
+	c, err := newFortiClient(context.Background(), *tgt, &http.Client{})
+	if err != nil {
+		t.Fatalf("Failed to create client: %v", err)
+	}
+
+	t.Cleanup(func() {
+		gock.Flush()
+	})
+
+	return &c
+}
+
+func httpMock(path string) *gock.Request {
+	return gock.New(DefaultLocalFortigateURI).Get(path)
+}
+
+func mockResponse(t *testing.T, status int, jfile string) func(*gock.Response) {
+	return func(response *gock.Response) {
+		t.Helper()
+
+		vm := jsonnet.MakeVM()
+		b, err := ioutil.ReadFile(jfile)
+		if err != nil {
+			t.Fatalf("Failed to read jsonnet %q: %v", jfile, err)
+		}
+		output, err := vm.EvaluateSnippet(jfile, string(b))
+		if err != nil {
+			t.Fatalf("Failed to evaluate jsonnet %q: %v", jfile, err)
+		}
+
+		response.Status(status).BodyString(output)
+	}
 }
 
 func TestSystemStatus(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/status", "testdata/status.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/status").ReplyFunc(mockResponse(t, 200, "testdata/status.jsonnet"))
+
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeSystemStatus, c, r) {
-		t.Errorf("probeSystemStatus() returned non-success")
+		t.Fatalf("probeSystemStatus() returned non-success")
 	}
 
 	em := `
@@ -132,11 +128,12 @@ func TestSystemStatus(t *testing.T) {
 }
 
 func TestVPNConnection(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/vpn/ssl", "testdata/vpn.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/vpn/ssl").ReplyFunc(mockResponse(t, 200, "testdata/vpn.jsonnet"))
+
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeVPNStatistics, c, r) {
-		t.Errorf("probeSystemStatus() returned non-success")
+		t.Fatalf("probeSystemStatus() returned non-success")
 	}
 
 	em := `
@@ -151,11 +148,11 @@ func TestVPNConnection(t *testing.T) {
 }
 
 func TestIPSec(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/vpn/ipsec", "testdata/ipsec.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/vpn/ipsec").ReplyFunc(mockResponse(t, 200, "testdata/ipsec.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeIPSec, c, r) {
-		t.Errorf("probeIPSec() returned non-success")
+		t.Fatalf("probeIPSec() returned non-success")
 	}
 
 	em := `
@@ -177,11 +174,11 @@ func TestIPSec(t *testing.T) {
 }
 
 func TestSystemResources(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/resource/usage").ReplyFunc(mockResponse(t, 200, "testdata/usage.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeSystemResources, c, r) {
-		t.Errorf("probeSystemResources() returned non-success")
+		t.Fatalf("probeSystemResources() returned non-success")
 	}
 
 	em := `
@@ -202,11 +199,11 @@ func TestSystemResources(t *testing.T) {
 }
 
 func TestSystemVDOMResources(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage-vdom.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/resource/usage").ReplyFunc(mockResponse(t, 200, "testdata/usage-vdom.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeSystemVDOMResources, c, r) {
-		t.Errorf("probeSystemVDOMResources() returned non-success")
+		t.Fatalf("probeSystemVDOMResources() returned non-success")
 	}
 
 	em := `
@@ -231,14 +228,14 @@ func TestSystemVDOMResources(t *testing.T) {
 }
 
 func TestFirewallPoliciesPre64(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/firewall/policy/select", "testdata/fw-policy-pre64.jsonnet")
-	c.prepare("api/v2/monitor/firewall/policy6/select", "testdata/fw-policy6-pre64.jsonnet")
-	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config-pre64.jsonnet")
-	c.prepare("api/v2/cmdb/firewall/policy6", "testdata/fw-policy6-config-pre64.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/firewall/policy/select").ReplyFunc(mockResponse(t, 200, "testdata/fw-policy-pre64.jsonnet"))
+	httpMock("api/v2/monitor/firewall/policy6/select").ReplyFunc(mockResponse(t, 200, "testdata/fw-policy6-pre64.jsonnet"))
+	httpMock("api/v2/cmdb/firewall/policy").ReplyFunc(mockResponse(t, 200, "testdata/fw-policy-config-pre64.jsonnet"))
+	httpMock("api/v2/cmdb/firewall/policy6").ReplyFunc(mockResponse(t, 200, "testdata/fw-policy6-config-pre64.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeFirewallPolicies, c, r) {
-		t.Errorf("probeFirewallPolicies() returned non-success")
+		t.Fatalf("probeFirewallPolicies() returned non-success")
 	}
 
 	em := `
@@ -285,13 +282,13 @@ func TestFirewallPoliciesPre64(t *testing.T) {
 }
 
 func TestFirewallPolicies(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/firewall/policy/select?ip_version=ipv4", "testdata/fw-policy-v4.jsonnet")
-	c.prepare("api/v2/monitor/firewall/policy/select?ip_version=ipv6", "testdata/fw-policy-v6.jsonnet")
-	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/firewall/policy/select").ParamPresent("vdom").MatchParam("ip_version", "ipv4").ReplyFunc(mockResponse(t, 200, "testdata/fw-policy-v4.jsonnet"))
+	httpMock("api/v2/monitor/firewall/policy/select").MatchParam("ip_version", "ipv6").ReplyFunc(mockResponse(t, 200, "testdata/fw-policy-v6.jsonnet"))
+	httpMock("api/v2/cmdb/firewall/policy").ReplyFunc(mockResponse(t, 200, "testdata/fw-policy-config.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeFirewallPolicies, c, r) {
-		t.Errorf("probeFirewallPolicies() returned non-success")
+		t.Fatalf("probeFirewallPolicies() returned non-success")
 	}
 
 	em := `
@@ -342,11 +339,11 @@ func TestFirewallPolicies(t *testing.T) {
 }
 
 func TestInterfaces(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/interface/select", "testdata/interface.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/interface/select").ReplyFunc(mockResponse(t, 200, "testdata/interface.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeInterfaces, c, r) {
-		t.Errorf("probeInterfaces() returned non-success")
+		t.Fatalf("probeInterfaces() returned non-success")
 	}
 
 	em := `
@@ -501,12 +498,12 @@ func TestInterfaces(t *testing.T) {
 }
 
 func TestHAStatistics(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/ha-statistics", "testdata/ha-statistics.jsonnet")
-	c.prepare("api/v2/cmdb/system/ha", "testdata/ha-config.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/ha-statistics").ReplyFunc(mockResponse(t, 200, "testdata/ha-statistics.jsonnet"))
+	httpMock("api/v2/cmdb/system/ha").ReplyFunc(mockResponse(t, 200, "testdata/ha-config.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeHAStatistics, c, r) {
-		t.Errorf("probeHAStatistics() returned non-success")
+		t.Fatalf("probeHAStatistics() returned non-success")
 	}
 
 	em := `
@@ -555,12 +552,12 @@ func TestHAStatistics(t *testing.T) {
 func TestHAStatisticsNoConfigAccess(t *testing.T) {
 	// The only difference here to TestHAStatistics is that the "group" label
 	// is empty in fortigate_ha_member_info.
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/ha-statistics", "testdata/ha-statistics.jsonnet")
-	c.prepare("api/v2/cmdb/system/ha", "testdata/ha-config-no-access.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/ha-statistics").ReplyFunc(mockResponse(t, 200, "testdata/ha-statistics.jsonnet"))
+	httpMock("api/v2/cmdb/system/ha").ReplyFunc(mockResponse(t, 200, "testdata/ha-config-no-access.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeHAStatistics, c, r) {
-		t.Errorf("probeHAStatistics() returned non-success")
+		t.Fatalf("probeHAStatistics() returned non-success")
 	}
 
 	em := `
@@ -607,11 +604,11 @@ func TestHAStatisticsNoConfigAccess(t *testing.T) {
 }
 
 func TestLicenseStatus(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/license/status/select", "testdata/license-status.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/license/status/select").ReplyFunc(mockResponse(t, 200, "testdata/license-status.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeLicenseStatus, c, r) {
-		t.Errorf("probeLicenseStatus() returned non-success")
+		t.Fatalf("probeLicenseStatus() returned non-success")
 	}
 
 	em := `
@@ -628,11 +625,11 @@ func TestLicenseStatus(t *testing.T) {
 }
 
 func TestLinkStatus(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/link-monitor").ReplyFunc(mockResponse(t, 200, "testdata/link-monitor.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeLinkMonitor, c, r) {
-		t.Errorf("probeLinkMonitor() returned non-success")
+		t.Fatalf("probeLinkMonitor() returned non-success")
 	}
 
 	em := `
@@ -678,11 +675,11 @@ func TestLinkStatus(t *testing.T) {
 
 // testing status error and empty results
 func TestLinkStatusFailure(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor-error.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/link-monitor").ReplyFunc(mockResponse(t, 200, "testdata/link-monitor-error.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeLinkMonitor, c, r) {
-		t.Errorf("probeLinkMonitor() returned non-success")
+		t.Fatalf("probeLinkMonitor() returned non-success")
 	}
 
 	em := `
@@ -704,11 +701,11 @@ func TestLinkStatusFailure(t *testing.T) {
 }
 
 func TestLinkStatusUnknown(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor-unknown.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/link-monitor").ReplyFunc(mockResponse(t, 200, "testdata/link-monitor-unknown.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeLinkMonitor, c, r) {
-		t.Errorf("probeLinkMonitor() returned non-success")
+		t.Fatalf("probeLinkMonitor() returned non-success")
 	}
 
 	em := `
@@ -729,11 +726,11 @@ func TestLinkStatusUnknown(t *testing.T) {
 }
 
 func TestVirtualWANHealthCheck(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/virtual-wan/health-check", "testdata/virtual_wan_health_check.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/virtual-wan/health-check").ReplyFunc(mockResponse(t, 200, "testdata/virtual_wan_health_check.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeVirtualWANPerf, c, r) {
-		t.Errorf("probeVirtualWanPerf() returned non-success")
+		t.Fatalf("probeVirtualWanPerf() returned non-success")
 	}
 
 	em := `
@@ -784,12 +781,12 @@ func TestVirtualWANHealthCheck(t *testing.T) {
 }
 
 func TestCertificates(t *testing.T) {
-	c := newFakeClient()
-	c.prepare("api/v2/monitor/system/available-certificates?scope=global", "testdata/available-certificates-scope-global.jsonnet")
-	c.prepare("api/v2/monitor/system/available-certificates?vdom=*", "testdata/available-certificates-vdom.jsonnet")
+	c := newTestClient(t)
+	httpMock("api/v2/monitor/system/available-certificates").MatchParam("scope", "global").ReplyFunc(mockResponse(t, 200, "testdata/available-certificates-scope-global.jsonnet"))
+	httpMock("api/v2/monitor/system/available-certificates").ParamPresent("vdom").ReplyFunc(mockResponse(t, 200, "testdata/available-certificates-vdom.jsonnet"))
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeCertificates, c, r) {
-		t.Errorf("testCertificates() returned non-success")
+		t.Fatalf("probeCertificates() returned non-success")
 	}
 
 	em := `
