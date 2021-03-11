@@ -48,7 +48,7 @@ func probeSystemStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 		Status  string
 		Serial  string
 		Version string
-		Build   int
+		Build   int64
 	}
 	var st systemStatus
 
@@ -83,7 +83,7 @@ func probeSystemResources(c FortiHTTP) ([]prometheus.Metric, bool) {
 	)
 
 	type resUsage struct {
-		Current int
+		Current float64
 	}
 	type resContainer struct {
 		CPU []resUsage
@@ -145,7 +145,7 @@ func probeSystemVDOMResources(c FortiHTTP) ([]prometheus.Metric, bool) {
 	)
 
 	type resUsage struct {
-		Current int
+		Current float64
 	}
 	type resContainer struct {
 		CPU []resUsage
@@ -228,10 +228,10 @@ func probeIPSec(c FortiHTTP) ([]prometheus.Metric, bool) {
 	)
 
 	type proxyid struct {
-		Name     string `json:"p2name"`
-		Status   string `json:"status"`
-		Incoming int    `json:"incoming_bytes"`
-		Outgoing int    `json:"outgoing_bytes"`
+		Name     string  `json:"p2name"`
+		Status   string  `json:"status"`
+		Incoming float64 `json:"incoming_bytes"`
+		Outgoing float64 `json:"outgoing_bytes"`
 	}
 	type tunnel struct {
 		Name    string    `json:"name"`
@@ -264,8 +264,8 @@ func probeIPSec(c FortiHTTP) ([]prometheus.Metric, bool) {
 					s = 1.0
 				}
 				m = append(m, prometheus.MustNewConstMetric(status, prometheus.GaugeValue, s, v.VDOM, t.Name, i.Name))
-				m = append(m, prometheus.MustNewConstMetric(transmitted, prometheus.CounterValue, float64(t.Outgoing), v.VDOM, t.Name, i.Name))
-				m = append(m, prometheus.MustNewConstMetric(received, prometheus.CounterValue, float64(t.Incoming), v.VDOM, t.Name, i.Name))
+				m = append(m, prometheus.MustNewConstMetric(transmitted, prometheus.CounterValue, t.Outgoing, v.VDOM, t.Name, i.Name))
+				m = append(m, prometheus.MustNewConstMetric(received, prometheus.CounterValue, t.Incoming, v.VDOM, t.Name, i.Name))
 			}
 		}
 	}
@@ -297,23 +297,23 @@ func probeFirewallPolicies(c FortiHTTP) ([]prometheus.Metric, bool) {
 	)
 
 	type pStats struct {
-		ID               int `json:"policyid"`
+		ID               int64 `json:"policyid"`
 		UUID             string
-		ActiveSessions   int `json:"active_sessions"`
-		Bytes            int
-		Packets          int
-		SoftwareBytes    int `json:"software_bytes"`
-		SoftwarePackets  int `json:"software_packets"`
-		ASICBytes        int `json:"asic_bytes"`
-		ASICPackets      int `json:"asic_packets"`
-		NTurboBytes      int `json:"nturbo_bytes"`
-		NTurboPackets    int `json:"nturbo_packets"`
-		HitCount         int `json:"hit_count"`
-		SessionCount     int `json:"session_count"`
-		SessionLastUsed  int `json:"session_last_used"`
-		SessionFirstUsed int `json:"session_first_used"`
-		LastUsed         int `json:"last_used"`
-		FirstUsed        int `json:"first_used"`
+		ActiveSessions   float64 `json:"active_sessions"`
+		Bytes            float64
+		Packets          float64
+		SoftwareBytes    float64 `json:"software_bytes"`
+		SoftwarePackets  float64 `json:"software_packets"`
+		ASICBytes        float64 `json:"asic_bytes"`
+		ASICPackets      float64 `json:"asic_packets"`
+		NTurboBytes      float64 `json:"nturbo_bytes"`
+		NTurboPackets    float64 `json:"nturbo_packets"`
+		HitCount         float64 `json:"hit_count"`
+		SessionCount     float64 `json:"session_count"`
+		SessionLastUsed  float64 `json:"session_last_used"`
+		SessionFirstUsed float64 `json:"session_first_used"`
+		LastUsed         float64 `json:"last_used"`
+		FirstUsed        float64 `json:"first_used"`
 	}
 	type policyStats struct {
 		Results []pStats
@@ -353,7 +353,7 @@ func probeFirewallPolicies(c FortiHTTP) ([]prometheus.Metric, bool) {
 	}
 
 	type pConfig struct {
-		ID     int `json:"policyid"`
+		ID     int64 `json:"policyid"`
 		Name   string
 		UUID   string
 		Action string
@@ -410,10 +410,10 @@ func probeFirewallPolicies(c FortiHTTP) ([]prometheus.Metric, bool) {
 			}
 		}
 		m := []prometheus.Metric{
-			prometheus.MustNewConstMetric(mHitCount, prometheus.CounterValue, float64(s.HitCount), ps.VDOM, proto, name, s.UUID, id),
-			prometheus.MustNewConstMetric(mBytes, prometheus.CounterValue, float64(s.Bytes), ps.VDOM, proto, name, s.UUID, id),
-			prometheus.MustNewConstMetric(mPackets, prometheus.CounterValue, float64(s.Packets), ps.VDOM, proto, name, s.UUID, id),
-			prometheus.MustNewConstMetric(mActiveSessions, prometheus.GaugeValue, float64(s.ActiveSessions), ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mHitCount, prometheus.CounterValue, s.HitCount, ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mBytes, prometheus.CounterValue, s.Bytes, ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mPackets, prometheus.CounterValue, s.Packets, ps.VDOM, proto, name, s.UUID, id),
+			prometheus.MustNewConstMetric(mActiveSessions, prometheus.GaugeValue, s.ActiveSessions, ps.VDOM, proto, name, s.UUID, id),
 		}
 		return m
 	}
@@ -484,13 +484,13 @@ func probeInterfaces(c FortiHTTP) ([]prometheus.Metric, bool) {
 		Alias     string
 		Link      bool
 		Speed     float64
-		Duplex    int
-		TxPackets int64 `json:"tx_packets"`
-		RxPackets int64 `json:"rx_packets"`
-		TxBytes   int64 `json:"tx_bytes"`
-		RxBytes   int64 `json:"rx_bytes"`
-		TxErrors  int64 `json:"tx_errors"`
-		RxErrors  int64 `json:"rx_errors"`
+		Duplex    float64
+		TxPackets float64 `json:"tx_packets"`
+		RxPackets float64 `json:"rx_packets"`
+		TxBytes   float64 `json:"tx_bytes"`
+		RxBytes   float64 `json:"rx_bytes"`
+		TxErrors  float64 `json:"tx_errors"`
+		RxErrors  float64 `json:"rx_errors"`
 		Interface string
 	}
 	type ifResponse struct {
@@ -512,12 +512,12 @@ func probeInterfaces(c FortiHTTP) ([]prometheus.Metric, bool) {
 			}
 			m = append(m, prometheus.MustNewConstMetric(mLink, prometheus.GaugeValue, linkf, v.VDOM, ir.Name, ir.Alias, ir.Interface))
 			m = append(m, prometheus.MustNewConstMetric(mSpeed, prometheus.GaugeValue, ir.Speed*1000*1000, v.VDOM, ir.Name, ir.Alias, ir.Interface))
-			m = append(m, prometheus.MustNewConstMetric(mTxPkts, prometheus.CounterValue, float64(ir.TxPackets), v.VDOM, ir.Name, ir.Alias, ir.Interface))
-			m = append(m, prometheus.MustNewConstMetric(mRxPkts, prometheus.CounterValue, float64(ir.RxPackets), v.VDOM, ir.Name, ir.Alias, ir.Interface))
-			m = append(m, prometheus.MustNewConstMetric(mTxB, prometheus.CounterValue, float64(ir.TxBytes), v.VDOM, ir.Name, ir.Alias, ir.Interface))
-			m = append(m, prometheus.MustNewConstMetric(mRxB, prometheus.CounterValue, float64(ir.RxBytes), v.VDOM, ir.Name, ir.Alias, ir.Interface))
-			m = append(m, prometheus.MustNewConstMetric(mTxErr, prometheus.CounterValue, float64(ir.TxErrors), v.VDOM, ir.Name, ir.Alias, ir.Interface))
-			m = append(m, prometheus.MustNewConstMetric(mRxErr, prometheus.CounterValue, float64(ir.RxErrors), v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mTxPkts, prometheus.CounterValue, ir.TxPackets, v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mRxPkts, prometheus.CounterValue, ir.RxPackets, v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mTxB, prometheus.CounterValue, ir.TxBytes, v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mRxB, prometheus.CounterValue, ir.RxBytes, v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mTxErr, prometheus.CounterValue, ir.TxErrors, v.VDOM, ir.Name, ir.Alias, ir.Interface))
+			m = append(m, prometheus.MustNewConstMetric(mRxErr, prometheus.CounterValue, ir.RxErrors, v.VDOM, ir.Name, ir.Alias, ir.Interface))
 		}
 	}
 	return m, true
@@ -647,10 +647,10 @@ func probeLicenseStatus(c FortiHTTP) ([]prometheus.Metric, bool) {
 
 	type LicenseStatus struct {
 		VDOM struct {
-			Type       string `json:"type"`
-			CanUpgrade bool   `json:"can_upgrade"`
-			Used       int    `json:"used"`
-			Max        int    `json:"max"`
+			Type       string  `json:"type"`
+			CanUpgrade bool    `json:"can_upgrade"`
+			Used       float64 `json:"used"`
+			Max        float64 `json:"max"`
 		} `json:"vdom"`
 	}
 
@@ -750,7 +750,7 @@ func probeLinkMonitor(c FortiHTTP) ([]prometheus.Metric, bool) {
 		Status     string               `json:"status"`
 		Serial     string               `json:"serial"`
 		Version    string               `json:"version"`
-		Build      int                  `json:"build"`
+		Build      int64                `json:"build"`
 	}
 
 	var rs []linkMonitorResponse
@@ -883,7 +883,7 @@ func probeVirtualWANPerf(c FortiHTTP) ([]prometheus.Metric, bool) {
 		Status     string                   `json:"status"`
 		Serial     string                   `json:"serial"`
 		Version    string                   `json:"version"`
-		Build      int                      `json:"build"`
+		Build      int64                    `json:"build"`
 	}
 
 	var rs []VirtualWanMonitorResponse
@@ -1058,7 +1058,7 @@ func probeLoadBalanceServers(c FortiHTTP) ([]prometheus.Metric, bool) {
 		ID     int    `json:"real_server_id"`
 		Mode   string `json:"mode"`
 		Status string `json:"status"`
-		// MonitorEvents  int    `json:"monitor_events"`
+		// MonitorEvents  float64    `json:"monitor_events"`
 		ActiveSessions float64 `json:"active_sessions"`
 		RTT            string  `json:"RTT"`
 		BytesProcessed float64 `json:"bytes_processed"`
@@ -1081,7 +1081,7 @@ func probeLoadBalanceServers(c FortiHTTP) ([]prometheus.Metric, bool) {
 		Status     string          `json:"status"`
 		Serial     string          `json:"serial"`
 		Version    string          `json:"version"`
-		Build      int             `json:"build"`
+		Build      int64           `json:"build"`
 	}
 
 	// Consider implementing pagination to remove this limit of 1000 entries
