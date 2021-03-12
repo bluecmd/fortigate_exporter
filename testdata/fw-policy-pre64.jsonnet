@@ -6,7 +6,7 @@
       {
         "policyid":0,
         "active_sessions":0,
-        "bytes":0,
+        "bytes":64687125982,
         "packets":0
       },
       {
