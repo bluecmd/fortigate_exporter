@@ -253,7 +253,7 @@ func TestFirewallPoliciesPre64(t *testing.T) {
 	fortigate_policy_active_sessions{id="2",name="ping",protocol="ipv4",uuid="24843c52-9e9d-51ea-b838-3500a9e54b2e",vdom="FG-traffic"} 0
 	# HELP fortigate_policy_bytes_total Number of bytes that has passed through a policy
 	# TYPE fortigate_policy_bytes_total counter
-	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 0
+	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="FG-traffic"} 64687125982
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv4",uuid="",vdom="root"} 0
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="FG-traffic"} 0
 	fortigate_policy_bytes_total{id="0",name="Implicit Deny",protocol="ipv6",uuid="",vdom="root"} 432
@@ -447,7 +447,7 @@ func TestInterfaces(t *testing.T) {
 	fortigate_interface_transmit_bytes_total{alias="",name="internal2",parent="",vdom="infra"} 1.0426856559e+10
 	fortigate_interface_transmit_bytes_total{alias="",name="internal3",parent="",vdom="root"} 0
 	fortigate_interface_transmit_bytes_total{alias="",name="internal4",parent="",vdom="root"} 0
-	fortigate_interface_transmit_bytes_total{alias="",name="internal5",parent="",vdom="root"} 0
+	fortigate_interface_transmit_bytes_total{alias="",name="internal5",parent="",vdom="root"} 6.4687125982e+17
 	fortigate_interface_transmit_bytes_total{alias="",name="modem",parent="",vdom="root"} 0
 	fortigate_interface_transmit_bytes_total{alias="",name="npu0_vlink0",parent="",vdom="root"} 90
 	fortigate_interface_transmit_bytes_total{alias="",name="npu0_vlink1",parent="",vdom="root"} 90

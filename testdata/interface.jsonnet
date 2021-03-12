@@ -249,7 +249,7 @@
         "duplex":0,
         "tx_packets":0,
         "rx_packets":0,
-        "tx_bytes":0,
+        "tx_bytes":646871259820000000,
         "rx_bytes":0,
         "tx_errors":0,
         "rx_errors":0
