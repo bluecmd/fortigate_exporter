@@ -2,40 +2,40 @@ name: Go
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - '**'
+      - '!master'
   pull_request:
     branches: [ master ]
 
 jobs:
-
-  build:
-    name: Build
+  test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.14
-      id: go
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.14
+        id: go
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      - name: Ensure that all files are properly formatted
+        run: |
+          FILES=$(gofmt -s -l .)
+          if [ -n "${FILES}" ]; then
+              printf "Following files are not formatted: \n%s" "$FILES"
+              exit 1
+          fi
 
-    - name: Ensure that all files are properly formatted
-      run: |
-        FILES=$(gofmt -s -l .)
-        if [ -n "${FILES}" ]; then
-            printf "Following files are not formatted: \n%s" "$FILES"
-            exit 1
-        fi
+      - name: GO vet
+        run: go vet ./...
 
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
+      - name: Test
+        run: go test -v .
 
-    - name: Build
-      run: go build -v .
-
-    - name: Test
-      run: go test -v .
+      - name: Test building
+        run: go build -v .

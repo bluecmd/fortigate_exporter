@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    name: 'Release to GitHub'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+# Go setup
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.14
+        id: go
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+
+# Go test
+      - name: Ensure that all files are properly formatted
+        run: |
+          FILES=$(gofmt -s -l .)
+          if [ -n "${FILES}" ]; then
+              printf "Following files are not formatted: \n%s" "$FILES"
+              exit 1
+          fi
+
+      - name: GO vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -v .
+
+      - name: Test building
+        run: go build -v .
+
+# Prepare release
+      - name: Invoking go binaries generation
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o=.github/workflows/fortigate-exporter.linux.amd64 .
+          GOOS=windows GOARCH=amd64 go build -o=.github/workflows/fortigate-exporter.windows.amd64.exe .
+          GOOS=darwin GOARCH=amd64 go build -o=.github/workflows/fortigate-exporter.darwin.amd64 .
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 13
+      - name: Release to GitHub
+        working-directory: ./.github/workflows
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx semantic-release
