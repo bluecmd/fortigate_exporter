@@ -9,6 +9,7 @@ jobs:
   release:
     name: 'Release to GitHub'
     runs-on: ubuntu-latest
+    environment: GH_TOKEN
     steps:
       - uses: actions/checkout@v2
 # Go setup
