@@ -12,4 +12,3 @@ plugins:
           label: "Windows AMD64"
         - path: "target/fortigate-exporter.darwin.amd64"
           label: "Darwin AMD64"
-dryRun: true
