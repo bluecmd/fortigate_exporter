@@ -1,7 +1,7 @@
 # PromQL usage examples for Fortigate Exporter
 
-PromQL is an advanced language and proper usage of it requires one to both understand
-the language itself and how the metrics one has are constructed.
+PromQL is an advanced language and proper usage of it requires firstly to understand
+the language itself and secondly how the metrics are organized.
 
 To help the users of this exporter, here are some examples to illustrate
 how one could use the power of PromQL to query interesting facts about one's
