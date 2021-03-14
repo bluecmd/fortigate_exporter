@@ -41,7 +41,7 @@ Example: `fortigate_memory_usage_ratio * on (instance) group_left (version) fort
 ## Expiring Certificates
 
 Dealing with certificates can unfortunately be quite complex.
-However using PromQL it is possible to construct a query that returns
+However, by using PromQL it is possible to construct a query that returns
 all certificates expiring within the coming 90 days.
 
 Example:
