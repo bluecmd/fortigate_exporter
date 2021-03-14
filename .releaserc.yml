@@ -6,9 +6,9 @@ plugins:
   - "@semantic-release/release-notes-generator"
   - - "@semantic-release/github"
     - assets:
-        - path: "target/fortigate-exporter.linux.amd64"
+        - path: "fortigate-exporter.linux.amd64"
           label: "Linux AMD64"
-        - path: "target/fortigate-exporter.windows.amd64.exe"
+        - path: "fortigate-exporter.windows.amd64.exe"
           label: "Windows AMD64"
-        - path: "target/fortigate-exporter.darwin.amd64"
+        - path: "fortigate-exporter.darwin.amd64"
           label: "Darwin AMD64"
