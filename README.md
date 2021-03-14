@@ -11,6 +11,8 @@ Prometheus exporter for Fortigate firewalls.
 Right now the exporter supports a quite limited set of metrics, but it is very easy to add!
 Open an issue if your favorite metric is missing.
 
+For example PromQL usage, see [EXAMPLES](EXAMPLES.md).
+
 Supported metrics right now as follows.
 
 Global:
