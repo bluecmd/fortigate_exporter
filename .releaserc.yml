@@ -1,5 +1,5 @@
 ---
-ranches:
+branches:
   - master
 plugins:
   - "@semantic-release/commit-analyzer"
