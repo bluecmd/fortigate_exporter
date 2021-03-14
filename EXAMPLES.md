@@ -3,7 +3,7 @@
 PromQL is an advanced language and proper usage of it requires one to both understand
 the language itself and how the metrics one has are constructed.
 
-To help all the users of this exporter, here are some examples to illustrate
+To help the users of this exporter, here are some examples to illustrate
 how one could use the power of PromQL to query interesting facts about one's
 environment.
 
@@ -16,6 +16,7 @@ Using the `topk` function it is easy to get the most active firewall policies
 based on whatever ranking function you want.
 
 Example: `topk(3, rate(fortigate_policy_bytes_total[15m])) * 8`
+
 This will return the top 3 most active policies based upon the bytes transfered on
 average the last 15m. The output will be bits/s.
 
@@ -28,6 +29,7 @@ average the last 15m. The output will be bits/s.
 ## Adding Version Information
 
 Using `group_left` one can add data from other metadata metrics like `fortigate_version_info`.
+
 Example: `fortigate_memory_usage_ratio * on (instance) group_left (version) fortigate_version_info`
 
 | Element | Value| 
@@ -42,6 +44,7 @@ Certificates can unfortunately be quite involved, but PromQL makes it possible f
 construct a query to return certificates that will expire within the coming 90 days.
 
 Example:
+
 ```
 floor( # return whole days
   (
