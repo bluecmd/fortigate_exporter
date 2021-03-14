@@ -1,8 +1,6 @@
 name: Go
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -11,10 +9,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: ls -la .github/actions/
-      - name: Prepare GO env
-        uses: ./.github/actions/go-setup
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
         with:
           go-version: ^1.14
-      - name: Test GO
-        uses: ./.github/actions/go-test
+        id: go
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+
+      - name: Ensure that all files are properly formatted
+        run: |
+          FILES=$(gofmt -s -l .)
+          if [ -n "${FILES}" ]; then
+              printf "Following files are not formatted: \n%s" "$FILES"
+              exit 1
+          fi
+
+      - name: GO vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -v .
+
+      - name: Test building
+        run: go build -v .
