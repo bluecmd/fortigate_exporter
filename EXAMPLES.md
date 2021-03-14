@@ -7,6 +7,9 @@ To help all the users of this exporter, here are some examples to illustrate
 how one could use the power of PromQL to query interesting facts about one's
 environment.
 
+For an introduction to PromQL, see the official Prometheus
+[documentation](https://prometheus.io/docs/prometheus/latest/querying/examples/).
+
 ## Most Active Firewall Policies
 
 Using the `topk` function it is easy to get the most active firewall policies
