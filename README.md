@@ -122,6 +122,13 @@ which means that currently you need HTTPS to be configured properly.
 
 To probe a Fortigate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
+## Known Issues
+
+This is a collection of known issues that for some reason cannot be fixed,
+but might be possible to work around.
+
+ * Probing causing [httpsd memory leak in FortiOS 6.2.x](https://github.com/bluecmd/fortigate_exporter/issues/62) ([Workaround](https://github.com/bluecmd/fortigate_exporter/issues/62#issuecomment-798602061))
+
 ## Available CLI parameters
 | flag  | default value  |  description  |
 |---|---|---|
