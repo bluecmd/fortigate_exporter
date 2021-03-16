@@ -6,6 +6,16 @@
 
 Prometheus exporter for Fortigate firewalls.
 
+  * [Supported Metrics](#supported-metrics)
+  * [Usage](#usage)
+    + [Available CLI parameters](#available-cli-parameters)
+    + [Fortigate Configuration](#fortigate-configuration)
+    + [Prometheus Configuration](#prometheus-configuration)
+    + [Docker](#docker)
+      - [docker-compose](#docker-compose)
+  * [Known Issues](#known-issues)
+  * [Missing Metrics?](#missing-metrics)
+
 ## Supported Metrics
 
 Right now the exporter supports a quite limited set of metrics, but it is very easy to add!
@@ -122,14 +132,7 @@ which means that currently you need HTTPS to be configured properly.
 
 To probe a Fortigate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
-## Known Issues
-
-This is a collection of known issues that for some reason cannot be fixed,
-but might be possible to work around.
-
- * Probing causing [httpsd memory leak in FortiOS 6.2.x](https://github.com/bluecmd/fortigate_exporter/issues/62) ([Workaround](https://github.com/bluecmd/fortigate_exporter/issues/62#issuecomment-798602061))
-
-## Available CLI parameters
+### Available CLI parameters
 | flag  | default value  |  description  |
 |---|---|---|
 | -auth-file      | /config/fortigate-key.yaml  | path to the location of the key file |
@@ -139,7 +142,7 @@ but might be possible to work around.
 | -insecure       | false  | allows to turn off security validation of TLS certificates  |
 | -extra-ca-certs | (none) | comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store |
 
-## Fortigate Configuration
+### Fortigate Configuration
 
 The following example Admin Profile describes the permissions that needs to be granted
 to the monitor user in order for all metrics to be available.
@@ -176,7 +179,7 @@ config system accprofile
 end
 ```
 
-## Prometheus Configuration
+### Prometheus Configuration
 
 An example configuration for Prometheus looks something like this:
 
@@ -198,7 +201,7 @@ An example configuration for Prometheus looks something like this:
         replacement: '[::1]:9710'
 ```
 
-## Docker
+### Docker
 
 You can either use the automatic builds on
 [quay.io](https://quay.io/repository/bluecmd/fortigate_exporter) or build yourself
@@ -209,7 +212,7 @@ docker build -t fortigate_exporter .
 docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/config/fortigate-key.yaml fortigate_exporter
 ```
 
-### docker-compose
+#### docker-compose
 
 ```yaml
 prometheus_fortigate_exporter:
@@ -222,6 +225,13 @@ prometheus_fortigate_exporter:
   command: ["-auth-file", "/config/fortigate-key.yaml", "-insecure", "true"]
   restart: unless-stopped
 ```
+
+## Known Issues
+
+This is a collection of known issues that for some reason cannot be fixed,
+but might be possible to work around.
+
+ * Probing causing [httpsd memory leak in FortiOS 6.2.x](https://github.com/bluecmd/fortigate_exporter/issues/62) ([Workaround](https://github.com/bluecmd/fortigate_exporter/issues/62#issuecomment-798602061))
 
 ## Missing Metrics?
 
