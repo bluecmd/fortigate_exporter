@@ -1,6 +1,6 @@
 module github.com/bluecmd/fortigate_exporter
 
-go 1.15
+go 1.16
 
 require (
 	github.com/google/go-jsonnet v0.17.0
