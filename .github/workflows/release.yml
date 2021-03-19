@@ -19,8 +19,7 @@ jobs:
         id: go
 
       - name: Get dependencies
-        run: |
-          go get -v -t -d ./...
+        run: make get-dependencies
 
 # Go test
       - name: Ensure that all files are properly formatted
@@ -32,26 +31,24 @@ jobs:
           fi
 
       - name: GO vet
-        run: go vet ./...
+        run: make vet
 
       - name: Test
-        run: go test -v .
+        run: make test
 
       - name: Test building
-        run: go build -v .
+        run: make build
 
 # Prepare release
       - name: Invoking go binaries generation
         run: |
-          GOOS=linux GOARCH=amd64 go build -o=.github/workflows/fortigate-exporter.linux.amd64 .
-          GOOS=windows GOARCH=amd64 go build -o=.github/workflows/fortigate-exporter.windows.amd64.exe .
-          GOOS=darwin GOARCH=amd64 go build -o=.github/workflows/fortigate-exporter.darwin.amd64 .
+          make build-release
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 13
       - name: Release to GitHub
-        working-directory: ./.github/workflows
+        working-directory: ./target
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npx semantic-release
