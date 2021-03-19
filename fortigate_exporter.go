@@ -23,10 +23,13 @@ import (
 	"crypto/x509"
 	"flag"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -44,14 +47,55 @@ var (
 	extraCAs       = flag.String("extra-ca-certs", "", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store")
 
 	authMap = map[string]Auth{}
+
+	Version = "(devel)"
+	GitHash = "(no hash)"
 )
 
 type Auth struct {
 	Token string
 }
 
+type BuildInfo struct {
+	version   string
+	gitHash   string
+	goVersion string
+}
+
 type FortiHTTP interface {
 	Get(path string, query string, obj interface{}) error
+}
+
+func setUpMetricsEndpoint(buildInfo BuildInfo) {
+	fortigateExporterInfo := promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "fortigate_exporter_build_info",
+		Help: "This info metric contains build information for about the exporter",
+	}, []string{"version", "revision", "goversion"})
+
+	fortigateExporterInfo.With(prometheus.Labels{
+		"version":   buildInfo.version,
+		"revision":  buildInfo.gitHash,
+		"goversion": buildInfo.goVersion,
+	}).Set(1)
+}
+
+func getBuildInfo() BuildInfo {
+	// don't overwrite the version if it was set by -ldflags=-X
+	if info, ok := debug.ReadBuildInfo(); ok && Version == "(devel)" {
+		mod := &info.Main
+		if mod.Replace != nil {
+			mod = mod.Replace
+		}
+		Version = mod.Version
+	}
+	// remove leading `v`
+	massagedVersion := strings.TrimPrefix(Version, "v")
+	buildInfo := BuildInfo{
+		version:   massagedVersion,
+		gitHash:   GitHash,
+		goVersion: runtime.Version(),
+	}
+	return buildInfo
 }
 
 func newFortiClient(ctx context.Context, tgt url.URL, hc *http.Client) (FortiHTTP, error) {
@@ -117,6 +161,10 @@ func probeHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	flag.Parse()
+
+	buildInfo := getBuildInfo()
+	log.Printf("FortigateExporter %s ( %s )", buildInfo.version, buildInfo.gitHash)
+	setUpMetricsEndpoint(buildInfo)
 
 	roots, err := x509.SystemCertPool()
 	if err != nil {
