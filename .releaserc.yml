@@ -4,6 +4,8 @@ branches:
 plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
+  - - "@semantic-release/exec"
+    - prepareCmd: "make build-release"
   - - "@semantic-release/github"
     - assets:
         - path: "fortigate-exporter.linux.amd64"

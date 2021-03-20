@@ -11,9 +11,9 @@ build:
 
 .PHONY: build-release
 build-release:
-	GOOS=linux   GOARCH=amd64 go build ${LDFLAGS} -o=target/fortigate-exporter.linux.amd64 .        && \
-  	GOOS=windows GOARCH=amd64 go build ${LDFLAGS} -o=target/fortigate-exporter.windows.amd64.exe .  && \
-  	GOOS=darwin  GOARCH=amd64 go build ${LDFLAGS} -o=target/fortigate-exporter.darwin.amd64 .
+	GOOS=linux   GOARCH=amd64 go build ${LDFLAGS} -o=fortigate-exporter.linux.amd64 .        && \
+  	GOOS=windows GOARCH=amd64 go build ${LDFLAGS} -o=fortigate-exporter.windows.amd64.exe .  && \
+  	GOOS=darwin  GOARCH=amd64 go build ${LDFLAGS} -o=fortigate-exporter.darwin.amd64 .
 
 .PHONY: test
 test:
