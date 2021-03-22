@@ -1126,6 +1126,8 @@ func probeLoadBalanceServers(c FortiHTTP) ([]prometheus.Metric, bool) {
 				realServerRTTValue := math.NaN()
 				if "<1" == realServer.RTT {
 					realServerRTTValue = 0.001
+				} else if "" == realServer.RTT {
+					// NaN
 				} else {
 					if realServerRTTValueInMs, err := strconv.ParseFloat(realServer.RTT, 64); err != nil {
 						log.Printf("Failed to parse RTT value: %v", err)
