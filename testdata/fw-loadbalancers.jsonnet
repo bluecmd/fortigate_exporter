@@ -41,6 +41,17 @@
             "active_sessions":0,
             "RTT":"foo",
             "bytes_processed":0
+          },
+          {
+            "real_server_ip":"10.10.0.4",
+            "real_server_port":8080,
+            "real_server_id":4,
+            "mode":"disabled",
+            "status":"standby",
+            "monitor_events":0,
+            "active_sessions":0,
+            "RTT":"",
+            "bytes_processed":0
           }
         ]
       }
