@@ -14,3 +14,7 @@ plugins:
           label: "Windows AMD64"
         - path: "fortigate-exporter.darwin.amd64"
           label: "Darwin AMD64"
+        - path: "fortigate-exporter.linux.arm64"
+          label: "Linux ARM64"
+        - path: "fortigate-exporter.darwin.arm64"
+          label: "Darwin ARM64"
