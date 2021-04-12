@@ -1,0 +1,14 @@
+# Example systemd service file for fortigate_exporter.
+# Place in e.g. /etc/systemd/system/fortigate_exporter.service
+
+[Unit]
+Description=Fortigate Exporter
+
+[Service]
+User=fortigate_exporter
+ExecStart=/usr/local/bin/fortigate_exporter \
+  --auth-file=/home/fortigate_exporter/fortigate.key \
+  --listen='[::1]:9710'
+
+[Install]
+WantedBy=multi-user.target
