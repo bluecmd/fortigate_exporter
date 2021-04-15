@@ -28,7 +28,31 @@
             "expire":11279,
             "incoming_bytes": 14298240,
             "outgoing_bytes": 14248560
-          }
+          },
+          {
+            "proxy_src":[
+              {
+                "subnet":"0.0.0.0\/0.0.0.0",
+                "port":0,
+                "protocol":0,
+                "protocol_name":""
+              }
+            ],
+            "proxy_dst":[
+              {
+                "subnet":"0.0.0.0\/0.0.0.0",
+                "port":0,
+                "protocol":0,
+                "protocol_name":""
+              }
+            ],
+            "status":"down",
+            "p2name":"tunnel_1-sub",
+            "p2serial":12,
+            "expire":11279,
+            "incoming_bytes": 14298240,
+            "outgoing_bytes": 14248560
+          }          
         ],
         "name":"tunnel_1",
         "comments":"",
