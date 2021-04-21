@@ -1,0 +1,93 @@
+{
+  "http_method":"GET",
+  "results":[
+    {
+      "status":"unclassified",
+      "is_managed":"unmanaged",
+      "is_dead":true,
+      "is_wired":false,
+      "is_fake":false,
+      "capinfo":"EPSs",
+      "ssid":"Rille XC40",
+      "mac":"00:10:02:38:18:19",
+      "manufacturer":"ACTIA",
+      "security_mode":"WPA2 Personal",
+      "encryption":"AES",
+      "channel":6,
+      "rate":72,
+      "first_seen":"2021-04-19 16:45:48",
+      "last_seen":"2021-04-21 08:02:22",
+      "sta_mac":"00:00:00:00:00:00",
+      "wtp_count":1,
+      "detected_by_wtp":[
+        {
+          "is_managed":"unmanaged",
+          "name":"2nd Floor",
+          "serial":"FP221E0000000000",
+          "wtp_id":"FP221E0000000000",
+          "ssid":"Rille XC40",
+          "channel":6,
+          "rate":72,
+          "security_mode":"WPA2 Personal",
+          "signal_strength":-95,
+          "noise":-95,
+          "last_seen":"2021-04-21 08:02:22",
+          "wtp_ip":"0.0.0.0",
+          "wtp_port":5246,
+          "wtp_index":9,
+          "wtp_radio":1
+        }
+      ],
+      "onwire":false
+    },
+    {
+      "status":"unclassified",
+      "is_managed":"unmanaged",
+      "is_dead":true,
+      "is_wired":false,
+      "is_fake":false,
+      "capinfo":"EPs",
+      "ssid":"HUAWEI P20 Pro",
+      "mac":"00:be:3b:dd:80:26",
+      "manufacturer":"HUAWEI TECHNOLOGIES",
+      "security_mode":"WPA2 Personal",
+      "encryption":"AES",
+      "signal_strength_noise":"-91\/-95",
+      "signal_strength":-91,
+      "noise":-95,
+      "channel":11,
+      "rate":144,
+      "first_seen":"2021-04-20 16:50:44",
+      "last_seen":"2021-04-20 16:52:28",
+      "sta_mac":"00:00:00:00:00:00",
+      "wtp_count":1,
+      "detected_by_wtp":[
+        {
+          "is_managed":"unmanaged",
+          "name":"3rd Floor",
+          "serial":"FP221E0000000000",
+          "wtp_id":"FP221E0000000000",
+          "ssid":"HUAWEI P20 Pro",
+          "channel":11,
+          "rate":144,
+          "security_mode":"WPA2 Personal",
+          "signal_strength":-91,
+          "noise":-95,
+          "last_seen":"2021-04-20 16:52:28",
+          "wtp_ip":"0.0.0.0",
+          "wtp_port":5246,
+          "wtp_index":7,
+          "wtp_radio":1
+        }
+      ],
+      "onwire":false
+    }
+  ],
+  "vdom":"root",
+  "path":"wifi",
+  "name":"rogue_ap",
+  "status":"success",
+  "serial":"FGT61FT000000000",
+  "version":"v6.4.5",
+  "build":1828
+}
