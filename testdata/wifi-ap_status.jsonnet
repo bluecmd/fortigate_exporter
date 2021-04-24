@@ -1,3 +1,5 @@
+# https://xxx.xxx.xxx.xxx/api/v2/monitor/wifi/ap_status
+
 {
   "http_method":"GET",
   "results":{
