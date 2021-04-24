@@ -1,3 +1,5 @@
+# https://xxx.xxx.xxx.xxx/api/v2/monitor/wifi/managed_ap
+
 {
   "http_method":"GET",
   "results":[
