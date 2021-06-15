@@ -25,7 +25,7 @@ build-release-arm64:
 
 .PHONY: test
 test:
-	go test -v .
+	go test -v -race ./...
 
 .PHONY: get-dependencies
 get-dependencies:
@@ -37,3 +37,7 @@ vet:
 
 test-output:
 	$(shell echo $$GO_VERSION_NUMBER)
+
+.PHONY: fmt-fix
+fmt-fix:
+	gofmt -s -w -l .
