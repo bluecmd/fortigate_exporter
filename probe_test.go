@@ -944,3 +944,12 @@ func TestLoadBalanceServers(t *testing.T) {
 		t.Fatalf("metric compare: err %v", err)
 	}
 }
+
+func TestLoadBalanceServers_6_0_5(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/firewall/load-balance?vdom=*&start=0&count=1000", "testdata/fw-loadbalancers_6_0_5.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if testProbe(probeLoadBalanceServers, c, r) {
+		t.Errorf("TestLoadBalanceServers_6_0_5() returned not expected success")
+	}
+}

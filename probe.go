@@ -1095,6 +1095,13 @@ func probeLoadBalanceServers(c FortiHTTP) ([]prometheus.Metric, bool) {
 	m := []prometheus.Metric{}
 
 	for _, r := range rs {
+
+		major, minor, ok := ParseVersion(r.Version)
+		if !ok || major < 6 || (major == 6 && minor < 4) {
+			// not supported version. Before 6.4.0 there is no real_server_id and therefore this will fail
+			return nil, false
+		}
+
 		for _, virtualServer := range r.Results {
 			m = append(m, prometheus.MustNewConstMetric(virtualServerInfo, prometheus.GaugeValue, 1, r.VDOM, virtualServer.Name, virtualServer.IP, strconv.Itoa(virtualServer.Port), virtualServer.Type))
 
