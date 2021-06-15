@@ -1,2 +1,8 @@
 .*.sw?
+
+# IDEs
+.idea
+
+# artifacts
+target
 fortigate_exporter

@@ -15,12 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package main
+package http
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -34,7 +35,7 @@ type fortiTokenClient struct {
 	tgt url.URL
 	hc  HTTPClient
 	ctx context.Context
-	tok string
+	tok config.Token
 }
 
 func (c *fortiTokenClient) newGetRequest(url string) (*http.Request, error) {
@@ -76,6 +77,6 @@ func (c *fortiTokenClient) String() string {
 	return c.tgt.String()
 }
 
-func newFortiTokenClient(ctx context.Context, tgt url.URL, hc HTTPClient, token string) (*fortiTokenClient, error) {
+func newFortiTokenClient(ctx context.Context, tgt url.URL, hc HTTPClient, token config.Token) (*fortiTokenClient, error) {
 	return &fortiTokenClient{tgt, hc, ctx, token}, nil
 }
