@@ -3,12 +3,13 @@ package probes
 import (
 	"context"
 	"fmt"
-	"github.com/bluecmd/fortigate_exporter/internal/config"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func ProbeHandler(w http.ResponseWriter, r *http.Request) {

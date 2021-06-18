@@ -20,11 +20,12 @@ package probes
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	fortiHttp "github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
-	"net/http"
-	"net/url"
 )
 
 type ProbeCollector struct {

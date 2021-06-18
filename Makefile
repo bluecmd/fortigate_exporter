@@ -40,4 +40,4 @@ test-output:
 
 .PHONY: fmt-fix
 fmt-fix:
-	gofmt -s -w -l .
+	goimports -w -l .

@@ -1,10 +1,11 @@
 package probes
 
 import (
-	"github.com/bluecmd/fortigate_exporter/pkg/http"
-	"github.com/prometheus/client_golang/prometheus"
 	"log"
 	"strconv"
+
+	"github.com/bluecmd/fortigate_exporter/pkg/http"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func probeVPNIPSec(c http.FortiHTTP) ([]prometheus.Metric, bool) {

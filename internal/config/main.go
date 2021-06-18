@@ -2,10 +2,11 @@ package config
 
 import (
 	"flag"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 type FortiExporterParameter struct {

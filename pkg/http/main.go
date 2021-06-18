@@ -5,11 +5,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"log"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/bluecmd/fortigate_exporter/internal/config"
 )
 
 type FortiHTTP interface {
