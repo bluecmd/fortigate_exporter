@@ -50,10 +50,10 @@ func Configure(config config.FortiExporterConfig) error {
 		}
 	}
 	tc := &tls.Config{RootCAs: roots}
-	if config.TlsInsecure {
+	if config.TLSInsecure {
 		tc.InsecureSkipVerify = true
 	}
-	http.DefaultTransport.(*http.Transport).TLSHandshakeTimeout = time.Duration(config.TlsTimeout) * time.Second
+	http.DefaultTransport.(*http.Transport).TLSHandshakeTimeout = time.Duration(config.TLSTimeout) * time.Second
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = tc
 	return nil
 }

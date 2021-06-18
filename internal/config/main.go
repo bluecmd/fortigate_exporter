@@ -13,8 +13,8 @@ type FortiExporterParameter struct {
 	AuthFile      *string
 	Listen        *string
 	ScrapeTimeout *int
-	TlsTimeout    *int
-	TlsInsecure   *bool
+	TLSTimeout    *int
+	TLSInsecure   *bool
 	TlsExtraCAs   *string
 }
 
@@ -22,8 +22,8 @@ type FortiExporterConfig struct {
 	AuthKeys      AuthKeys
 	Listen        string
 	ScrapeTimeout int
-	TlsTimeout    int
-	TlsInsecure   bool
+	TLSTimeout    int
+	TLSInsecure   bool
 	TlsExtraCAs   []LocalCert
 }
 
@@ -42,8 +42,8 @@ var (
 		AuthFile:      flag.String("auth-file", "", "file containing the authentication map to use when connecting to a Fortigate device"),
 		Listen:        flag.String("listen", ":9710", "address to listen on"),
 		ScrapeTimeout: flag.Int("scrape-timeout", 30, "max seconds to allow a scrape to take"),
-		TlsTimeout:    flag.Int("https-timeout", 10, "TLS Handshake timeout in seconds"),
-		TlsInsecure:   flag.Bool("insecure", false, "Allow insecure certificates"),
+		TLSTimeout:    flag.Int("https-timeout", 10, "TLS Handshake timeout in seconds"),
+		TLSInsecure:   flag.Bool("insecure", false, "Allow insecure certificates"),
 		TlsExtraCAs:   flag.String("extra-ca-certs", "", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store"),
 	}
 
@@ -61,8 +61,8 @@ func Init() error {
 	savedConfig = FortiExporterConfig{
 		Listen:        *parameter.Listen,
 		ScrapeTimeout: *parameter.ScrapeTimeout,
-		TlsTimeout:    *parameter.TlsTimeout,
-		TlsInsecure:   *parameter.TlsInsecure,
+		TLSTimeout:    *parameter.TLSTimeout,
+		TLSInsecure:   *parameter.TLSInsecure,
 	}
 
 	// parse AuthKeys
