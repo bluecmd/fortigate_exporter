@@ -24,7 +24,7 @@ import (
 	"net/url"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
-	fortiHttp "github.com/bluecmd/fortigate_exporter/pkg/http"
+	fortiHTTP "github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -32,7 +32,7 @@ type ProbeCollector struct {
 	metrics []prometheus.Metric
 }
 
-type probeFunc func(fortiHttp.FortiHTTP) ([]prometheus.Metric, bool)
+type probeFunc func(fortiHTTP.FortiHTTP) ([]prometheus.Metric, bool)
 
 func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client, savedConfig config.FortiExporterConfig) (bool, error) {
 	tgt, err := url.Parse(target)
@@ -49,7 +49,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		Scheme: tgt.Scheme,
 		Host:   tgt.Host,
 	}
-	c, err := fortiHttp.NewFortiClient(ctx, u, hc, savedConfig)
+	c, err := fortiHTTP.NewFortiClient(ctx, u, hc, savedConfig)
 	if err != nil {
 		return false, err
 	}

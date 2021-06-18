@@ -27,7 +27,7 @@ import (
 	"github.com/bluecmd/fortigate_exporter/pkg/probe"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
-	fortiHttp "github.com/bluecmd/fortigate_exporter/pkg/http"
+	fortiHTTP "github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -87,7 +87,7 @@ func main() {
 
 	savedConfig := config.GetConfig()
 
-	if err := fortiHttp.Configure(savedConfig); err != nil {
+	if err := fortiHTTP.Configure(savedConfig); err != nil {
 		log.Fatalf("%+v", err)
 	}
 
