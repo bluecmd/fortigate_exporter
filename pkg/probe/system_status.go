@@ -1,4 +1,4 @@
-package probes
+package probe
 
 import (
 	"fmt"
