@@ -81,15 +81,14 @@ func main() {
 	log.Printf("FortigateExporter %s ( %s )", buildInfo.version, buildInfo.gitHash)
 	setUpMetricsEndpoint(buildInfo)
 
-	initErr := config.Init()
-	if initErr != nil {
-		log.Fatalf("%q", initErr)
+	if err := config.Init(); err != nil {
+		log.Fatalf("Initialization error: %+v", err)
 	}
 
 	savedConfig := config.GetConfig()
-	err := fortiHttp.Configure(savedConfig)
-	if err != nil {
-		log.Fatalf("%q", err)
+
+	if err := fortiHttp.Configure(savedConfig); err != nil {
+		log.Fatalf("%+v", err)
 	}
 
 	http.Handle("/metrics", promhttp.Handler())
