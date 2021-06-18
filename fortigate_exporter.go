@@ -18,17 +18,18 @@
 package main
 
 import (
+	"log"
+	"net/http"
+	"runtime"
+	"runtime/debug"
+	"strings"
+
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	fortiHttp "github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/bluecmd/fortigate_exporter/pkg/probes"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"log"
-	"net/http"
-	"runtime"
-	"runtime/debug"
-	"strings"
 )
 
 var (

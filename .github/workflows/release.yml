@@ -24,7 +24,7 @@ jobs:
 # Go test
       - name: Ensure that all files are properly formatted
         run: |
-          FILES=$(gofmt -s -l .)
+          FILES=$(goimports -w -l .)
           if [ -n "${FILES}" ]; then
               printf "Following files are not formatted: \n%s" "$FILES"
               exit 1

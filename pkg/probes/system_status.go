@@ -2,9 +2,10 @@ package probes
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
-	"log"
 )
 
 func probeSystemStatus(c http.FortiHTTP) ([]prometheus.Metric, bool) {

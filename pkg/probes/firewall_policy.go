@@ -2,10 +2,11 @@ package probes
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/bluecmd/fortigate_exporter/internal/version"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
-	"log"
 )
 
 func probeFirewallPolicies(c http.FortiHTTP) ([]prometheus.Metric, bool) {

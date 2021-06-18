@@ -19,12 +19,13 @@ package probes
 
 import (
 	"encoding/json"
+	"log"
+	"net/url"
+
 	"github.com/bluecmd/fortigate_exporter/internal/utils/files"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/google/go-jsonnet"
 	"github.com/prometheus/client_golang/prometheus"
-	"log"
-	"net/url"
 )
 
 type preparedResp struct {

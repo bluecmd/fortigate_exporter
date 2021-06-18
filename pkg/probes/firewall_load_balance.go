@@ -1,12 +1,13 @@
 package probes
 
 import (
-	"github.com/bluecmd/fortigate_exporter/internal/version"
-	"github.com/bluecmd/fortigate_exporter/pkg/http"
-	"github.com/prometheus/client_golang/prometheus"
 	"log"
 	"math"
 	"strconv"
+
+	"github.com/bluecmd/fortigate_exporter/internal/version"
+	"github.com/bluecmd/fortigate_exporter/pkg/http"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func probeFirewallLoadBalance(c http.FortiHTTP) ([]prometheus.Metric, bool) {
