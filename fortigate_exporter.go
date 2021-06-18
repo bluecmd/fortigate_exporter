@@ -24,9 +24,10 @@ import (
 	"runtime/debug"
 	"strings"
 
+	"github.com/bluecmd/fortigate_exporter/pkg/probe"
+
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	fortiHttp "github.com/bluecmd/fortigate_exporter/pkg/http"
-	"github.com/bluecmd/fortigate_exporter/pkg/probes"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -92,7 +93,7 @@ func main() {
 	}
 
 	http.Handle("/metrics", promhttp.Handler())
-	http.HandleFunc("/probe", probes.ProbeHandler)
+	http.HandleFunc("/probe", probe.ProbeHandler)
 	go func() {
 		if err := http.ListenAndServe(savedConfig.Listen, nil); err != nil {
 			log.Fatalf("Unable to serve: %v", err)
