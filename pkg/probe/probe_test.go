@@ -22,7 +22,6 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/bluecmd/fortigate_exporter/internal/utils/files"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/google/go-jsonnet"
 	"github.com/prometheus/client_golang/prometheus"
@@ -43,11 +42,7 @@ func (c *fakeClient) prepare(path string, jfile string) {
 		panic(err)
 	}
 	vm := jsonnet.MakeVM()
-	b, err := files.ReadRelativeFile(jfile)
-	if err != nil {
-		log.Fatalf("Failed to read jsonnet %q: %v", jfile, err)
-	}
-	output, err := vm.EvaluateSnippet(jfile, string(b))
+	output, err := vm.EvaluateFile(jfile)
 	if err != nil {
 		log.Fatalf("Failed to evaluate jsonnet %q: %v", jfile, err)
 	}
