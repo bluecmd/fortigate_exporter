@@ -59,6 +59,9 @@ Per-VDOM:
  * `fortigate_ipsec_tunnel_up`
  * `fortigate_bgp_neighbor_ipv4_info`
  * `fortigate_bgp_neighbor_ipv6_info`
+ * `fortigate_wifi_access_points`
+ * `fortigate_wifi_access_point_client_count`
+ * `fortigate_wifi_access_point_allowed_client_count`
 
  Per-HA-Member and VDOM:
  * `fortigate_ha_member_info`
