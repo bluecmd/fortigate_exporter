@@ -4,7 +4,9 @@
 ![Docker](https://github.com/bluecmd/fortigate_exporter/workflows/Docker/badge.svg)
 [![Docker Repository on Quay](https://quay.io/repository/bluecmd/fortigate_exporter/status "Docker Repository on Quay")](https://quay.io/repository/bluecmd/fortigate_exporter)
 
-Prometheus exporter for Fortigate firewalls.
+Prometheus exporter for FortiGate® firewalls.
+
+**NOTE:** This is not an official Fortinet product, it is developed fully independently by professionals and hobbyists alike.
 
   * [Supported Metrics](#supported-metrics)
   * [Usage](#usage)
@@ -118,7 +120,7 @@ $ ./fortigate_exporter -auth-file ~/fortigate-key.yaml
 $ docker run -d -p 9710:9710 -v /path/to/fortigate-key.yaml:/config/fortigate-key.yaml quay.io/bluecmd/fortigate_exporter:master
 ```
 
-Where `fortigate-key.yaml` contains pairs of Fortigate targets and API keys in the following format:
+Where `fortigate-key.yaml` contains pairs of FortiGate targets and API keys in the following format:
 
 ```
 "https://my-fortigate":
@@ -127,10 +129,10 @@ Where `fortigate-key.yaml` contains pairs of Fortigate targets and API keys in t
   token: api-key-goes-here
 ```
 
-NOTE: Currently only token authentication is supported. Fortigate does not allow usage of tokens on non-HTTPS connections,
+NOTE: Currently only token authentication is supported. FortiGate does not allow usage of tokens on non-HTTPS connections,
 which means that currently you need HTTPS to be configured properly.
 
-To probe a Fortigate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
+To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
 ### Available CLI parameters
 | flag  | default value  |  description  |
@@ -142,7 +144,7 @@ To probe a Fortigate, do something like `curl 'localhost:9710/probe?target=https
 | -insecure       | false  | allows to turn off security validation of TLS certificates  |
 | -extra-ca-certs | (none) | comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store |
 
-### Fortigate Configuration
+### FortiGate Configuration
 
 The following example Admin Profile describes the permissions that needs to be granted
 to the monitor user in order for all metrics to be available.
@@ -241,4 +243,10 @@ Include as much details as possible please, e.g. how the perfect Prometheus metr
 An alternative to using this exporter is to use generic SNMP polling, e.g. using a Prometheus SNMP exporter
 ([official](https://github.com/prometheus/snmp_exporter), [alternative](https://github.com/dhtech/snmpexporter)).
 Note that there are limitations (e.g. [1](https://kb.fortinet.com/kb/documentLink.do?externalID=FD47703))
-in what Fortigate supports querying via SNMP.
+in what FortiGate supports querying via SNMP.
+
+## Legal
+
+Fortinet®, and FortiGate® are registered trademarks of Fortinet, Inc.
+
+This is not an official Fortinet product.
