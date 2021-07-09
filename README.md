@@ -115,6 +115,16 @@ Per-VDOM:
  * `fortigate_certificate_valid_to_seconds`
  * `fortigate_certificate_cmdb_references`
 
+Per-VDOM and Wifi-Client
+ * `fortigate_wifi_client_info`
+ * `fortigate_wifi_client_data_rate_bit_per_second`
+ * `fortigate_wifi_client_bandwidth_rx_bit_per_second`
+ * `fortigate_wifi_client_bandwidth_tx_bit_per_second`
+ * `fortigate_wifi_client_signal_strength_decibel`
+ * `fortigate_wifi_client_signal_noise_decibel`
+ * `fortigate_wifi_client_tx_discard_percentage`
+ * `fortigate_wifi_client_tx_retries_percentage`
+
 ## Usage
 
 Example:
