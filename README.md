@@ -125,6 +125,36 @@ Per-VDOM and Wifi-Client
  * `fortigate_wifi_client_tx_discard_percentage`
  * `fortigate_wifi_client_tx_retries_percentage`
 
+Per-VDOM and managed access point:
+ * `fortigate_wifi_managed_ap_info`
+ * `fortigate_wifi_managed_ap_join_time`
+ * `fortigate_wifi_managed_ap_cpu_usage_percentage`
+ * `fortigate_wifi_managed_ap_mem_free_bytes`
+ * `fortigate_wifi_managed_ap_mem_bytes_total`
+
+Per-VDOM, managed access point and radio:
+ * `fortigate_wifi_managed_ap_radio_info`
+ * `fortigate_wifi_managed_ap_radio_client_count`
+ * `fortigate_wifi_managed_ap_radio_operating_tx_power_percentage`
+ * `fortigate_wifi_managed_ap_radio_operating_channel_utilization_percentage`
+ * `fortigate_wifi_managed_ap_radio_bandwidth_rx_bit_per_second`
+ * `fortigate_wifi_managed_ap_radio_rx_bytes_total`
+ * `fortigate_wifi_managed_ap_radio_tx_bytes_total`
+ * `fortigate_wifi_managed_ap_radio_interfering_aps_count`
+ * `fortigate_wifi_managed_ap_radio_tx_power_percentage`
+ * `fortigate_wifi_managed_ap_radio_tx_discard_percentage`
+ * `fortigate_wifi_managed_ap_radio_tx_retries_percentage`
+
+Per-VDOM, managed access point and interface:
+ * `fortigate_wifi_managed_ap_interface_rx_bytes_total`
+ * `fortigate_wifi_managed_ap_interface_tx_bytes_total`
+ * `fortigate_wifi_managed_ap_interface_rx_packages_total`
+ * `fortigate_wifi_managed_ap_interface_tx_packages_total`
+ * `fortigate_wifi_managed_ap_interface_rx_errors_total`
+ * `fortigate_wifi_managed_ap_interface_tx_errors_total`
+ * `fortigate_wifi_managed_ap_interface_rx_dropped_packages_total`
+ * `fortigate_wifi_managed_ap_interface_tx_dropped_packages_total`
+
 ## Usage
 
 Example:
