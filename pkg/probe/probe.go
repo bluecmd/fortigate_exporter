@@ -70,7 +70,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		probeVirtualWANHealthCheck,
 		probeSystemAvailableCertificates,
 		probeFirewallLoadBalance,
-		probeBgpPeers,
+		probeBgpNeighbors,
 	} {
 		m, ok := f(c)
 		if !ok {

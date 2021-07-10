@@ -14,8 +14,8 @@ func TestBgpPeers(t *testing.T) {
 	c.prepare("api/v2/monitor/router/bgp/neighbors", "testdata/bpg-peers-v4.jsonnet")
 	c.prepare("api/v2/monitor/router/bgp/neighbors6", "testdata/bpg-peers-v6.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeBgpPeers, c, r) {
-		t.Errorf("probeBgpPeers() returned non-success")
+	if !testProbe(probeBgpNeighbors, c, r) {
+		t.Errorf("probeBgpNeighbors() returned non-success")
 	}
 
 	em := `

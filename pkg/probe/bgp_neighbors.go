@@ -10,7 +10,7 @@ import (
 	"github.com/bluecmd/fortigate_exporter/internal/version"
 )
 
-func probeBgpPeers(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeBgpNeighbors(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 
 	var (
 		bpgNeighbor = prometheus.NewDesc(
