@@ -137,7 +137,7 @@ To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https
 ### Available CLI parameters
 | flag  | default value  |  description  |
 |---|---|---|
-| -auth-file      | /config/fortigate-key.yaml  | path to the location of the key file |
+| -auth-file      | fortigate-key.yaml  | path to the location of the key file |
 | -listen         | :9710  | address to listen for incoming requests  |
 | -scrape-timeout | 30     | timeout in seconds  |
 | -https-timeout  | 10     | timeout in seconds for establishment of HTTPS connections  |
