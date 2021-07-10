@@ -15,7 +15,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 	var (
 		bpgNeighbor = prometheus.NewDesc(
 			"fortigate_bgp_neighbors_ipv4",
-			"Confiured bgp neighbors over ipv4",
+			"State of configured IPv4 BGP peers",
 			[]string{"vdom", "remote_as", "state", "admin_status", "local_ip", "neighbor_ip", "type"}, nil,
 		)
 	)
