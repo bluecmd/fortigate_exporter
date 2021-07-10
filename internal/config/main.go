@@ -27,10 +27,14 @@ type FortiExporterConfig struct {
 	TlsExtraCAs   []LocalCert
 }
 
-type AuthKeys map[Target]Token
+type AuthKeys map[Target]TargetAuth
 
 type Target string
 type Token string
+
+type TargetAuth struct {
+	Token Token
+}
 
 type LocalCert struct {
 	Path    string
