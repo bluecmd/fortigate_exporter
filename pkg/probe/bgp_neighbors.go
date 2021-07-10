@@ -3,29 +3,28 @@ package probe
 import (
 	"log"
 	"strconv"
-    
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/bluecmd/fortigate_exporter/internal/version"
+	"github.com/bluecmd/fortigate_exporter/pkg/http"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type BGPNeighbor struct {
-	NeighborIP        string       `json:"neighbor_ip"`
-	LocalIP           string       `json:"local_ip"`
-	RemoteAS          int          `json:"remote_as"`
-	AdminStatus       bool         `json:"admin_status"`
-	State             string       `json:"state"`
+	NeighborIP  string `json:"neighbor_ip"`
+	LocalIP     string `json:"local_ip"`
+	RemoteAS    int    `json:"remote_as"`
+	AdminStatus bool   `json:"admin_status"`
+	State       string `json:"state"`
 }
 
 type BGPNeighborResponse struct {
-	Results    []BGPNeighbor          `json:"results"`
-	VDOM       string                 `json:"vdom"`
-	Path       string                 `json:"path"`
-	Name       string                 `json:"name"`
-	Status     string                 `json:"status"`
-	Version    string                 `json:"version"`
-	Build      int64                  `json:"build"`
+	Results []BGPNeighbor `json:"results"`
+	VDOM    string        `json:"vdom"`
+	Path    string        `json:"path"`
+	Name    string        `json:"name"`
+	Status  string        `json:"status"`
+	Version string        `json:"version"`
+	Build   int64         `json:"build"`
 }
 
 func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
@@ -44,7 +43,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
-	
+
 	m := []prometheus.Metric{}
 
 	for _, r := range rs {
@@ -77,7 +76,7 @@ func probeBGPNeighborsIPv6(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
-	
+
 	m := []prometheus.Metric{}
 
 	for _, r := range rs {
@@ -93,4 +92,3 @@ func probeBGPNeighborsIPv6(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 
 	return m, true
 }
-
