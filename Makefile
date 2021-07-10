@@ -7,7 +7,7 @@ LDFLAGS = -ldflags "-X main.Version=${VERSION} -X main.GitHash=${GIT_HASH} -X ma
 
 .PHONY: build
 build:
-	go build ${LDFLAGS} -v -o target/fortigate-exporter .
+	CGO_ENABLED=0 go build ${LDFLAGS} -v -o target/fortigate-exporter .
 
 .PHONY: build-release
 build-release: build-release-amd64 build-release-arm64
