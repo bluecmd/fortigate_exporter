@@ -57,6 +57,7 @@ Per-VDOM:
  * `fortigate_ipsec_tunnel_receive_bytes_total`
  * `fortigate_ipsec_tunnel_transmit_bytes_total`
  * `fortigate_ipsec_tunnel_up`
+ * `fortigate_bgp_neighbor`
 
  Per-HA-Member and VDOM:
  * `fortigate_ha_member_info`
