@@ -10,12 +10,12 @@ import (
 	"github.com/bluecmd/fortigate_exporter/internal/version"
 )
 
-func probeBgpNeighbors(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeBgpNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 
 	var (
 		bpgNeighbor = prometheus.NewDesc(
-			"fortigate_bgp_neighbors",
-			"Confiured bgp neighbors",
+			"fortigate_bgp_neighbors_ipv4",
+			"Confiured bgp neighbors over ipv4",
 			[]string{"vdom", "remote_as", "state", "admin_status", "local_ip", "neighbor_ip", "type"}, nil,
 		)
 	)
@@ -42,13 +42,8 @@ func probeBgpNeighbors(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 	}
 
 	var rs []BpgNeighborResponse
-	var rs6 []BpgNeighborResponse
 
 	if err := c.Get("api/v2/monitor/router/bgp/neighbors", "vdom=*", &rs); err != nil {
-		log.Printf("Error: %v", err)
-		return nil, false
-	}
-	if err := c.Get("api/v2/monitor/router/bgp/neighbors6", "vdom=*", &rs6); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
@@ -62,17 +57,6 @@ func probeBgpNeighbors(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 			return nil, false
 		}
 		for _, peer := range r.Results {
-			m = append(m, prometheus.MustNewConstMetric(bpgNeighbor, prometheus.GaugeValue, 1, r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP, peer.Type))
-		}
-	}
-
-	for _, r := range rs6 {
-		major, _, ok := version.ParseVersion(r.Version)
-		if !ok || major < 7 {
-			// not supported version. Before 7.0.0 the requested endpoint doesn't exist
-			return nil, false
-		}
-		for _, peer := range r.Results {	
 			m = append(m, prometheus.MustNewConstMetric(bpgNeighbor, prometheus.GaugeValue, 1, r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP, peer.Type))
 		}
 	}
