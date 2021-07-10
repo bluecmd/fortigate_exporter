@@ -1,0 +1,24 @@
+# api/v2/monitor/router/bgp/neighbors6?vdom=*
+[
+  {
+    "http_method":"GET",
+    "results":[
+      {
+        "neighbor_ip":"fd00::2",
+        "local_ip":"fd00::1",
+        "remote_as":1337,
+        "admin_status":true,
+        "state":"Established",
+        "type":"ipv6"
+      }
+    ],
+    "vdom":"root",
+    "path":"router",
+    "name":"bgp",
+    "action":"neighbors6",
+    "status":"success",
+    "serial":"FGT61FT000000000",
+    "version":"v7.0.0",
+    "build":66
+  }
+]

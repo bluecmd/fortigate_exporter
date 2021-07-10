@@ -57,6 +57,8 @@ Per-VDOM:
  * `fortigate_ipsec_tunnel_receive_bytes_total`
  * `fortigate_ipsec_tunnel_transmit_bytes_total`
  * `fortigate_ipsec_tunnel_up`
+ * `fortigate_bgp_neighbor_ipv4_info`
+ * `fortigate_bgp_neighbor_ipv6_info`
 
  Per-HA-Member and VDOM:
  * `fortigate_ha_member_info`
@@ -171,6 +173,8 @@ config system accprofile
             # If you do not wish to grant this permission, the relevant
             # labels/metrics will be absent.
             set cfg read
+            # If you wish to collect ipv6 bgp neighbours, add this:
+            set route-cfg read
         end
         config fwgrp-permission
             set policy read
