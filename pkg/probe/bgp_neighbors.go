@@ -31,7 +31,7 @@ type BGPNeighborResponse struct {
 func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 
 	var (
-		BGPNeighbor = prometheus.NewDesc(
+		mBGPNeighbor = prometheus.NewDesc(
 			"fortigate_bgp_neighbors_ipv4",
 			"Confiured bgp neighbors over ipv4",
 			[]string{"vdom", "remote_as", "state", "admin_status", "local_ip", "neighbor_ip"}, nil,
@@ -54,7 +54,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 			return nil, false
 		}
 		for _, peer := range r.Results {
-			m = append(m, prometheus.MustNewConstMetric(BGPNeighbor, prometheus.GaugeValue, 1, r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
+			m = append(m, prometheus.MustNewConstMetric(mBGPNeighbor, prometheus.GaugeValue, 1, r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
 		}
 	}
 
@@ -64,7 +64,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 func probeBGPNeighborsIPv6(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 
 	var (
-		BGPNeighbor = prometheus.NewDesc(
+		mBGPNeighbor = prometheus.NewDesc(
 			"fortigate_bgp_neighbors_ipv6",
 			"Confiured bgp neighbors over ipv6",
 			[]string{"vdom", "remote_as", "state", "admin_status", "local_ip", "neighbor_ip"}, nil,
@@ -87,7 +87,7 @@ func probeBGPNeighborsIPv6(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 			return nil, false
 		}
 		for _, peer := range r.Results {
-			m = append(m, prometheus.MustNewConstMetric(BGPNeighbor, prometheus.GaugeValue, 1, r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
+			m = append(m, prometheus.MustNewConstMetric(mBGPNeighbor, prometheus.GaugeValue, 1, r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
 		}
 	}
 
