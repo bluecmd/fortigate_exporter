@@ -19,16 +19,16 @@ type FortiHTTP interface {
 
 func NewFortiClient(ctx context.Context, tgt url.URL, hc *http.Client, aConfig config.FortiExporterConfig) (FortiHTTP, error) {
 
-	token, ok := aConfig.AuthKeys[config.Target(tgt.String())]
+	auth, ok := aConfig.AuthKeys[config.Target(tgt.String())]
 	if !ok {
 		return nil, fmt.Errorf("no API authentication registered for %q", tgt.String())
 	}
 
-	if token != "" {
+	if auth.Token != "" {
 		if tgt.Scheme != "https" {
 			return nil, fmt.Errorf("FortiOS only supports token for HTTPS connections")
 		}
-		c, err := newFortiTokenClient(ctx, tgt, hc, token)
+		c, err := newFortiTokenClient(ctx, tgt, hc, auth.Token)
 		if err != nil {
 			return nil, err
 		}
