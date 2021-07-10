@@ -4,7 +4,6 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/bluecmd/fortigate_exporter/internal/version"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -23,8 +22,11 @@ type BGPNeighborResponse struct {
 	Version string        `json:"version"`
 }
 
-func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
-
+func probeBGPNeighborsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+	if meta.VersionMajor < 7 {
+		// not supported version. Before 7.0.0 the requested endpoint doesn't exist
+		return nil, true
+	}
 	var (
 		mBGPNeighbor = prometheus.NewDesc(
 			"fortigate_bgp_neighbor_ipv4_info",
@@ -43,11 +45,6 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 	m := []prometheus.Metric{}
 
 	for _, r := range rs {
-		major, _, ok := version.ParseVersion(r.Version)
-		if !ok || major < 7 {
-			// not supported version. Before 7.0.0 the requested endpoint doesn't exist
-			return nil, false
-		}
 		for _, peer := range r.Results {
 			m = append(m, prometheus.MustNewConstMetric(mBGPNeighbor, prometheus.GaugeValue, 1, r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
 		}
@@ -56,7 +53,11 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 	return m, true
 }
 
-func probeBGPNeighborsIPv6(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeBGPNeighborsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+	if meta.VersionMajor < 7 {
+		// not supported version. Before 7.0.0 the requested endpoint doesn't exist
+		return nil, true
+	}
 
 	var (
 		mBGPNeighbor = prometheus.NewDesc(
@@ -76,11 +77,6 @@ func probeBGPNeighborsIPv6(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 	m := []prometheus.Metric{}
 
 	for _, r := range rs {
-		major, _, ok := version.ParseVersion(r.Version)
-		if !ok || major < 7 {
-			// not supported version. Before 7.0.0 the requested endpoint doesn't exist
-			return nil, false
-		}
 		for _, peer := range r.Results {
 			m = append(m, prometheus.MustNewConstMetric(mBGPNeighbor, prometheus.GaugeValue, 1, r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
 		}

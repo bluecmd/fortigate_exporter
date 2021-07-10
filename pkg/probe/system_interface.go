@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemInterface(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeSystemInterface(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		mLink = prometheus.NewDesc(
 			"fortigate_interface_link_up",

@@ -9,7 +9,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeFirewallPolicies(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeFirewallPolicies(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		mHitCount = prometheus.NewDesc(
 			"fortigate_policy_hit_count_total",

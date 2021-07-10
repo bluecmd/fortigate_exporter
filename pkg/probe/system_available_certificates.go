@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemAvailableCertificates(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeSystemAvailableCertificates(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		certificateInfo = prometheus.NewDesc(
 			"fortigate_certificate_info",
