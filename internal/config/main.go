@@ -43,7 +43,7 @@ type LocalCert struct {
 
 var (
 	parameter = FortiExporterParameter{
-		AuthFile:      flag.String("auth-file", "", "file containing the authentication map to use when connecting to a Fortigate device"),
+		AuthFile:      flag.String("auth-file", "fortigate-key.yaml", "file containing the authentication map to use when connecting to a Fortigate device"),
 		Listen:        flag.String("listen", ":9710", "address to listen on"),
 		ScrapeTimeout: flag.Int("scrape-timeout", 30, "max seconds to allow a scrape to take"),
 		TLSTimeout:    flag.Int("https-timeout", 10, "TLS Handshake timeout in seconds"),
