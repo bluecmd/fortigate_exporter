@@ -20,11 +20,7 @@ type BGPNeighbor struct {
 type BGPNeighborResponse struct {
 	Results []BGPNeighbor `json:"results"`
 	VDOM    string        `json:"vdom"`
-	Path    string        `json:"path"`
-	Name    string        `json:"name"`
-	Status  string        `json:"status"`
 	Version string        `json:"version"`
-	Build   int64         `json:"build"`
 }
 
 func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {

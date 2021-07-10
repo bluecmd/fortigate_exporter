@@ -17,7 +17,7 @@ func TestBGPNeighborsIPv4(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_bgp_neighbor_ipv4_info Confiured bgp neighbor over ipv4
+    # HELP fortigate_bgp_neighbor_ipv4_info Confiured bgp neighbor over ipv4
     # TYPE fortigate_bgp_neighbor_ipv4_info gauge
     fortigate_bgp_neighbor_ipv4_info{admin_status="true",local_ip="10.0.0.0",neighbor_ip="10.0.0.1",remote_as="1337",state="Established",vdom="root"} 1
 	`
@@ -36,7 +36,7 @@ func TestBGPNeighborsIPv6(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_bgp_neighbor_ipv6_info Confiured bgp neighbor over ipv6
+    # HELP fortigate_bgp_neighbor_ipv6_info Confiured bgp neighbor over ipv6
     # TYPE fortigate_bgp_neighbor_ipv6_info gauge
     fortigate_bgp_neighbor_ipv6_info{admin_status="true",local_ip="fd00::1",neighbor_ip="fd00::2",remote_as="1337",state="Established",vdom="root"} 1
 	`
