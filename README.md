@@ -172,7 +172,8 @@ config system accprofile
             # If you do not wish to grant this permission, the relevant
             # labels/metrics will be absent.
             set cfg read
-            # If you wish to collect ipv6 bgp neighbours please add `set route-cfg read`
+            # If you wish to collect ipv6 bgp neighbours, add this:
+            set route-cfg read
         end
         config fwgrp-permission
             set policy read
