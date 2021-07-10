@@ -18,9 +18,9 @@ func TestBGPNeighborsIPv4(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_bgp_neighbors_ipv4 Confiured bgp neighbors over ipv4
-    # TYPE fortigate_bgp_neighbors_ipv4 gauge
-    fortigate_bgp_neighbors_ipv4{admin_status="true",local_ip="10.0.0.0",neighbor_ip="10.0.0.1",remote_as="1337",state="Established",vdom="root"} 1
+	# HELP fortigate_bgp_neighbors_ipv4_info Confiured bgp neighbors over ipv4
+    # TYPE fortigate_bgp_neighbors_ipv4_info gauge
+    fortigate_bgp_neighbors_ipv4_info{admin_status="true",local_ip="10.0.0.0",neighbor_ip="10.0.0.1",remote_as="1337",state="Established",vdom="root"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
@@ -37,9 +37,9 @@ func TestBGPNeighborsIPv6(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_bgp_neighbors_ipv6 Confiured bgp neighbors over ipv6
-    # TYPE fortigate_bgp_neighbors_ipv6 gauge
-    fortigate_bgp_neighbors_ipv6{admin_status="true",local_ip="fd00::1",neighbor_ip="fd00::2",remote_as="1337",state="Established",vdom="root"} 1
+	# HELP fortigate_bgp_neighbors_ipv6_info Confiured bgp neighbors over ipv6
+    # TYPE fortigate_bgp_neighbors_ipv6_info gauge
+    fortigate_bgp_neighbors_ipv6_info{admin_status="true",local_ip="fd00::1",neighbor_ip="fd00::2",remote_as="1337",state="Established",vdom="root"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {

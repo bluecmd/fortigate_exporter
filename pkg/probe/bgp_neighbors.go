@@ -32,7 +32,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 
 	var (
 		mBGPNeighbor = prometheus.NewDesc(
-			"fortigate_bgp_neighbors_ipv4",
+			"fortigate_bgp_neighbors_ipv4_info",
 			"Confiured bgp neighbors over ipv4",
 			[]string{"vdom", "remote_as", "state", "admin_status", "local_ip", "neighbor_ip"}, nil,
 		)
@@ -65,7 +65,7 @@ func probeBGPNeighborsIPv6(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 
 	var (
 		mBGPNeighbor = prometheus.NewDesc(
-			"fortigate_bgp_neighbors_ipv6",
+			"fortigate_bgp_neighbors_ipv6_info",
 			"Confiured bgp neighbors over ipv6",
 			[]string{"vdom", "remote_as", "state", "admin_status", "local_ip", "neighbor_ip"}, nil,
 		)
