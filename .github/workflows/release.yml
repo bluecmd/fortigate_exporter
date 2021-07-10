@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-# Go setup
+        # Go setup
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -24,10 +24,10 @@ jobs:
       - name: Get dependencies
         run: make get-dependencies
 
-# Go test
+        # Go test
       - name: Ensure that all files are properly formatted
         run: |
-          FILES=$(goimports -w -l .)
+          FILES=$(go run golang.org/x/tools/cmd/goimports -w -l .)
           if [ -n "${FILES}" ]; then
               printf "Following files are not formatted: \n%s" "$FILES"
               exit 1
@@ -42,7 +42,7 @@ jobs:
       - name: Test building
         run: make build
 
-# Prepare release
+        # Prepare release
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
