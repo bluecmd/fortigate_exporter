@@ -20,7 +20,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 		)
 	)
 
-	type BgpNeighbor struct {
+	type BGPNeighbor struct {
 		NeighborIP        string       `json:"neighbor_ip"`
 		LocalIP           string       `json:"local_ip"`
 		RemoteAS          int          `json:"remote_as"`
