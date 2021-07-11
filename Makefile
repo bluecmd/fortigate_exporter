@@ -40,9 +40,4 @@ test-output:
 
 .PHONY: fmt-fix
 fmt-fix:
-	goimports -w -l .
-
-.PHONY: setup-env
-setup-env:
-	go get golang.org/x/tools/cmd/goimports
-	go install golang.org/x/tools/cmd/goimports
+	go run golang.org/x/tools/cmd/goimports -w -l .

@@ -20,15 +20,12 @@ jobs:
           go-version: ^1.16
         id: go
 
-      - name: Setup Env
-        run: make setup-env
-
       - name: Get dependencies
         run: make get-dependencies
 
       - name: Ensure that all files are properly formatted
         run: |
-          FILES=$(goimports -w -l .)
+          FILES=$(go run golang.org/x/tools/cmd/goimports -w -l .)
           if [ -n "${FILES}" ]; then
               printf "Following files are not formatted: \n%s" "$FILES"
               exit 1
