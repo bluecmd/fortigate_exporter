@@ -17,12 +17,12 @@ func TestProbeWifiAPStatus(t *testing.T) {
 	}
 
 	em := `
-        # HELP fortigate_wifi_access_point_allowed_client_count Maximum number of clients which are allowed to connect
-        # TYPE fortigate_wifi_access_point_allowed_client_count gauge
-        fortigate_wifi_access_point_allowed_client_count{vdom="root"} 0
-        # HELP fortigate_wifi_access_point_client_count Number of connected clients
-        # TYPE fortigate_wifi_access_point_client_count gauge
-        fortigate_wifi_access_point_client_count{vdom="root"} 17
+        # HELP fortigate_wifi_fabric_max_allowed_clients Maximum number of clients which are allowed to connect
+        # TYPE fortigate_wifi_fabric_max_allowed_clients gauge
+        fortigate_wifi_fabric_max_allowed_clients{vdom="root"} 0
+        # HELP fortigate_wifi_fabric_clients Number of connected clients
+        # TYPE fortigate_wifi_fabric_clients gauge
+        fortigate_wifi_fabric_clients{vdom="root"} 17
         # HELP fortigate_wifi_access_points Number of connected access points by status
         # TYPE fortigate_wifi_access_points gauge
         fortigate_wifi_access_points{status="active",vdom="root"} 3

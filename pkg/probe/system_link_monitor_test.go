@@ -32,7 +32,7 @@ func TestLinkStatus(t *testing.T) {
         # HELP fortigate_link_latency_seconds Average latency of this link based on the last 30 probes in seconds
         # TYPE fortigate_link_latency_seconds gauge
         fortigate_link_latency_seconds{link="wan1",monitor="wan-mon",vdom="root"} 0.006810200214385986
-        # HELP fortigate_link_packet_loss_ratio Percentage of packages lost relative to  all sent based on the last 30 probes
+        # HELP fortigate_link_packet_loss_ratio Percentage of packets lost relative to  all sent based on the last 30 probes
         # TYPE fortigate_link_packet_loss_ratio gauge
         fortigate_link_packet_loss_ratio{link="wan1",monitor="wan-mon",vdom="root"} 0
         # HELP fortigate_link_packet_received_total Number of packets received on this link

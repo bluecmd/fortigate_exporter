@@ -15,12 +15,12 @@ func probeWifiAPStatus(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 			[]string{"vdom", "status"}, nil,
 		)
 		wtpClientCount = prometheus.NewDesc(
-			"fortigate_wifi_access_point_client_count",
+			"fortigate_wifi_fabric_clients",
 			"Number of connected clients",
 			[]string{"vdom"}, nil,
 		)
 		wtpMaxClientCount = prometheus.NewDesc(
-			"fortigate_wifi_access_point_allowed_client_count",
+			"fortigate_wifi_fabric_max_allowed_clients",
 			"Maximum number of clients which are allowed to connect",
 			[]string{"vdom"}, nil,
 		)
