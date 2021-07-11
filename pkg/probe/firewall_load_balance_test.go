@@ -83,7 +83,11 @@ func TestLoadBalanceServers_6_0_5(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/firewall/load-balance?vdom=*&start=0&count=1000", "testdata/fw-loadbalancers_6_0_5.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if testProbe(probeFirewallLoadBalance, c, r) {
-		t.Errorf("TestLoadBalanceServers_6_0_5() returned not expected success")
+	meta := &TargetMetadata{
+		VersionMajor: 6,
+		VersionMinor: 0,
+	}
+	if !testProbeWithMetadata(probeFirewallLoadBalance, c, meta, r) {
+		t.Errorf("TestLoadBalanceServers_6_0_5() failed, but should have succeeded")
 	}
 }

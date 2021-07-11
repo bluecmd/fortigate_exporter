@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemResourceUsage(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeSystemResourceUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		mResCPU = prometheus.NewDesc(
 			"fortigate_cpu_usage_ratio",
@@ -70,7 +70,7 @@ func probeSystemResourceUsage(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 	return m, true
 }
 
-func probeSystemVDOMResources(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeSystemVDOMResources(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		mResCPU = prometheus.NewDesc(
 			"fortigate_vdom_cpu_usage_ratio",

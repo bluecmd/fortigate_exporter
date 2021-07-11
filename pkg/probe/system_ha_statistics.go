@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemHAStatistics(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeSystemHAStatistics(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		memberInfo = prometheus.NewDesc(
 			"fortigate_ha_member_info",

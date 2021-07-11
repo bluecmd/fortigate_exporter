@@ -5,12 +5,16 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/bluecmd/fortigate_exporter/internal/version"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeFirewallLoadBalance(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeFirewallLoadBalance(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+	if meta.VersionMajor < 6 || (meta.VersionMajor == 6 && meta.VersionMinor < 4) {
+		// not supported version. Before 6.4.0 there is no real_server_id and therefore this will fail
+		return nil, true
+	}
+
 	var (
 		virtualServerInfo = prometheus.NewDesc(
 			"fortigate_lb_virtual_server_info",
@@ -91,13 +95,6 @@ func probeFirewallLoadBalance(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 	m := []prometheus.Metric{}
 
 	for _, r := range rs {
-
-		major, minor, ok := version.ParseVersion(r.Version)
-		if !ok || major < 6 || (major == 6 && minor < 4) {
-			// not supported version. Before 6.4.0 there is no real_server_id and therefore this will fail
-			return nil, false
-		}
-
 		for _, virtualServer := range r.Results {
 			m = append(m, prometheus.MustNewConstMetric(virtualServerInfo, prometheus.GaugeValue, 1, r.VDOM, virtualServer.Name, virtualServer.IP, strconv.Itoa(virtualServer.Port), virtualServer.Type))
 
