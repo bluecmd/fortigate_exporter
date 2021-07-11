@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeVPNSsl(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeVPNSsl(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		vpncon = prometheus.NewDesc(
 			"fortigate_vpn_connections",

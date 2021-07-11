@@ -57,6 +57,8 @@ Per-VDOM:
  * `fortigate_ipsec_tunnel_receive_bytes_total`
  * `fortigate_ipsec_tunnel_transmit_bytes_total`
  * `fortigate_ipsec_tunnel_up`
+ * `fortigate_bgp_neighbor_ipv4_info`
+ * `fortigate_bgp_neighbor_ipv6_info`
 
  Per-HA-Member and VDOM:
  * `fortigate_ha_member_info`
@@ -137,7 +139,7 @@ To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https
 ### Available CLI parameters
 | flag  | default value  |  description  |
 |---|---|---|
-| -auth-file      | /config/fortigate-key.yaml  | path to the location of the key file |
+| -auth-file      | fortigate-key.yaml  | path to the location of the key file |
 | -listen         | :9710  | address to listen for incoming requests  |
 | -scrape-timeout | 30     | timeout in seconds  |
 | -https-timeout  | 10     | timeout in seconds for establishment of HTTPS connections  |
@@ -171,6 +173,8 @@ config system accprofile
             # If you do not wish to grant this permission, the relevant
             # labels/metrics will be absent.
             set cfg read
+            # If you wish to collect ipv6 bgp neighbours, add this:
+            set route-cfg read
         end
         config fwgrp-permission
             set policy read

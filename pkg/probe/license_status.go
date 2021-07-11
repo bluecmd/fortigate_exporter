@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeLicenseStatus(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeLicenseStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		vdomUsed = prometheus.NewDesc(
 			"fortigate_license_vdom_usage",

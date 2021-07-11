@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemLinkMonitor(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeSystemLinkMonitor(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		linkStatus = prometheus.NewDesc(
 			"fortigate_link_status",

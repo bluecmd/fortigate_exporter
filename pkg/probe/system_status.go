@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemStatus(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeSystemStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		mVersion = prometheus.NewDesc(
 			"fortigate_version_info",

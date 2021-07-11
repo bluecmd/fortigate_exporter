@@ -20,10 +20,12 @@ package probe
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
+	"github.com/bluecmd/fortigate_exporter/internal/version"
 	fortiHTTP "github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -32,7 +34,12 @@ type ProbeCollector struct {
 	metrics []prometheus.Metric
 }
 
-type probeFunc func(fortiHTTP.FortiHTTP) ([]prometheus.Metric, bool)
+type TargetMetadata struct {
+	VersionMajor int
+	VersionMinor int
+}
+
+type probeFunc func(fortiHTTP.FortiHTTP, *TargetMetadata) ([]prometheus.Metric, bool)
 
 func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client, savedConfig config.FortiExporterConfig) (bool, error) {
 	tgt, err := url.Parse(target)
@@ -54,6 +61,36 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		return false, err
 	}
 
+	type systemStatus struct {
+		Status  string
+		Version string
+	}
+	var st systemStatus
+
+	// Test client connection before we blast all the probes.
+	// The "system status" group has access group "any" so it is a good source
+	// to test the authentication as well as fetching the OS version.
+	if err := c.Get("api/v2/monitor/system/status", "", &st); err != nil {
+		log.Printf("Error: API connectivity test failed, %v", err)
+		return false, nil
+	}
+
+	if st.Status != "success" {
+		log.Printf("Error: API connectivity test returned status: %s", st.Status)
+		return false, nil
+	}
+
+	major, minor, ok := version.ParseVersion(st.Version)
+	if !ok {
+		log.Printf("Error: Failed to parse OS version: %q", st.Version)
+		return false, nil
+	}
+
+	meta := &TargetMetadata{
+		VersionMajor: major,
+		VersionMinor: minor,
+	}
+
 	// TODO: Make parallel
 	success := true
 	for _, f := range []probeFunc{
@@ -70,8 +107,10 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		probeVirtualWANHealthCheck,
 		probeSystemAvailableCertificates,
 		probeFirewallLoadBalance,
+		probeBGPNeighborsIPv4,
+		probeBGPNeighborsIPv6,
 	} {
-		m, ok := f(c)
+		m, ok := f(c, meta)
 		if !ok {
 			success = false
 		}
