@@ -18,9 +18,6 @@ jobs:
           go-version: ^1.16
         id: go
 
-      - name: Setup Env
-        run: make setup-env
-
       - name: Get dependencies
         run: make get-dependencies
 
