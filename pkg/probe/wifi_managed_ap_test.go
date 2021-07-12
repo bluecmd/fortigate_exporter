@@ -72,11 +72,11 @@ func TestProbeWifiManagedAP(t *testing.T) {
         fortigate_wifi_managed_ap_join_time_seconds{ap_name="1st Floor",vdom="root"} 1.61883368e+09
         fortigate_wifi_managed_ap_join_time_seconds{ap_name="2nd Floor",vdom="root"} 1.618833935e+09
         fortigate_wifi_managed_ap_join_time_seconds{ap_name="3rd Floor",vdom="root"} 1.618833476e+09
-        # HELP fortigate_wifi_managed_ap_mem_bytes_total Total memory of the managed access point
-        # TYPE fortigate_wifi_managed_ap_mem_bytes_total gauge
-        fortigate_wifi_managed_ap_mem_bytes_total{ap_name="1st Floor",vdom="root"} 235216
-        fortigate_wifi_managed_ap_mem_bytes_total{ap_name="2nd Floor",vdom="root"} 235216
-        fortigate_wifi_managed_ap_mem_bytes_total{ap_name="3rd Floor",vdom="root"} 235216
+        # HELP fortigate_wifi_managed_ap_memory_bytes_total Total memory of the managed access point
+        # TYPE fortigate_wifi_managed_ap_memory_bytes_total gauge
+        fortigate_wifi_managed_ap_memory_bytes_total{ap_name="1st Floor",vdom="root"} 235216
+        fortigate_wifi_managed_ap_memory_bytes_total{ap_name="2nd Floor",vdom="root"} 235216
+        fortigate_wifi_managed_ap_memory_bytes_total{ap_name="3rd Floor",vdom="root"} 235216
         # HELP fortigate_wifi_managed_ap_memory_free_bytes Free memory of the managed access point
         # TYPE fortigate_wifi_managed_ap_memory_free_bytes gauge
         fortigate_wifi_managed_ap_memory_free_bytes{ap_name="1st Floor",vdom="root"} 80500

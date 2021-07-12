@@ -130,7 +130,7 @@ Per-VDOM and managed access point:
  * `fortigate_wifi_managed_ap_join_time_seconds`
  * `fortigate_wifi_managed_ap_cpu_usage_percentage`
  * `fortigate_wifi_managed_ap_memory_free_bytes`
- * `fortigate_wifi_managed_ap_mem_bytes_total`
+ * `fortigate_wifi_managed_ap_memory_bytes_total`
 
 Per-VDOM, managed access point and radio:
  * `fortigate_wifi_managed_ap_radio_info`

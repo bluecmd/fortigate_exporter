@@ -31,7 +31,7 @@ func probeWifiManagedAP(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 			[]string{"vdom", "ap_name"}, nil,
 		)
 		managedAPMemTotal = prometheus.NewDesc(
-			"fortigate_wifi_managed_ap_mem_bytes_total",
+			"fortigate_wifi_managed_ap_memory_bytes_total",
 			"Total memory of the managed access point",
 			[]string{"vdom", "ap_name"}, nil,
 		)
@@ -178,7 +178,7 @@ func probeWifiManagedAP(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 		Name        string      `json:"name"`
 		VDOM        string      `json:"vdom"`
 		Serial      string      `json:"serial"`
-		ApProfile   string      `json:"ap_profile"`
+		APProfile   string      `json:"ap_profile"`
 		OSVersion   string      `json:"os_version"`
 		JoinTimeRaw float64     `json:"join_time_raw"`
 		CPUUsage    float64     `json:"cpu_usage"`
@@ -202,7 +202,7 @@ func probeWifiManagedAP(c http.FortiHTTP) ([]prometheus.Metric, bool) {
 
 	var m []prometheus.Metric
 	for _, result := range rs.Results {
-		m = append(m, prometheus.MustNewConstMetric(managedAPInfo, prometheus.CounterValue, 1, result.VDOM, result.Name, result.ApProfile, result.OSVersion, result.Serial))
+		m = append(m, prometheus.MustNewConstMetric(managedAPInfo, prometheus.CounterValue, 1, result.VDOM, result.Name, result.APProfile, result.OSVersion, result.Serial))
 		m = append(m, prometheus.MustNewConstMetric(managedApJoinTime, prometheus.CounterValue, result.JoinTimeRaw, result.VDOM, result.Name))
 		m = append(m, prometheus.MustNewConstMetric(managedAPCPUUsage, prometheus.GaugeValue, result.CPUUsage/100, result.VDOM, result.Name))
 		m = append(m, prometheus.MustNewConstMetric(managedAPMemFree, prometheus.GaugeValue, result.MemFree, result.VDOM, result.Name))
