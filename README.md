@@ -57,8 +57,6 @@ Per-VDOM:
  * `fortigate_ipsec_tunnel_receive_bytes_total`
  * `fortigate_ipsec_tunnel_transmit_bytes_total`
  * `fortigate_ipsec_tunnel_up`
- * `fortigate_bgp_neighbor_ipv4_info`
- * `fortigate_bgp_neighbor_ipv6_info`
  * `fortigate_wifi_access_points`
  * `fortigate_wifi_fabric_clients`
  * `fortigate_wifi_fabric_max_allowed_clients`
@@ -97,6 +95,14 @@ Per-VDOM:
  * `fortigate_virtual_wan_bandwidth_tx_byte_per_second`
  * `fortigate_virtual_wan_bandwidth_rx_byte_per_second`
  * `fortigate_virtual_wan_status_change_time_seconds`
+
+ Per-BGP-Neighbor and VDOM:
+ * `fortigate_bgp_neighbor_ipv4_info`
+ * `fortigate_bgp_neighbor_ipv6_info`
+ * `fortigate_bgp_neighbor_paths_ipv4_count`
+ * `fortigate_bgp_neighbor_paths_ipv6_count`
+ * `fortigate_bgp_neighbor_best_paths_ipv4_count`
+ * `fortigate_bgp_neighbor_best_paths_ipv6_count`
 
  Per-VirtualServer and VDOM:
  * `fortigate_lb_virtual_server_info`
@@ -180,6 +186,7 @@ which means that currently you need HTTPS to be configured properly.
 To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
 ### Available CLI parameters
+
 | flag  | default value  |  description  |
 |---|---|---|
 | -auth-file      | fortigate-key.yaml  | path to the location of the key file |
@@ -188,7 +195,7 @@ To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https
 | -https-timeout  | 10     | timeout in seconds for establishment of HTTPS connections  |
 | -insecure       | false  | allows to turn off security validation of TLS certificates  |
 | -extra-ca-certs | (none) | comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store |
-
+| -max-bgp-paths  | 10000  | Sets maximum amount of BGP paths to fetch, value is per IP stack version (IPv4 a& IPv6) |
 ### FortiGate Configuration
 
 The following example Admin Profile describes the permissions that needs to be granted
