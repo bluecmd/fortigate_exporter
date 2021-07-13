@@ -51,18 +51,20 @@ var (
 		TlsExtraCAs:   flag.String("extra-ca-certs", "", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store"),
 	}
 
-	savedConfig FortiExporterConfig
+	savedConfig *FortiExporterConfig
 )
 
 func Init() error {
 	// check if already parsed
-	if flag.Parsed() {
+	if savedConfig != nil {
 		return nil
 	}
 
-	flag.Parse()
+	if !flag.Parsed() {
+		flag.Parse()
+	}
 
-	savedConfig = FortiExporterConfig{
+	savedConfig = &FortiExporterConfig{
 		Listen:        *parameter.Listen,
 		ScrapeTimeout: *parameter.ScrapeTimeout,
 		TLSTimeout:    *parameter.TLSTimeout,
@@ -106,5 +108,5 @@ func Init() error {
 }
 
 func GetConfig() FortiExporterConfig {
-	return savedConfig
+	return *savedConfig
 }
