@@ -64,29 +64,30 @@ func probeWifiClients(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metr
 		WtpName             string  `json:"wtp_name"`
 	}
 
-	type ApiWifiClientResponse struct {
+	type ApiWifiClientResponse []struct {
 		Results []Results `json:"results"`
 		VDOM    string    `json:"vdom"`
 	}
 
 	// Consider implementing pagination to remove this limit of 1000 entries
-	var rs ApiWifiClientResponse
-	if err := c.Get("api/v2/monitor/wifi/client", "vdom=*&start=0&count=1000", &rs); err != nil {
+	var response ApiWifiClientResponse
+	if err := c.Get("api/v2/monitor/wifi/client", "vdom=*&start=0&count=1000", &response); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
 
 	var m []prometheus.Metric
-	for _, result := range rs.Results {
-		m = append(m, prometheus.MustNewConstMetric(clientInfo, prometheus.CounterValue, 1, rs.VDOM, result.MAC, result.Hostname, result.WtpName))
-		m = append(m, prometheus.MustNewConstMetric(clientDataRate, prometheus.GaugeValue, result.DataRateBps, rs.VDOM, result.MAC))
-		m = append(m, prometheus.MustNewConstMetric(wtpBandwidthRx, prometheus.GaugeValue, result.BandwidthRx, rs.VDOM, result.MAC))
-		m = append(m, prometheus.MustNewConstMetric(wtpBandwidthTx, prometheus.GaugeValue, result.BandwidthTx, rs.VDOM, result.MAC))
-		m = append(m, prometheus.MustNewConstMetric(signalStrength, prometheus.GaugeValue, result.Signal, rs.VDOM, result.MAC))
-		m = append(m, prometheus.MustNewConstMetric(signalNoise, prometheus.GaugeValue, result.Noise, rs.VDOM, result.MAC))
-		m = append(m, prometheus.MustNewConstMetric(txDiscardPercentage, prometheus.GaugeValue, result.TxDiscardPercentage/100, rs.VDOM, result.MAC))
-		m = append(m, prometheus.MustNewConstMetric(txRetryPercentage, prometheus.GaugeValue, result.TxRetryPercentage/100, rs.VDOM, result.MAC))
+	for _, rs := range response {
+		for _, result := range rs.Results {
+			m = append(m, prometheus.MustNewConstMetric(clientInfo, prometheus.CounterValue, 1, rs.VDOM, result.MAC, result.Hostname, result.WtpName))
+			m = append(m, prometheus.MustNewConstMetric(clientDataRate, prometheus.GaugeValue, result.DataRateBps, rs.VDOM, result.MAC))
+			m = append(m, prometheus.MustNewConstMetric(wtpBandwidthRx, prometheus.GaugeValue, result.BandwidthRx, rs.VDOM, result.MAC))
+			m = append(m, prometheus.MustNewConstMetric(wtpBandwidthTx, prometheus.GaugeValue, result.BandwidthTx, rs.VDOM, result.MAC))
+			m = append(m, prometheus.MustNewConstMetric(signalStrength, prometheus.GaugeValue, result.Signal, rs.VDOM, result.MAC))
+			m = append(m, prometheus.MustNewConstMetric(signalNoise, prometheus.GaugeValue, result.Noise, rs.VDOM, result.MAC))
+			m = append(m, prometheus.MustNewConstMetric(txDiscardPercentage, prometheus.GaugeValue, result.TxDiscardPercentage/100, rs.VDOM, result.MAC))
+			m = append(m, prometheus.MustNewConstMetric(txRetryPercentage, prometheus.GaugeValue, result.TxRetryPercentage/100, rs.VDOM, result.MAC))
+		}
 	}
-
 	return m, true
 }

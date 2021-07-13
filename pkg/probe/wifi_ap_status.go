@@ -26,7 +26,7 @@ func probeWifiAPStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 		)
 	)
 
-	type ApiStatusResponse struct {
+	type ApiStatusResponse []struct {
 		Results struct {
 			WtpSessionCount float64 `json:"wtp_session_count"`
 			WtpActive       float64 `json:"wtp_active"`
@@ -39,19 +39,21 @@ func probeWifiAPStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 	}
 
 	// Consider implementing pagination to remove this limit of 1000 entries
-	var rs ApiStatusResponse
-	if err := c.Get("api/v2/monitor/wifi/ap_status", "vdom=*&start=0&count=1000", &rs); err != nil {
+	var response ApiStatusResponse
+	if err := c.Get("api/v2/monitor/wifi/ap_status", "vdom=*&start=0&count=1000", &response); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
 
 	var m []prometheus.Metric
 
-	m = append(m, prometheus.MustNewConstMetric(wtpCount, prometheus.GaugeValue, rs.Results.WtpActive, rs.VDOM, "active"))
-	m = append(m, prometheus.MustNewConstMetric(wtpCount, prometheus.GaugeValue, rs.Results.WtpDown, rs.VDOM, "down"))
-	m = append(m, prometheus.MustNewConstMetric(wtpCount, prometheus.GaugeValue, rs.Results.WtpRebooted, rs.VDOM, "rebooting"))
-	m = append(m, prometheus.MustNewConstMetric(wtpClientCount, prometheus.GaugeValue, rs.Results.ClientCount, rs.VDOM))
-	m = append(m, prometheus.MustNewConstMetric(wtpMaxClientCount, prometheus.GaugeValue, rs.Results.ClientCountMax, rs.VDOM))
+	for _, rs := range response {
+		m = append(m, prometheus.MustNewConstMetric(wtpCount, prometheus.GaugeValue, rs.Results.WtpActive, rs.VDOM, "active"))
+		m = append(m, prometheus.MustNewConstMetric(wtpCount, prometheus.GaugeValue, rs.Results.WtpDown, rs.VDOM, "down"))
+		m = append(m, prometheus.MustNewConstMetric(wtpCount, prometheus.GaugeValue, rs.Results.WtpRebooted, rs.VDOM, "rebooting"))
+		m = append(m, prometheus.MustNewConstMetric(wtpClientCount, prometheus.GaugeValue, rs.Results.ClientCount, rs.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(wtpMaxClientCount, prometheus.GaugeValue, rs.Results.ClientCountMax, rs.VDOM))
+	}
 
 	return m, true
 }
