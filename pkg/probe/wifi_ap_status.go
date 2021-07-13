@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeWifiAPStatus(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeWifiAPStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		wtpCount = prometheus.NewDesc(
 			"fortigate_wifi_access_points",

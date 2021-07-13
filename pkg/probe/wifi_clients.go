@@ -7,7 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeWifiClients(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeWifiClients(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		clientInfo = prometheus.NewDesc(
 			"fortigate_wifi_client_info",

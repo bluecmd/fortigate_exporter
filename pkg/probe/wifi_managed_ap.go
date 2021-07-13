@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeWifiManagedAP(c http.FortiHTTP) ([]prometheus.Metric, bool) {
+func probeWifiManagedAP(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		managedAPInfo = prometheus.NewDesc(
 			"fortigate_wifi_managed_ap_info",
