@@ -109,6 +109,9 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		probeFirewallLoadBalance,
 		probeBGPNeighborsIPv4,
 		probeBGPNeighborsIPv6,
+		probeWifiAPStatus,
+		probeWifiClients,
+		probeWifiManagedAP,
 	} {
 		m, ok := f(c, meta)
 		if !ok {

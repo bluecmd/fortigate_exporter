@@ -26,7 +26,7 @@ func probeSystemLinkMonitor(c http.FortiHTTP, meta *TargetMetadata) ([]prometheu
 		)
 		linkPacketLoss = prometheus.NewDesc(
 			"fortigate_link_packet_loss_ratio",
-			"Percentage of packages lost relative to  all sent based on the last 30 probes",
+			"Percentage of packets lost relative to  all sent based on the last 30 probes",
 			[]string{"vdom", "monitor", "link"}, nil,
 		)
 		linkPacketSent = prometheus.NewDesc(

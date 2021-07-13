@@ -59,6 +59,9 @@ Per-VDOM:
  * `fortigate_ipsec_tunnel_up`
  * `fortigate_bgp_neighbor_ipv4_info`
  * `fortigate_bgp_neighbor_ipv6_info`
+ * `fortigate_wifi_access_points`
+ * `fortigate_wifi_fabric_clients`
+ * `fortigate_wifi_fabric_max_allowed_clients`
 
  Per-HA-Member and VDOM:
  * `fortigate_ha_member_info`
@@ -111,6 +114,46 @@ Per-VDOM:
  * `fortigate_certificate_valid_from_seconds`
  * `fortigate_certificate_valid_to_seconds`
  * `fortigate_certificate_cmdb_references`
+
+Per-VDOM and Wifi-Client
+ * `fortigate_wifi_client_info`
+ * `fortigate_wifi_client_data_rate_bps`
+ * `fortigate_wifi_client_bandwidth_rx_bps`
+ * `fortigate_wifi_client_bandwidth_tx_bps`
+ * `fortigate_wifi_client_signal_strength_dBm`
+ * `fortigate_wifi_client_signal_noise_dBm`
+ * `fortigate_wifi_client_tx_discard_ratio`
+ * `fortigate_wifi_client_tx_retries_ratio`
+
+Per-VDOM and managed access point:
+ * `fortigate_wifi_managed_ap_info`
+ * `fortigate_wifi_managed_ap_join_time_seconds`
+ * `fortigate_wifi_managed_ap_cpu_usage_ratio`
+ * `fortigate_wifi_managed_ap_memory_free_bytes`
+ * `fortigate_wifi_managed_ap_memory_bytes_total`
+
+Per-VDOM, managed access point and radio:
+ * `fortigate_wifi_managed_ap_radio_info`
+ * `fortigate_wifi_managed_ap_radio_client_count`
+ * `fortigate_wifi_managed_ap_radio_operating_tx_power_ratio`
+ * `fortigate_wifi_managed_ap_radio_operating_channel_utilization_ratio`
+ * `fortigate_wifi_managed_ap_radio_bandwidth_rx_bps`
+ * `fortigate_wifi_managed_ap_radio_rx_bytes_total`
+ * `fortigate_wifi_managed_ap_radio_tx_bytes_total`
+ * `fortigate_wifi_managed_ap_radio_interfering_aps`
+ * `fortigate_wifi_managed_ap_radio_tx_power_ratio`
+ * `fortigate_wifi_managed_ap_radio_tx_discard_ratio`
+ * `fortigate_wifi_managed_ap_radio_tx_retries_ratio`
+
+Per-VDOM, managed access point and interface:
+ * `fortigate_wifi_managed_ap_interface_rx_bytes_total`
+ * `fortigate_wifi_managed_ap_interface_tx_bytes_total`
+ * `fortigate_wifi_managed_ap_interface_rx_packets_total`
+ * `fortigate_wifi_managed_ap_interface_tx_packets_total`
+ * `fortigate_wifi_managed_ap_interface_rx_errors_total`
+ * `fortigate_wifi_managed_ap_interface_tx_errors_total`
+ * `fortigate_wifi_managed_ap_interface_rx_dropped_packets_total`
+ * `fortigate_wifi_managed_ap_interface_tx_dropped_packets_total`
 
 ## Usage
 
