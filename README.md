@@ -99,10 +99,10 @@ Per-VDOM:
  Per-BGP-Neighbor and VDOM:
  * `fortigate_bgp_neighbor_ipv4_info`
  * `fortigate_bgp_neighbor_ipv6_info`
- * `fortigate_bgp_neighbor_paths_ipv4_count`
- * `fortigate_bgp_neighbor_paths_ipv6_count`
- * `fortigate_bgp_neighbor_best_paths_ipv4_count`
- * `fortigate_bgp_neighbor_best_paths_ipv6_count`
+ * `fortigate_bgp_neighbor_ipv4_paths`
+ * `fortigate_bgp_neighbor_ipv6_paths`
+ * `fortigate_bgp_neighbor_ipv4_best_paths`
+ * `fortigate_bgp_neighbor_ipv6_best_paths`
 
  Per-VirtualServer and VDOM:
  * `fortigate_lb_virtual_server_info`
