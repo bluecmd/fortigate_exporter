@@ -16,6 +16,7 @@ type FortiExporterParameter struct {
 	TLSTimeout    *int
 	TLSInsecure   *bool
 	TlsExtraCAs   *string
+	MaxBGPPaths   *int
 }
 
 type FortiExporterConfig struct {
@@ -25,6 +26,7 @@ type FortiExporterConfig struct {
 	TLSTimeout    int
 	TLSInsecure   bool
 	TlsExtraCAs   []LocalCert
+	MaxBGPPaths   int
 }
 
 type AuthKeys map[Target]TargetAuth
@@ -49,6 +51,7 @@ var (
 		TLSTimeout:    flag.Int("https-timeout", 10, "TLS Handshake timeout in seconds"),
 		TLSInsecure:   flag.Bool("insecure", false, "Allow insecure certificates"),
 		TlsExtraCAs:   flag.String("extra-ca-certs", "", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store"),
+		MaxBGPPaths:   flag.Int("max-bgp-paths", 10000, "How many BGP Paths to receive when counting routes, needs to be higher then the number of routes or metrics will not be generated"),
 	}
 
 	savedConfig *FortiExporterConfig
@@ -69,6 +72,7 @@ func Init() error {
 		ScrapeTimeout: *parameter.ScrapeTimeout,
 		TLSTimeout:    *parameter.TLSTimeout,
 		TLSInsecure:   *parameter.TLSInsecure,
+		MaxBGPPaths:   *parameter.MaxBGPPaths,
 	}
 
 	// parse AuthKeys
