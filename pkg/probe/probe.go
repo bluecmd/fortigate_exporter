@@ -119,6 +119,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		{"System/VDOMResources", probeSystemVDOMResources},
 		{"VPN/IPSec", probeVPNIPSec},
 		{"VPN/Ssl", probeVPNSsl},
+		{"VPN/Ssl/Stats", probeVPNSslStats},
 		{"VirtualWAN/HealthCheck", probeVirtualWANHealthCheck},
 		{"Wifi/APStatus", probeWifiAPStatus},
 		{"Wifi/Clients", probeWifiClients},

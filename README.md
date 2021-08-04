@@ -62,6 +62,10 @@ Per-VDOM:
  * _VPN/Ssl_
    * `fortigate_vpn_connections`
    * `fortigate_vpn_users`
+ * _VPN/Ssl/Stats_
+   * `fortigate_vpn_ssl_current_users`
+   * `fortigate_vpn_ssl_current_tunnels`
+   * `fortigate_vpn_ssl_current_connections`
  * _VPN/IPSec_
    * `fortigate_ipsec_tunnel_receive_bytes_total`
    * `fortigate_ipsec_tunnel_transmit_bytes_total`
