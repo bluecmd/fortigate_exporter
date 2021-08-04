@@ -70,6 +70,14 @@ Per-VDOM:
    * `fortigate_wifi_access_points`
    * `fortigate_wifi_fabric_clients`
    * `fortigate_wifi_fabric_max_allowed_clients`
+ * _Log/Fortianalyzer/Status_
+   * `fortigate_log_fortianalyzer_registration`
+   * `fortigate_log_fortianalyzer_connection`
+   * `fortigate_log_fortianalyzer_received`
+ * _Log/Fortianalyzer/Queue_
+   * `fortigate_log_fortianalyzer_queue_connected`
+   * `fortigate_log_fortianalyzer_queue_failed`
+   * `fortigate_log_fortianalyzer_queue_cached`
 
  Per-HA-Member and VDOM:
  * _System/HAStatistics_
