@@ -41,6 +41,12 @@ type TargetMetadata struct {
 
 type probeFunc func(fortiHTTP.FortiHTTP, *TargetMetadata) ([]prometheus.Metric, bool)
 
+type probeDetailedFunc struct {
+	category string
+	name     string
+	function probeFunc
+}
+
 func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client, savedConfig config.FortiExporterConfig) (bool, error) {
 	tgt, err := url.Parse(target)
 	if err != nil {
@@ -91,31 +97,50 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		VersionMinor: minor,
 	}
 
+	wantedProbes := savedConfig.AuthKeys[config.Target(u.String())].Probes
+
 	// TODO: Make parallel
 	success := true
-	for _, f := range []probeFunc{
-		probeSystemStatus,
-		probeSystemResourceUsage,
-		probeSystemVDOMResources,
-		probeFirewallPolicies,
-		probeSystemInterface,
-		probeVPNSsl,
-		probeVPNIPSec,
-		probeSystemHAStatistics,
-		probeLicenseStatus,
-		probeSystemLinkMonitor,
-		probeVirtualWANHealthCheck,
-		probeSystemAvailableCertificates,
-		probeFirewallLoadBalance,
-		probeBGPNeighborsIPv4,
-		probeBGPNeighborsIPv6,
-		probeWifiAPStatus,
-		probeWifiClients,
-		probeWifiManagedAP,
-		probeBGPNeighborPathsIPv4,
-		probeBGPNeighborPathsIPv6,
+	for _, aProbe := range []probeDetailedFunc{
+		{"BGP", "BGPNeighborPathsIPv4", probeBGPNeighborPathsIPv4},
+		{"BGP", "BGPNeighborPathsIPv6", probeBGPNeighborPathsIPv6},
+		{"BGP", "BGPNeighborsIPv4", probeBGPNeighborsIPv4},
+		{"BGP", "BGPNeighborsIPv6", probeBGPNeighborsIPv6},
+		{"Firewall", "FirewallLoadBalance", probeFirewallLoadBalance},
+		{"Firewall", "FirewallPolicies", probeFirewallPolicies},
+		{"Licence", "LicenseStatus", probeLicenseStatus},
+		{"System", "SystemAvailableCertificates", probeSystemAvailableCertificates},
+		{"System", "SystemHAStatistics", probeSystemHAStatistics},
+		{"System", "SystemInterface", probeSystemInterface},
+		{"System", "SystemLinkMonitor", probeSystemLinkMonitor},
+		{"System", "SystemResourceUsage", probeSystemResourceUsage},
+		{"System", "SystemStatus", probeSystemStatus},
+		{"System", "SystemVDOMResources", probeSystemVDOMResources},
+		{"VPN", "VPNIPSec", probeVPNIPSec},
+		{"VPN", "VPNSsl", probeVPNSsl},
+		{"Virtual", "VirtualWANHealthCheck", probeVirtualWANHealthCheck},
+		{"Wifi", "WifiAPStatus", probeWifiAPStatus},
+		{"Wifi", "WifiClients", probeWifiClients},
+		{"Wifi", "WifiManagedAP", probeWifiManagedAP},
 	} {
-		m, ok := f(c, meta)
+		wanted := false
+
+		if len(wantedProbes) == 0 {
+			wanted = true
+		}
+
+		for _, wantedProbe := range wantedProbes {
+			if aProbe.category == wantedProbe || aProbe.name == wantedProbe {
+				wanted = true
+				break
+			}
+		}
+
+		if !wanted {
+			continue
+		}
+
+		m, ok := aProbe.function(c, meta)
 		if !ok {
 			success = false
 		}

@@ -183,6 +183,22 @@ Where `fortigate-key.yaml` contains pairs of FortiGate targets and API keys in t
 NOTE: Currently only token authentication is supported. FortiGate does not allow usage of tokens on non-HTTPS connections,
 which means that currently you need HTTPS to be configured properly.
 
+You can select which probes or probe categories you want to run per target, for example:
+
+```
+"https://my-fortigate":
+  token: api-key-goes-here
+  probes:
+    - System
+"https://my-other-fortigate:8443":
+  token: api-key-goes-here
+  probes:
+    - BGPNeighborsIPv4
+    - Wifi
+```
+
+If `probes` isn't set or is empty, all probes will be run against the target.
+
 To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
 ### Available CLI parameters

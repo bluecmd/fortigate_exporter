@@ -35,7 +35,8 @@ type Target string
 type Token string
 
 type TargetAuth struct {
-	Token Token
+	Token  Token
+	Probes []string
 }
 
 type LocalCert struct {
