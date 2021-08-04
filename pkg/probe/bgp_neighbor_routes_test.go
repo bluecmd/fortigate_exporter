@@ -19,6 +19,9 @@ func TestBGPNeighborPathsIPv4(t *testing.T) {
 	}
 
 	em := `
+    # HELP fortigate_bgp_ipv4_paths Count of paths received from BGP (global)
+    # TYPE fortigate_bgp_ipv4_paths gauge
+    fortigate_bgp_ipv4_paths{neighbor_ip="0.0.0.0",vdom="*"} 3
     # HELP fortigate_bgp_neighbor_ipv4_best_paths Count of best paths for an BGP neighbor
     # TYPE fortigate_bgp_neighbor_ipv4_best_paths gauge
     fortigate_bgp_neighbor_ipv4_best_paths{neighbor_ip="10.0.0.1",vdom="root"} 1
@@ -27,6 +30,9 @@ func TestBGPNeighborPathsIPv4(t *testing.T) {
     # TYPE fortigate_bgp_neighbor_ipv4_paths gauge
     fortigate_bgp_neighbor_ipv4_paths{neighbor_ip="10.0.0.1",vdom="root"} 1
     fortigate_bgp_neighbor_ipv4_paths{neighbor_ip="10.0.0.2",vdom="root"} 2
+    # HELP fortigate_bgp_vdom_ipv4_paths Count of paths received from BGP (per VDOM)
+    # TYPE fortigate_bgp_vdom_ipv4_paths gauge
+    fortigate_bgp_vdom_ipv4_paths{neighbor_ip="0.0.0.0",vdom="root"} 3
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
@@ -48,6 +54,9 @@ func TestBGPNeighborPathsIPv6(t *testing.T) {
 	}
 
 	em := `
+    # HELP fortigate_bgp_ipv6_paths Count of paths received from BGP (global)
+    # TYPE fortigate_bgp_ipv6_paths gauge
+    fortigate_bgp_ipv6_paths{neighbor_ip="::",vdom="*"} 4
     # HELP fortigate_bgp_neighbor_ipv6_best_paths Count of best paths for an BGP neighbor
     # TYPE fortigate_bgp_neighbor_ipv6_best_paths gauge
     fortigate_bgp_neighbor_ipv6_best_paths{neighbor_ip="::",vdom="root"} 1
@@ -56,6 +65,9 @@ func TestBGPNeighborPathsIPv6(t *testing.T) {
     # TYPE fortigate_bgp_neighbor_ipv6_paths gauge
     fortigate_bgp_neighbor_ipv6_paths{neighbor_ip="::",vdom="root"} 1
     fortigate_bgp_neighbor_ipv6_paths{neighbor_ip="fd00::1",vdom="root"} 3
+    # HELP fortigate_bgp_vdom_ipv6_paths Count of paths received from BGP (per VDOM)
+    # TYPE fortigate_bgp_vdom_ipv6_paths gauge
+    fortigate_bgp_vdom_ipv6_paths{neighbor_ip="::",vdom="root"} 4
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {

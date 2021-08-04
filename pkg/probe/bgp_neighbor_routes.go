@@ -38,6 +38,16 @@ func probeBGPNeighborPathsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 		return nil, true
 	}
 	var (
+		BGPGlobalPaths = prometheus.NewDesc(
+			"fortigate_bgp_ipv4_paths",
+			"Count of paths received from BGP (global)",
+			[]string{"vdom", "neighbor_ip"}, nil,
+		)
+		BGPVDOMPaths = prometheus.NewDesc(
+			"fortigate_bgp_vdom_ipv4_paths",
+			"Count of paths received from BGP (per VDOM)",
+			[]string{"vdom", "neighbor_ip"}, nil,
+		)
 		BGPNeighborPaths = prometheus.NewDesc(
 			"fortigate_bgp_neighbor_ipv4_paths",
 			"Count of paths received from an BGP neighbor",
@@ -59,11 +69,13 @@ func probeBGPNeighborPathsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 
 	m := []prometheus.Metric{}
 
-	srMap := make(map[PathCount]int)
-	sr2Map := make(map[PathCount]int)
+	srGP := 0                           // BGPGlobalPaths
+	srVPMap := make(map[PathCount]int)  // BGPVDOMPaths
+	srNPMap := make(map[PathCount]int)  // BGPNeighborPaths
+	srNBPMap := make(map[PathCount]int) // BGPNeighborBestPaths
 	for _, r := range rs {
 
-		if len(r.Results) >= MaxBGPPaths {
+		if len(r.Results) > MaxBGPPaths {
 			log.Printf("Error: Received more BGP Paths than maximum (%d > %d) allowed, ignoring metric ...", len(r.Results), MaxBGPPaths)
 			return nil, false
 		}
@@ -72,21 +84,25 @@ func probeBGPNeighborPathsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 				Source: route.LearnedFrom,
 				VDOM:   r.VDOM,
 			}
-			srMap[sr] += 1
+			srNPMap[sr] += 1
 			if route.IsBest {
-				sr2 := PathCount{
-					Source: route.LearnedFrom,
-					VDOM:   r.VDOM,
-				}
-				sr2Map[sr2] += 1
+				srNBPMap[sr] += 1
 			}
+			sr.Source = "0.0.0.0"
+			srVPMap[sr] += 1
+			srGP += 1
 		}
 	}
 
-	for neighbor, count := range srMap {
+	m = append(m, prometheus.MustNewConstMetric(BGPGlobalPaths, prometheus.GaugeValue, float64(srGP), "*", "0.0.0.0"))
+
+	for neighbor, count := range srVPMap {
+		m = append(m, prometheus.MustNewConstMetric(BGPVDOMPaths, prometheus.GaugeValue, float64(count), neighbor.VDOM, neighbor.Source))
+	}
+	for neighbor, count := range srNPMap {
 		m = append(m, prometheus.MustNewConstMetric(BGPNeighborPaths, prometheus.GaugeValue, float64(count), neighbor.VDOM, neighbor.Source))
 	}
-	for neighbor, count := range sr2Map {
+	for neighbor, count := range srNBPMap {
 		m = append(m, prometheus.MustNewConstMetric(BGPNeighborBestPaths, prometheus.GaugeValue, float64(count), neighbor.VDOM, neighbor.Source))
 	}
 
@@ -106,6 +122,16 @@ func probeBGPNeighborPathsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 		return nil, true
 	}
 	var (
+		BGPGlobalPaths = prometheus.NewDesc(
+			"fortigate_bgp_ipv6_paths",
+			"Count of paths received from BGP (global)",
+			[]string{"vdom", "neighbor_ip"}, nil,
+		)
+		BGPVDOMPaths = prometheus.NewDesc(
+			"fortigate_bgp_vdom_ipv6_paths",
+			"Count of paths received from BGP (per VDOM)",
+			[]string{"vdom", "neighbor_ip"}, nil,
+		)
 		BGPNeighborPaths = prometheus.NewDesc(
 			"fortigate_bgp_neighbor_ipv6_paths",
 			"Count of paths received from an BGP neighbor",
@@ -127,11 +153,13 @@ func probeBGPNeighborPathsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 
 	m := []prometheus.Metric{}
 
-	srMap := make(map[PathCount]int)
-	sr2Map := make(map[PathCount]int)
+	srGP := 0                           // BGPGlobalPaths
+	srVPMap := make(map[PathCount]int)  // BGPVDOMPaths
+	srNPMap := make(map[PathCount]int)  // BGPNeighborPaths
+	srNBPMap := make(map[PathCount]int) // BGPNeighborBestPaths
 	for _, r := range rs {
 
-		if len(r.Results) >= MaxBGPPaths {
+		if len(r.Results) > MaxBGPPaths {
 			log.Printf("Error: Received more BGP Paths than maximum (%d > %d) allowed, ignoring metric ...", len(r.Results), MaxBGPPaths)
 			return nil, false
 		}
@@ -140,21 +168,25 @@ func probeBGPNeighborPathsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 				Source: route.LearnedFrom,
 				VDOM:   r.VDOM,
 			}
-			srMap[sr] += 1
+			srNPMap[sr] += 1
 			if route.IsBest {
-				sr2 := PathCount{
-					Source: route.LearnedFrom,
-					VDOM:   r.VDOM,
-				}
-				sr2Map[sr2] += 1
+				srNBPMap[sr] += 1
 			}
+			sr.Source = "::"
+			srVPMap[sr] += 1
+			srGP += 1
 		}
 	}
 
-	for neighbor, count := range srMap {
+	m = append(m, prometheus.MustNewConstMetric(BGPGlobalPaths, prometheus.GaugeValue, float64(srGP), "*", "::"))
+
+	for neighbor, count := range srVPMap {
+		m = append(m, prometheus.MustNewConstMetric(BGPVDOMPaths, prometheus.GaugeValue, float64(count), neighbor.VDOM, neighbor.Source))
+	}
+	for neighbor, count := range srNPMap {
 		m = append(m, prometheus.MustNewConstMetric(BGPNeighborPaths, prometheus.GaugeValue, float64(count), neighbor.VDOM, neighbor.Source))
 	}
-	for neighbor, count := range sr2Map {
+	for neighbor, count := range srNBPMap {
 		m = append(m, prometheus.MustNewConstMetric(BGPNeighborBestPaths, prometheus.GaugeValue, float64(count), neighbor.VDOM, neighbor.Source))
 	}
 
