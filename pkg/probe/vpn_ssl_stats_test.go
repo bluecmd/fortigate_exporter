@@ -13,7 +13,7 @@ func TestVPNSslStats(t *testing.T) {
 	c.prepare("api/v2/monitor/vpn/ssl/stats", "testdata/vpn-stats.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeVPNSslStats, c, r) {
-		t.Errorf("probeSystemStatus() returned non-success")
+		t.Errorf("probeVPNSslStats() returned non-success")
 	}
 
 	em := `
