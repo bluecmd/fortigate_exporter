@@ -23,6 +23,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/bluecmd/fortigate_exporter/internal/version"
@@ -42,7 +43,6 @@ type TargetMetadata struct {
 type probeFunc func(fortiHTTP.FortiHTTP, *TargetMetadata) ([]prometheus.Metric, bool)
 
 type probeDetailedFunc struct {
-	category string
 	name     string
 	function probeFunc
 }
@@ -97,42 +97,52 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		VersionMinor: minor,
 	}
 
-	wantedProbes := savedConfig.AuthKeys[config.Target(u.String())].Probes
+	includedProbes := savedConfig.AuthKeys[config.Target(u.String())].Probes.Include
+	excludedProbes := savedConfig.AuthKeys[config.Target(u.String())].Probes.Exclude
 
 	// TODO: Make parallel
 	success := true
 	for _, aProbe := range []probeDetailedFunc{
-		{"BGP", "BGPNeighborPathsIPv4", probeBGPNeighborPathsIPv4},
-		{"BGP", "BGPNeighborPathsIPv6", probeBGPNeighborPathsIPv6},
-		{"BGP", "BGPNeighborsIPv4", probeBGPNeighborsIPv4},
-		{"BGP", "BGPNeighborsIPv6", probeBGPNeighborsIPv6},
-		{"Firewall", "FirewallLoadBalance", probeFirewallLoadBalance},
-		{"Firewall", "FirewallPolicies", probeFirewallPolicies},
-		{"Licence", "LicenseStatus", probeLicenseStatus},
-		{"System", "SystemAvailableCertificates", probeSystemAvailableCertificates},
-		{"System", "SystemHAStatistics", probeSystemHAStatistics},
-		{"System", "SystemInterface", probeSystemInterface},
-		{"System", "SystemLinkMonitor", probeSystemLinkMonitor},
-		{"System", "SystemResourceUsage", probeSystemResourceUsage},
-		{"System", "SystemStatus", probeSystemStatus},
-		{"System", "SystemVDOMResources", probeSystemVDOMResources},
-		{"VPN", "VPNIPSec", probeVPNIPSec},
-		{"VPN", "VPNSsl", probeVPNSsl},
-		{"Virtual", "VirtualWANHealthCheck", probeVirtualWANHealthCheck},
-		{"Wifi", "WifiAPStatus", probeWifiAPStatus},
-		{"Wifi", "WifiClients", probeWifiClients},
-		{"Wifi", "WifiManagedAP", probeWifiManagedAP},
+		{"BGP/NeighborPaths/IPv4", probeBGPNeighborPathsIPv4},
+		{"BGP/NeighborPaths/IPv6", probeBGPNeighborPathsIPv6},
+		{"BGP/Neighbors/IPv4", probeBGPNeighborsIPv4},
+		{"BGP/Neighbors/IPv6", probeBGPNeighborsIPv6},
+		{"Firewall/LoadBalance", probeFirewallLoadBalance},
+		{"Firewall/Policies", probeFirewallPolicies},
+		{"License/Status", probeLicenseStatus},
+		{"System/AvailableCertificates", probeSystemAvailableCertificates},
+		{"System/HAStatistics", probeSystemHAStatistics},
+		{"System/Interface", probeSystemInterface},
+		{"System/LinkMonitor", probeSystemLinkMonitor},
+		{"System/Resource/Usage", probeSystemResourceUsage},
+		{"System/Status", probeSystemStatus},
+		{"System/VDOMResources", probeSystemVDOMResources},
+		{"VPN/IPSec", probeVPNIPSec},
+		{"VPN/Ssl", probeVPNSsl},
+		{"VirtualWAN/HealthCheck", probeVirtualWANHealthCheck},
+		{"Wifi/APStatus", probeWifiAPStatus},
+		{"Wifi/Clients", probeWifiClients},
+		{"Wifi/ManagedAP", probeWifiManagedAP},
 	} {
 		wanted := false
 
-		if len(wantedProbes) == 0 {
+		if len(includedProbes) == 0 {
 			wanted = true
+		} else {
+			for _, wantedProbe := range includedProbes {
+				if strings.HasPrefix(aProbe.name, wantedProbe) {
+					wanted = true
+					break
+				}
+			}
 		}
 
-		for _, wantedProbe := range wantedProbes {
-			if aProbe.category == wantedProbe || aProbe.name == wantedProbe {
-				wanted = true
-				break
+		if len(excludedProbes) != 0 {
+			for _, unwantedProbe := range excludedProbes {
+				if strings.HasPrefix(aProbe.name, unwantedProbe) {
+					wanted = false
+					break
+				}
 			}
 		}
 

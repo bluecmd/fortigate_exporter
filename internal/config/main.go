@@ -33,10 +33,17 @@ type AuthKeys map[Target]TargetAuth
 
 type Target string
 type Token string
+type ProbeList []string
+
+
+type Probes struct {
+	Include ProbeList
+	Exclude ProbeList
+}
 
 type TargetAuth struct {
 	Token  Token
-	Probes []string
+	Probes Probes
 }
 
 type LocalCert struct {
