@@ -29,137 +29,160 @@ Supported metrics right now as follows.
 
 Global:
 
- * `fortigate_version_info`
- * `fortigate_cpu_usage_ratio`
- * `fortigate_memory_usage_ratio`
- * `fortigate_current_sessions`
- * `fortigate_license_vdom_usage`
- * `fortigate_license_vdom_max`
+ * _System/Status_
+   * `fortigate_version_info`
+ * _System/Resource/Usage_
+   * `fortigate_cpu_usage_ratio`
+   * `fortigate_memory_usage_ratio`
+   * `fortigate_current_sessions`
+ * _License/Status_
+   * `fortigate_license_vdom_usage`
+   * `fortigate_license_vdom_max`
 
 Per-VDOM:
 
- * `fortigate_vdom_cpu_usage_ratio`
- * `fortigate_vdom_memory_usage_ratio`
- * `fortigate_vdom_current_sessions`
- * `fortigate_policy_active_sessions`
- * `fortigate_policy_bytes_total`
- * `fortigate_policy_hit_count_total`
- * `fortigate_policy_packets_total`
- * `fortigate_interface_link_up`
- * `fortigate_interface_speed_bps`
- * `fortigate_interface_transmit_packets_total`
- * `fortigate_interface_receive_packets_total`
- * `fortigate_interface_transmit_bytes_total`
- * `fortigate_interface_receive_bytes_total`
- * `fortigate_interface_transmit_errors_total`
- * `fortigate_interface_receive_errors_total`
- * `fortigate_vpn_connections`
- * `fortigate_ipsec_tunnel_receive_bytes_total`
- * `fortigate_ipsec_tunnel_transmit_bytes_total`
- * `fortigate_ipsec_tunnel_up`
- * `fortigate_wifi_access_points`
- * `fortigate_wifi_fabric_clients`
- * `fortigate_wifi_fabric_max_allowed_clients`
+ * _System/VDOMResources_
+   * `fortigate_vdom_cpu_usage_ratio`
+   * `fortigate_vdom_memory_usage_ratio`
+   * `fortigate_vdom_current_sessions`
+ * _Firewall/Policies_
+   * `fortigate_policy_active_sessions`
+   * `fortigate_policy_bytes_total`
+   * `fortigate_policy_hit_count_total`
+   * `fortigate_policy_packets_total`
+ * _System/Interface_
+   * `fortigate_interface_link_up`
+   * `fortigate_interface_speed_bps`
+   * `fortigate_interface_transmit_packets_total`
+   * `fortigate_interface_receive_packets_total`
+   * `fortigate_interface_transmit_bytes_total`
+   * `fortigate_interface_receive_bytes_total`
+   * `fortigate_interface_transmit_errors_total`
+   * `fortigate_interface_receive_errors_total`
+ * _VPN/Ssl_
+   * `fortigate_vpn_connections`
+ * _VPN/IPSec_
+   * `fortigate_ipsec_tunnel_receive_bytes_total`
+   * `fortigate_ipsec_tunnel_transmit_bytes_total`
+   * `fortigate_ipsec_tunnel_up`
+ * _Wifi/APStatus_
+   * `fortigate_wifi_access_points`
+   * `fortigate_wifi_fabric_clients`
+   * `fortigate_wifi_fabric_max_allowed_clients`
 
  Per-HA-Member and VDOM:
- * `fortigate_ha_member_info`
- * `fortigate_ha_member_cpu_usage_ratio`
- * `fortigate_ha_member_memory_usage_ratio`
- * `fortigate_ha_member_network_usage_ratio`
- * `fortigate_ha_member_sessions`
- * `fortigate_ha_member_packets_total`
- * `fortigate_ha_member_virus_events_total`
- * `fortigate_ha_member_bytes_total`
- * `fortigate_ha_member_ips_events_total`
+ * _System/HAStatistics_
+   * `fortigate_ha_member_info`
+   * `fortigate_ha_member_cpu_usage_ratio`
+   * `fortigate_ha_member_memory_usage_ratio`
+   * `fortigate_ha_member_network_usage_ratio`
+   * `fortigate_ha_member_sessions`
+   * `fortigate_ha_member_packets_total`
+   * `fortigate_ha_member_virus_events_total`
+   * `fortigate_ha_member_bytes_total`
+   * `fortigate_ha_member_ips_events_total`
 
- Per-Link and VDOM: 
- * `fortigate_link_status`
- * `fortigate_link_latency_seconds`
- * `fortigate_link_latency_jitter_seconds`
- * `fortigate_link_packet_loss_ratio`
- * `fortigate_link_packet_sent_total`
- * `fortigate_link_packet_received_total`
- * `fortigate_link_active_sessions`
- * `fortigate_link_bandwidth_tx_byte_per_second`
- * `fortigate_link_bandwidth_rx_byte_per_second`
- * `fortigate_link_status_change_time_seconds`
+ Per-Link and VDOM:
+ * _System/LinkMonitor_
+   * `fortigate_link_status`
+   * `fortigate_link_latency_seconds`
+   * `fortigate_link_latency_jitter_seconds`
+   * `fortigate_link_packet_loss_ratio`
+   * `fortigate_link_packet_sent_total`
+   * `fortigate_link_packet_received_total`
+   * `fortigate_link_active_sessions`
+   * `fortigate_link_bandwidth_tx_byte_per_second`
+   * `fortigate_link_bandwidth_rx_byte_per_second`
+   * `fortigate_link_status_change_time_seconds`
 
  Per-SDWAN and VDOM:
- * `fortigate_virtual_wan_status`
- * `fortigate_virtual_wan_latency_seconds`
- * `fortigate_virtual_wan_latency_jitter_seconds`
- * `fortigate_virtual_wan_packet_loss_ratio`
- * `fortigate_virtual_wan_packet_sent_total`
- * `fortigate_virtual_wan_packet_received_total`
- * `fortigate_virtual_wan_active_sessions`
- * `fortigate_virtual_wan_bandwidth_tx_byte_per_second`
- * `fortigate_virtual_wan_bandwidth_rx_byte_per_second`
- * `fortigate_virtual_wan_status_change_time_seconds`
+ * _VirtualWAN/HealthCheck_
+   * `fortigate_virtual_wan_status`
+   * `fortigate_virtual_wan_latency_seconds`
+   * `fortigate_virtual_wan_latency_jitter_seconds`
+   * `fortigate_virtual_wan_packet_loss_ratio`
+   * `fortigate_virtual_wan_packet_sent_total`
+   * `fortigate_virtual_wan_packet_received_total`
+   * `fortigate_virtual_wan_active_sessions`
+   * `fortigate_virtual_wan_bandwidth_tx_byte_per_second`
+   * `fortigate_virtual_wan_bandwidth_rx_byte_per_second`
+   * `fortigate_virtual_wan_status_change_time_seconds`
 
  Per-BGP-Neighbor and VDOM:
- * `fortigate_bgp_neighbor_ipv4_info`
- * `fortigate_bgp_neighbor_ipv6_info`
- * `fortigate_bgp_neighbor_ipv4_paths`
- * `fortigate_bgp_neighbor_ipv6_paths`
- * `fortigate_bgp_neighbor_ipv4_best_paths`
- * `fortigate_bgp_neighbor_ipv6_best_paths`
+ * _BGP/Neighbors/IPv4_
+   * `fortigate_bgp_neighbor_ipv4_info`
+ * _BGP/Neighbors/IPv6_
+   * `fortigate_bgp_neighbor_ipv6_info`
+ * _BGP/NeighborPaths/IPv4_
+   * `fortigate_bgp_neighbor_ipv4_paths`
+   * `fortigate_bgp_neighbor_ipv4_best_paths`
+ * _BGP/NeighborPaths/IPv6_
+   * `fortigate_bgp_neighbor_ipv6_paths`
+   * `fortigate_bgp_neighbor_ipv6_best_paths`
 
  Per-VirtualServer and VDOM:
- * `fortigate_lb_virtual_server_info`
+ * _Firewall/LoadBalance_
+   * `fortigate_lb_virtual_server_info`
 
  Per-RealServer for each VirtualServer and VDOM:
- * `fortigate_lb_real_server_info`
- * `fortigate_lb_real_server_mode`
- * `fortigate_lb_real_server_status`
- * `fortigate_lb_real_server_active_sessions`
- * `fortigate_lb_real_server_rtt_seconds`
- * `fortigate_lb_real_server_processed_bytes_total`
+ * _Firewall/LoadBalance_
+   * `fortigate_lb_real_server_info`
+   * `fortigate_lb_real_server_mode`
+   * `fortigate_lb_real_server_status`
+   * `fortigate_lb_real_server_active_sessions`
+   * `fortigate_lb_real_server_rtt_seconds`
+   * `fortigate_lb_real_server_processed_bytes_total`
 
- Per-Certificate
- * `fortigate_certificate_info`
- * `fortigate_certificate_valid_from_seconds`
- * `fortigate_certificate_valid_to_seconds`
- * `fortigate_certificate_cmdb_references`
+ Per-Certificate:
+ * _System/AvailableCertificates_
+   * `fortigate_certificate_info`
+   * `fortigate_certificate_valid_from_seconds`
+   * `fortigate_certificate_valid_to_seconds`
+   * `fortigate_certificate_cmdb_references`
 
-Per-VDOM and Wifi-Client
- * `fortigate_wifi_client_info`
- * `fortigate_wifi_client_data_rate_bps`
- * `fortigate_wifi_client_bandwidth_rx_bps`
- * `fortigate_wifi_client_bandwidth_tx_bps`
- * `fortigate_wifi_client_signal_strength_dBm`
- * `fortigate_wifi_client_signal_noise_dBm`
- * `fortigate_wifi_client_tx_discard_ratio`
- * `fortigate_wifi_client_tx_retries_ratio`
+Per-VDOM and Wifi-Client:
+ * _Wifi/Clients_
+   * `fortigate_wifi_client_info`
+   * `fortigate_wifi_client_data_rate_bps`
+   * `fortigate_wifi_client_bandwidth_rx_bps`
+   * `fortigate_wifi_client_bandwidth_tx_bps`
+   * `fortigate_wifi_client_signal_strength_dBm`
+   * `fortigate_wifi_client_signal_noise_dBm`
+   * `fortigate_wifi_client_tx_discard_ratio`
+   * `fortigate_wifi_client_tx_retries_ratio`
 
 Per-VDOM and managed access point:
- * `fortigate_wifi_managed_ap_info`
- * `fortigate_wifi_managed_ap_join_time_seconds`
- * `fortigate_wifi_managed_ap_cpu_usage_ratio`
- * `fortigate_wifi_managed_ap_memory_free_bytes`
- * `fortigate_wifi_managed_ap_memory_bytes_total`
+ * _Wifi/ManagedAP_
+   * `fortigate_wifi_managed_ap_info`
+   * `fortigate_wifi_managed_ap_join_time_seconds`
+   * `fortigate_wifi_managed_ap_cpu_usage_ratio`
+   * `fortigate_wifi_managed_ap_memory_free_bytes`
+   * `fortigate_wifi_managed_ap_memory_bytes_total`
 
 Per-VDOM, managed access point and radio:
- * `fortigate_wifi_managed_ap_radio_info`
- * `fortigate_wifi_managed_ap_radio_client_count`
- * `fortigate_wifi_managed_ap_radio_operating_tx_power_ratio`
- * `fortigate_wifi_managed_ap_radio_operating_channel_utilization_ratio`
- * `fortigate_wifi_managed_ap_radio_bandwidth_rx_bps`
- * `fortigate_wifi_managed_ap_radio_rx_bytes_total`
- * `fortigate_wifi_managed_ap_radio_tx_bytes_total`
- * `fortigate_wifi_managed_ap_radio_interfering_aps`
- * `fortigate_wifi_managed_ap_radio_tx_power_ratio`
- * `fortigate_wifi_managed_ap_radio_tx_discard_ratio`
- * `fortigate_wifi_managed_ap_radio_tx_retries_ratio`
+ * _Wifi/ManagedAP_
+   * `fortigate_wifi_managed_ap_radio_info`
+   * `fortigate_wifi_managed_ap_radio_client_count`
+   * `fortigate_wifi_managed_ap_radio_operating_tx_power_ratio`
+   * `fortigate_wifi_managed_ap_radio_operating_channel_utilization_ratio`
+   * `fortigate_wifi_managed_ap_radio_bandwidth_rx_bps`
+   * `fortigate_wifi_managed_ap_radio_rx_bytes_total`
+   * `fortigate_wifi_managed_ap_radio_tx_bytes_total`
+   * `fortigate_wifi_managed_ap_radio_interfering_aps`
+   * `fortigate_wifi_managed_ap_radio_tx_power_ratio`
+   * `fortigate_wifi_managed_ap_radio_tx_discard_ratio`
+   * `fortigate_wifi_managed_ap_radio_tx_retries_ratio`
 
 Per-VDOM, managed access point and interface:
- * `fortigate_wifi_managed_ap_interface_rx_bytes_total`
- * `fortigate_wifi_managed_ap_interface_tx_bytes_total`
- * `fortigate_wifi_managed_ap_interface_rx_packets_total`
- * `fortigate_wifi_managed_ap_interface_tx_packets_total`
- * `fortigate_wifi_managed_ap_interface_rx_errors_total`
- * `fortigate_wifi_managed_ap_interface_tx_errors_total`
- * `fortigate_wifi_managed_ap_interface_rx_dropped_packets_total`
- * `fortigate_wifi_managed_ap_interface_tx_dropped_packets_total`
+ * _Wifi/ManagedAP_
+   * `fortigate_wifi_managed_ap_interface_rx_bytes_total`
+   * `fortigate_wifi_managed_ap_interface_tx_bytes_total`
+   * `fortigate_wifi_managed_ap_interface_rx_packets_total`
+   * `fortigate_wifi_managed_ap_interface_tx_packets_total`
+   * `fortigate_wifi_managed_ap_interface_rx_errors_total`
+   * `fortigate_wifi_managed_ap_interface_tx_errors_total`
+   * `fortigate_wifi_managed_ap_interface_rx_dropped_packets_total`
+   * `fortigate_wifi_managed_ap_interface_tx_dropped_packets_total`
 
 ## Usage
 
@@ -182,6 +205,54 @@ Where `fortigate-key.yaml` contains pairs of FortiGate targets and API keys in t
 
 NOTE: Currently only token authentication is supported. FortiGate does not allow usage of tokens on non-HTTPS connections,
 which means that currently you need HTTPS to be configured properly.
+
+You can select which probes you want to run on a per target basis.
+
+- Probes can be included or excluded under the optional `probes` section by defining `include` and/or `exclude` lists.
+- Each probe name, that can be run by the fortigate exporter, is compared to the `include`/`exclude` lists.
+- Inclusion/exclusion of a probe is based on a prefix match, therefore lists must contains entries starting with a probe name to be included/excluded.
+- Prefix match is case sensitive.
+- `include` list is evaluated before `exclude` list, therefore `exclude` list can exclude a previously included probe.
+
+Example:
+
+```
+"https://my-fortigate":
+  token: api-key-goes-here
+  probes:
+    include:
+      - System
+      - VPN
+      - Firewall/Policies
+      # Include only probes with name starting with: System or VPN + probe: Firewall/Policies
+      # Other probes are excluded because there were not explictly included
+"https://my-other-fortigate:8443":
+  token: api-key-goes-here
+  probes:
+    exclude:
+      - Wifi
+      - Firewall/LoadBalance
+      # Exclude probes with name starting with: Wifi + probe: Firewall/LoadBalance
+      # All other probes are included by default because include list is empty
+"https://my-other-orther-fortigate:8443":
+  token: api-key-goes-here
+  probes:
+    include:
+      - System
+      - Firewall
+    exclude:
+      - System/LinkMonitor
+      # Inlcude probes with name starting with: System and Firewall
+      # Then exclude probe: System/LinkMonitor
+```
+
+Special cases:
+
+- If `probes` isn't set or is empty, all probes will be run against the target.
+- If `include` list is empty, by default, all probes will be selected to be run against the target.
+- If `include` contains an entry `- ''`, then all probes are included (equivalent to not defining `include`)
+- If `exclude` contains an entry `- ''`, then all probes are excluded (equivalent to not defining the target)
+
 
 To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
