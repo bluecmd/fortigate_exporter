@@ -250,7 +250,7 @@ Special cases:
 
 - If `probes` isn't set or is empty, all probes will be run against the target.
 - If `include` list is empty, by default, all probes will be selected to be run against the target.
-- If `include` contains an entry `- ''`, then all probes are inlcuded (equivalent to not defining `include`)
+- If `include` contains an entry `- ''`, then all probes are included (equivalent to not defining `include`)
 - If `exclude` contains an entry `- ''`, then all probes are excluded (equivalent to not defining the target)
 
 
