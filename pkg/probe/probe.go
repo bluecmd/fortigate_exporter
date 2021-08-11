@@ -23,6 +23,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/bluecmd/fortigate_exporter/internal/version"
@@ -40,6 +41,11 @@ type TargetMetadata struct {
 }
 
 type probeFunc func(fortiHTTP.FortiHTTP, *TargetMetadata) ([]prometheus.Metric, bool)
+
+type probeDetailedFunc struct {
+	name     string
+	function probeFunc
+}
 
 func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client, savedConfig config.FortiExporterConfig) (bool, error) {
 	tgt, err := url.Parse(target)
@@ -91,31 +97,60 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		VersionMinor: minor,
 	}
 
+	includedProbes := savedConfig.AuthKeys[config.Target(u.String())].Probes.Include
+	excludedProbes := savedConfig.AuthKeys[config.Target(u.String())].Probes.Exclude
+
 	// TODO: Make parallel
 	success := true
-	for _, f := range []probeFunc{
-		probeSystemStatus,
-		probeSystemResourceUsage,
-		probeSystemVDOMResources,
-		probeFirewallPolicies,
-		probeSystemInterface,
-		probeVPNSsl,
-		probeVPNIPSec,
-		probeSystemHAStatistics,
-		probeLicenseStatus,
-		probeSystemLinkMonitor,
-		probeVirtualWANHealthCheck,
-		probeSystemAvailableCertificates,
-		probeFirewallLoadBalance,
-		probeBGPNeighborsIPv4,
-		probeBGPNeighborsIPv6,
-		probeWifiAPStatus,
-		probeWifiClients,
-		probeWifiManagedAP,
-		probeBGPNeighborPathsIPv4,
-		probeBGPNeighborPathsIPv6,
+	for _, aProbe := range []probeDetailedFunc{
+		{"BGP/NeighborPaths/IPv4", probeBGPNeighborPathsIPv4},
+		{"BGP/NeighborPaths/IPv6", probeBGPNeighborPathsIPv6},
+		{"BGP/Neighbors/IPv4", probeBGPNeighborsIPv4},
+		{"BGP/Neighbors/IPv6", probeBGPNeighborsIPv6},
+		{"Firewall/LoadBalance", probeFirewallLoadBalance},
+		{"Firewall/Policies", probeFirewallPolicies},
+		{"License/Status", probeLicenseStatus},
+		{"System/AvailableCertificates", probeSystemAvailableCertificates},
+		{"System/HAStatistics", probeSystemHAStatistics},
+		{"System/Interface", probeSystemInterface},
+		{"System/LinkMonitor", probeSystemLinkMonitor},
+		{"System/Resource/Usage", probeSystemResourceUsage},
+		{"System/Status", probeSystemStatus},
+		{"System/VDOMResources", probeSystemVDOMResources},
+		{"VPN/IPSec", probeVPNIPSec},
+		{"VPN/Ssl", probeVPNSsl},
+		{"VirtualWAN/HealthCheck", probeVirtualWANHealthCheck},
+		{"Wifi/APStatus", probeWifiAPStatus},
+		{"Wifi/Clients", probeWifiClients},
+		{"Wifi/ManagedAP", probeWifiManagedAP},
 	} {
-		m, ok := f(c, meta)
+		wanted := false
+
+		if len(includedProbes) == 0 {
+			wanted = true
+		} else {
+			for _, wantedProbe := range includedProbes {
+				if strings.HasPrefix(aProbe.name, wantedProbe) {
+					wanted = true
+					break
+				}
+			}
+		}
+
+		if len(excludedProbes) != 0 {
+			for _, unwantedProbe := range excludedProbes {
+				if strings.HasPrefix(aProbe.name, unwantedProbe) {
+					wanted = false
+					break
+				}
+			}
+		}
+
+		if !wanted {
+			continue
+		}
+
+		m, ok := aProbe.function(c, meta)
 		if !ok {
 			success = false
 		}
