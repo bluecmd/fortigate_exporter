@@ -224,7 +224,7 @@ Example:
       - System
       - VPN
       - Firewall/Policies
-      # Inlcude only probes with name starting with: System or VPN + probe: Firewall/Policies
+      # Include only probes with name starting with: System or VPN + probe: Firewall/Policies
       # Other probes are excluded because there were not explictly included
 "https://my-other-fortigate:8443":
   token: api-key-goes-here
