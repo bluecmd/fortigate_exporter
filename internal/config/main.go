@@ -74,7 +74,7 @@ func Init() error {
 
 func MustReInit() {
 	if err := ReInit(); err != nil {
-		log.Fatalf("config.Init failed: %+v", err)
+		log.Fatalf("config.ReInit failed: %+v", err)
 	}
 }
 func ReInit() error {
