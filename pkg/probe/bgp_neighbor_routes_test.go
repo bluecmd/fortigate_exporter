@@ -10,11 +10,7 @@ import (
 )
 
 func TestBGPNeighborPathsIPv4(t *testing.T) {
-
-	if err := config.Init(); err != nil {
-		t.Fatalf("config.Init failed: %+v", err)
-	}
-
+	config.MustReInit()
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/router/bgp/paths", "testdata/router-bgp-paths-v4.jsonnet")
 	r := prometheus.NewPedanticRegistry()

@@ -69,10 +69,16 @@ func Init() error {
 	if savedConfig != nil {
 		return nil
 	}
+	return ReInit()
+}
 
-	if !flag.Parsed() {
-		flag.Parse()
+func MustReInit() {
+	if err := ReInit(); err != nil {
+		log.Fatalf("config.Init failed: %+v", err)
 	}
+}
+func ReInit() error {
+	flag.Parse()
 
 	savedConfig = &FortiExporterConfig{
 		Listen:        *parameter.Listen,
