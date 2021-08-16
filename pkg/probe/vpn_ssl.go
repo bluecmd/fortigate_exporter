@@ -22,10 +22,6 @@ func probeVPNSsl(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, b
 	savedConfig := config.GetConfig()
 	MaxVPNUsers := savedConfig.MaxVPNUsers
 
-	if MaxVPNUsers == 0 {
-		return nil, true
-	}
-
 	var (
 		vpncon = prometheus.NewDesc(
 			"fortigate_vpn_connections",
@@ -49,15 +45,16 @@ func probeVPNSsl(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, b
 	for _, r := range res {
 		count := len(r.Results)
 
-		if count > MaxVPNUsers {
-			log.Printf("Error: Received more VPN Users than maximum (%d > %d) allowed, ignoring metric ...", count, MaxVPNUsers)
-			return nil, false
-		}
-
 		m = append(m, prometheus.MustNewConstMetric(vpncon, prometheus.GaugeValue, float64(count), r.VDOM))
 
-		for _, result := range r.Results {
-			m = append(m, prometheus.MustNewConstMetric(vpnusr, prometheus.GaugeValue, float64(1), r.VDOM, result.UserName))
+		if MaxVPNUsers != 0 {
+			if count > MaxVPNUsers {
+				log.Printf("Error: Received more VPN Users than maximum (%d > %d) allowed, ignoring metric ...", count, MaxVPNUsers)
+			} else {
+				for _, result := range r.Results {
+					m = append(m, prometheus.MustNewConstMetric(vpnusr, prometheus.GaugeValue, float64(1), r.VDOM, result.UserName))
+				}
+			}
 		}
 	}
 
