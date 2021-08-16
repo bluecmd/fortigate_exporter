@@ -61,7 +61,7 @@ var (
 		TLSInsecure:   flag.Bool("insecure", false, "Allow insecure certificates"),
 		TlsExtraCAs:   flag.String("extra-ca-certs", "", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store"),
 		MaxBGPPaths:   flag.Int("max-bgp-paths", 10000, "How many BGP Paths to receive when counting routes, needs to be higher then the number of routes or metrics will not be generated"),
-		MaxVPNUsers:   flag.Int("max-vpn-users", 10000, "How many VPN Users to receive when counting users, needs to be greater than or equal the number of users or metrics will not be generated"),
+		MaxVPNUsers:   flag.Int("max-vpn-users", 0, "How many VPN Users to receive when counting users, needs to be greater than or equal the number of users or metrics will not be generated (0 eq. none by default)"),
 	}
 
 	savedConfig *FortiExporterConfig
