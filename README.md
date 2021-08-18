@@ -61,6 +61,7 @@ Per-VDOM:
    * `fortigate_interface_receive_errors_total`
  * _VPN/Ssl_
    * `fortigate_vpn_connections`
+   * `fortigate_vpn_users`
  * _VPN/IPSec_
    * `fortigate_ipsec_tunnel_receive_bytes_total`
    * `fortigate_ipsec_tunnel_transmit_bytes_total`
@@ -267,6 +268,8 @@ To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https
 | -insecure       | false  | allows to turn off security validation of TLS certificates  |
 | -extra-ca-certs | (none) | comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store |
 | -max-bgp-paths  | 10000  | Sets maximum amount of BGP paths to fetch, value is per IP stack version (IPv4 a& IPv6) |
+| -max-vpn-users  | 0      | Sets maximum amount of VPN users to fetch (0 eq. none by default) |
+
 ### FortiGate Configuration
 
 The following example Admin Profile describes the permissions that needs to be granted
