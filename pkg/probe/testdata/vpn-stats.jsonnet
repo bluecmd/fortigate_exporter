@@ -1,0 +1,27 @@
+# api/v2/monitor/vpn/ssl/stats/?vdom=*
+[
+  {
+    "http_method":"GET",
+    "results":{
+      "conserve_mode":false,
+      "max":{
+        "users":7,
+        "tunnels":6,
+        "connections":12
+      },
+      "current":{
+        "users":3,
+        "tunnels":2,
+        "connections":2
+      }
+    },
+    "vdom":"root",
+    "path":"vpn",
+    "name":"ssl",
+    "action":"stats",
+    "status":"success",
+    "serial":"FGT61FT000000000",
+    "version":"v6.0.10",
+    "build":365
+  },
+]
