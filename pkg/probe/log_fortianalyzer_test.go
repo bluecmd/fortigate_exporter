@@ -17,15 +17,12 @@ func TestLogAnalyzer(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_log_fortianalyzer_connection Fortianalyzer connection state
-	# TYPE fortigate_log_fortianalyzer_connection gauge
-	fortigate_log_fortianalyzer_connection{connection="allow",vdom="root"} 1
-	# HELP fortigate_log_fortianalyzer_received Received logs in fortianalyzer
-	# TYPE fortigate_log_fortianalyzer_received gauge
-	fortigate_log_fortianalyzer_received{vdom="root"} 999
-	# HELP fortigate_log_fortianalyzer_registration Fortianalyzer registration state
+	# HELP fortigate_log_fortianalyzer_logs_received Received logs in fortianalyzer
+	# TYPE fortigate_log_fortianalyzer_logs_received gauge
+	fortigate_log_fortianalyzer_logs_received{vdom="root"} 999
+	# HELP fortigate_log_fortianalyzer_registration Fortianalyzer state info
 	# TYPE fortigate_log_fortianalyzer_registration gauge
-	fortigate_log_fortianalyzer_registration{registration="registered",vdom="root"} 1
+	fortigate_log_fortianalyzer_registration{connection="allow",registration="registered",vdom="root"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {

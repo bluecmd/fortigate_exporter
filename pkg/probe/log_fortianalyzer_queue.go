@@ -8,33 +8,27 @@ import (
 )
 
 type LogAnaQueueResults struct {
-	Connected  int `json:"connected"`
-	FailedLogs int `json:"failed_logs"`
-	CachedLogs int `json:"cached_logs"`
+	Connected  float64 `json:"connected"`
+	FailedLogs float64 `json:"failed_logs"`
+	CachedLogs float64 `json:"cached_logs"`
 }
 
 type LogAnaQueue struct {
 	Results LogAnaQueueResults `json:"results"`
 	VDOM    string             `json:"vdom"`
-	Version string             `json:"version"`
 }
 
 func probeLogAnalyzerQueue(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		logAnaConn = prometheus.NewDesc(
-			"fortigate_log_fortianalyzer_queue_connected",
+			"fortigate_log_fortianalyzer_queue_connections",
 			"Fortianalyzer queue connected state",
 			[]string{"vdom"}, nil,
 		)
-		logAnaFail = prometheus.NewDesc(
-			"fortigate_log_fortianalyzer_queue_failed",
-			"Failed logs in fortianalyzer queue",
-			[]string{"vdom"}, nil,
-		)
-		logAnaCach = prometheus.NewDesc(
-			"fortigate_log_fortianalyzer_queue_cached",
-			"Cached logs in fortianalyzer queue",
-			[]string{"vdom"}, nil,
+		logAnaLogs = prometheus.NewDesc(
+			"fortigate_log_fortianalyzer_queue_logs",
+			"State of logs in the queue",
+			[]string{"vdom", "state"}, nil,
 		)
 	)
 
@@ -46,9 +40,9 @@ func probeLogAnalyzerQueue(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 
 	m := []prometheus.Metric{}
 	for _, r := range res {
-		m = append(m, prometheus.MustNewConstMetric(logAnaConn, prometheus.GaugeValue, float64(r.Results.Connected), r.VDOM))
-		m = append(m, prometheus.MustNewConstMetric(logAnaFail, prometheus.GaugeValue, float64(r.Results.FailedLogs), r.VDOM))
-		m = append(m, prometheus.MustNewConstMetric(logAnaCach, prometheus.GaugeValue, float64(r.Results.CachedLogs), r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(logAnaConn, prometheus.GaugeValue, r.Results.Connected, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(logAnaLogs, prometheus.GaugeValue, r.Results.FailedLogs, r.VDOM, "Failed"))
+		m = append(m, prometheus.MustNewConstMetric(logAnaLogs, prometheus.GaugeValue, r.Results.CachedLogs, r.VDOM, "Cached"))
 	}
 
 	return m, true

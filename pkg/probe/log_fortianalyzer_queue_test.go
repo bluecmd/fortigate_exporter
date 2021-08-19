@@ -13,19 +13,17 @@ func TestLogAnalyzerQueue(t *testing.T) {
 	c.prepare("api/v2/monitor/log/fortianalyzer-queue", "testdata/log-fortianalyzer-queue.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeLogAnalyzerQueue, c, r) {
-		t.Errorf("probeSystemStatus() returned non-success")
+		t.Errorf("probeLogAnalyzerQueue() returned non-success")
 	}
 
 	em := `
-	# HELP fortigate_log_fortianalyzer_queue_cached Cached logs in fortianalyzer queue
-	# TYPE fortigate_log_fortianalyzer_queue_cached gauge
-	fortigate_log_fortianalyzer_queue_cached{vdom="root"} 0
-	# HELP fortigate_log_fortianalyzer_queue_connected Fortianalyzer queue connected state
-	# TYPE fortigate_log_fortianalyzer_queue_connected gauge
-	fortigate_log_fortianalyzer_queue_connected{vdom="root"} 1
-	# HELP fortigate_log_fortianalyzer_queue_failed Failed logs in fortianalyzer queue
-	# TYPE fortigate_log_fortianalyzer_queue_failed gauge
-	fortigate_log_fortianalyzer_queue_failed{vdom="root"} 0
+	# HELP fortigate_log_fortianalyzer_queue_connections Fortianalyzer queue connected state
+	# TYPE fortigate_log_fortianalyzer_queue_connections gauge
+	fortigate_log_fortianalyzer_queue_connections{vdom="root"} 1
+	# HELP fortigate_log_fortianalyzer_queue_logs State of logs in the queue
+	# TYPE fortigate_log_fortianalyzer_queue_logs gauge
+	fortigate_log_fortianalyzer_queue_logs{state="Cached",vdom="root"} 0
+	fortigate_log_fortianalyzer_queue_logs{state="Failed",vdom="root"} 0
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {

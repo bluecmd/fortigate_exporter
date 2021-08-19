@@ -8,31 +8,25 @@ import (
 )
 
 type LogAnaResults struct {
-	Registration string `json:"registration"`
-	Connection   string `json:"connection"`
-	Received     int    `json:"received"`
+	Registration string  `json:"registration"`
+	Connection   string  `json:"connection"`
+	Received     float64 `json:"received"`
 }
 
 type LogAna struct {
 	Results LogAnaResults `json:"results"`
 	VDOM    string        `json:"vdom"`
-	Version string        `json:"version"`
 }
 
 func probeLogAnalyzer(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
-		logAnaReg = prometheus.NewDesc(
+		logAnaInfo = prometheus.NewDesc(
 			"fortigate_log_fortianalyzer_registration",
-			"Fortianalyzer registration state",
-			[]string{"vdom", "registration"}, nil,
-		)
-		logAnaCon = prometheus.NewDesc(
-			"fortigate_log_fortianalyzer_connection",
-			"Fortianalyzer connection state",
-			[]string{"vdom", "connection"}, nil,
+			"Fortianalyzer state info",
+			[]string{"vdom", "registration", "connection"}, nil,
 		)
 		logAnaRcv = prometheus.NewDesc(
-			"fortigate_log_fortianalyzer_received",
+			"fortigate_log_fortianalyzer_logs_received",
 			"Received logs in fortianalyzer",
 			[]string{"vdom"}, nil,
 		)
@@ -46,9 +40,8 @@ func probeLogAnalyzer(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metr
 
 	m := []prometheus.Metric{}
 	for _, r := range res {
-		m = append(m, prometheus.MustNewConstMetric(logAnaReg, prometheus.GaugeValue, float64(1), r.VDOM, r.Results.Registration))
-		m = append(m, prometheus.MustNewConstMetric(logAnaCon, prometheus.GaugeValue, float64(1), r.VDOM, r.Results.Connection))
-		m = append(m, prometheus.MustNewConstMetric(logAnaRcv, prometheus.GaugeValue, float64(r.Results.Received), r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(logAnaInfo, prometheus.GaugeValue, float64(1), r.VDOM, r.Results.Registration, r.Results.Connection))
+		m = append(m, prometheus.MustNewConstMetric(logAnaRcv, prometheus.GaugeValue, r.Results.Received, r.VDOM))
 	}
 
 	return m, true
