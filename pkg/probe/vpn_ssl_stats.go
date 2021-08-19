@@ -26,17 +26,17 @@ type VPNStats struct {
 func probeVPNSslStats(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		vpnCurUsr = prometheus.NewDesc(
-			"fortigate_vpn_ssl_current_users",
+			"fortigate_vpn_ssl_users",
 			"Number of current SSL VPN users",
 			[]string{"vdom"}, nil,
 		)
 		vpnCurTun = prometheus.NewDesc(
-			"fortigate_vpn_ssl_current_tunnels",
+			"fortigate_vpn_ssl_tunnels",
 			"Number of current SSL VPN tunnels",
 			[]string{"vdom"}, nil,
 		)
 		vpnCurCon = prometheus.NewDesc(
-			"fortigate_vpn_ssl_current_connections",
+			"fortigate_vpn_ssl_connections",
 			"Number of current SSL VPN connections",
 			[]string{"vdom"}, nil,
 		)
