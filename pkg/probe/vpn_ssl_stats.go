@@ -32,12 +32,12 @@ func probeVPNSslStats(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metr
 		)
 		vpnCurTun = prometheus.NewDesc(
 			"fortigate_vpn_ssl_current_tunnels",
-			"Number of current VPN tunnels",
+			"Number of current SSL VPN tunnels",
 			[]string{"vdom"}, nil,
 		)
 		vpnCurCon = prometheus.NewDesc(
 			"fortigate_vpn_ssl_current_connections",
-			"Number of current VPN connections",
+			"Number of current SSL VPN connections",
 			[]string{"vdom"}, nil,
 		)
 	)

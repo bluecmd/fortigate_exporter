@@ -17,13 +17,13 @@ func TestVPNSslStats(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_vpn_ssl_current_connections Number of current VPN connections
+	# HELP fortigate_vpn_ssl_current_connections Number of current SSL VPN connections
 	# TYPE fortigate_vpn_ssl_current_connections gauge
 	fortigate_vpn_ssl_current_connections{vdom="root"} 2
-	# HELP fortigate_vpn_ssl_current_tunnels Number of current VPN tunnels
+	# HELP fortigate_vpn_ssl_current_tunnels Number of current SSL VPN tunnels
 	# TYPE fortigate_vpn_ssl_current_tunnels gauge
 	fortigate_vpn_ssl_current_tunnels{vdom="root"} 2
-	# HELP fortigate_vpn_ssl_current_users Number of current VPN users
+	# HELP fortigate_vpn_ssl_current_users Number of current SSL VPN users
 	# TYPE fortigate_vpn_ssl_current_users gauge
 	fortigate_vpn_ssl_current_users{vdom="root"} 3
 	`
