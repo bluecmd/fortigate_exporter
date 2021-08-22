@@ -269,7 +269,7 @@ To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https
 | -listen         | :9710  | address to listen for incoming requests  |
 | -scrape-timeout | 30     | timeout in seconds  |
 | -https-timeout  | 10     | timeout in seconds for establishment of HTTPS connections  |
-| -insecure       | false  | allows to turn off security validation of TLS certificates  |
+| -insecure       | _not set_  | allows to turn off security validation of TLS certificates  |
 | -extra-ca-certs | (none) | comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store |
 | -max-bgp-paths  | 10000  | Sets maximum amount of BGP paths to fetch, value is per IP stack version (IPv4 a& IPv6) |
 | -max-vpn-users  | 0      | Sets maximum amount of VPN users to fetch (0 eq. none by default) |
@@ -356,7 +356,7 @@ prometheus_fortigate_exporter:
   volumes:
     - /path/to/fortigate-key.yaml:/config/fortigate-key.yaml
   # Applying multiple parameters
-  command: ["-auth-file", "/config/fortigate-key.yaml", "-insecure", "true"]
+  command: ["-auth-file", "/config/fortigate-key.yaml", "-insecure"]
   restart: unless-stopped
 ```
 
