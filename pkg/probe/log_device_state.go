@@ -22,7 +22,6 @@ type LogDevSttRes struct {
 type LogDevStt struct {
 	Results LogDevSttRes `json:"results"`
 	VDOM    string       `json:"vdom"`
-	Version string       `json:"version"`
 }
 
 func btof(b bool) float64 {

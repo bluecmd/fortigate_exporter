@@ -13,7 +13,7 @@ func TestLogDeviceState(t *testing.T) {
 	c.prepare("api/v2/monitor/log/device/state", "testdata/log-device-state.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeLogDeviceState, c, r) {
-		t.Errorf("probeSystemStatus() returned non-success")
+		t.Errorf("probeLogDeviceState() returned non-success")
 	}
 
 	em := `
