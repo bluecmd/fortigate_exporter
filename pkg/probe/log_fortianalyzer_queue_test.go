@@ -22,8 +22,8 @@ func TestLogAnalyzerQueue(t *testing.T) {
 	fortigate_log_fortianalyzer_queue_connections{vdom="root"} 1
 	# HELP fortigate_log_fortianalyzer_queue_logs State of logs in the queue
 	# TYPE fortigate_log_fortianalyzer_queue_logs gauge
-	fortigate_log_fortianalyzer_queue_logs{state="Cached",vdom="root"} 0
-	fortigate_log_fortianalyzer_queue_logs{state="Failed",vdom="root"} 0
+	fortigate_log_fortianalyzer_queue_logs{state="cached",vdom="root"} 0
+	fortigate_log_fortianalyzer_queue_logs{state="failed",vdom="root"} 0
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
