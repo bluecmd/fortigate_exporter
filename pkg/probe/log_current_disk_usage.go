@@ -8,32 +8,31 @@ import (
 )
 
 type LogResults struct {
-	UsedBytes  int `json:"used_bytes"`
-	FreeBytes  int `json:"free_bytes"`
-	TotalBytes int `json:"total_bytes"`
+	UsedBytes  float64 `json:"used_bytes"`
+	FreeBytes  float64 `json:"free_bytes"`
+	TotalBytes float64 `json:"total_bytes"`
 }
 
 type Log struct {
 	Results LogResults `json:"results"`
 	VDOM    string     `json:"vdom"`
-	Version string     `json:"version"`
 }
 
 func probeLogCurrentDiskUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		logUsed = prometheus.NewDesc(
-			"fortigate_log_used_bytes",
-			"Current used bytes for log",
+			"fortigate_log_disk_used_bytes",
+			"Disk used bytes for log",
 			[]string{"vdom"}, nil,
 		)
 		logFree = prometheus.NewDesc(
-			"fortigate_log_free_bytes",
-			"Current free bytes for log",
+			"fortigate_log_disk_free_bytes",
+			"Disk free bytes for log",
 			[]string{"vdom"}, nil,
 		)
 		logTotal = prometheus.NewDesc(
-			"fortigate_log_total_bytes",
-			"Current total bytes for log",
+			"fortigate_log_disk_total_bytes",
+			"Disk total bytes for log",
 			[]string{"vdom"}, nil,
 		)
 	)
@@ -46,9 +45,9 @@ func probeLogCurrentDiskUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 
 	m := []prometheus.Metric{}
 	for _, r := range res {
-		m = append(m, prometheus.MustNewConstMetric(logUsed, prometheus.GaugeValue, float64(r.Results.UsedBytes), r.VDOM))
-		m = append(m, prometheus.MustNewConstMetric(logFree, prometheus.GaugeValue, float64(r.Results.FreeBytes), r.VDOM))
-		m = append(m, prometheus.MustNewConstMetric(logTotal, prometheus.GaugeValue, float64(r.Results.TotalBytes), r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(logUsed, prometheus.GaugeValue, r.Results.UsedBytes, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(logFree, prometheus.GaugeValue, r.Results.FreeBytes, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(logTotal, prometheus.GaugeValue, r.Results.TotalBytes, r.VDOM))
 	}
 
 	return m, true
