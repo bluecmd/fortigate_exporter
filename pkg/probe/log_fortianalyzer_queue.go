@@ -41,8 +41,8 @@ func probeLogAnalyzerQueue(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 	m := []prometheus.Metric{}
 	for _, r := range res {
 		m = append(m, prometheus.MustNewConstMetric(logAnaConn, prometheus.GaugeValue, r.Results.Connected, r.VDOM))
-		m = append(m, prometheus.MustNewConstMetric(logAnaLogs, prometheus.GaugeValue, r.Results.FailedLogs, r.VDOM, "Failed"))
-		m = append(m, prometheus.MustNewConstMetric(logAnaLogs, prometheus.GaugeValue, r.Results.CachedLogs, r.VDOM, "Cached"))
+		m = append(m, prometheus.MustNewConstMetric(logAnaLogs, prometheus.GaugeValue, r.Results.FailedLogs, r.VDOM, "failed"))
+		m = append(m, prometheus.MustNewConstMetric(logAnaLogs, prometheus.GaugeValue, r.Results.CachedLogs, r.VDOM, "cached"))
 	}
 
 	return m, true
