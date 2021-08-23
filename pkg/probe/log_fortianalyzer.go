@@ -21,7 +21,7 @@ type LogAna struct {
 func probeLogAnalyzer(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		logAnaInfo = prometheus.NewDesc(
-			"fortigate_log_fortianalyzer_registration",
+			"fortigate_log_fortianalyzer_registration_info",
 			"Fortianalyzer state info",
 			[]string{"vdom", "registration", "connection"}, nil,
 		)
