@@ -1,0 +1,20 @@
+# api/v2/monitor/log/fortianalyzer-queue?vdom=* 
+[
+  {
+    "http_method":"GET",
+    "results":{
+      "connected":1,
+      "total_memory_blocks":0,
+      "used_memory_blocks":0,
+      "failed_logs":0,
+      "cached_logs":0
+    },
+    "vdom":"root",
+    "path":"log",
+    "name":"fortianalyzer-queue",
+    "status":"success",
+    "serial":"FG10000000000000",
+    "version":"v6.0.10",
+    "build":365
+  }
+]
