@@ -23,10 +23,11 @@ func TestVPNSsl(t *testing.T) {
 	em := `
 	# HELP fortigate_vpn_connections Number of VPN connections
 	# TYPE fortigate_vpn_connections gauge
-	fortigate_vpn_connections{vdom="root"} 1
-	# HELP fortigate_vpn_users Users of VPN connections
+	fortigate_vpn_connections{vdom="root"} 3
+	# HELP fortigate_vpn_users Number of VPN users connections
 	# TYPE fortigate_vpn_users gauge
-	fortigate_vpn_users{user="user1",vdom="root"} 1
+	fortigate_vpn_users{user="user1",vdom="root"} 2
+	fortigate_vpn_users{user="user2",vdom="root"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
