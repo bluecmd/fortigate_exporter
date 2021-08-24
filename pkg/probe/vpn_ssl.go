@@ -15,7 +15,6 @@ type VPNUser struct {
 type VPNUsers struct {
 	Results []VPNUser `json:"results"`
 	VDOM    string    `json:"vdom"`
-	Version string    `json:"version"`
 }
 
 func probeVPNSsl(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
@@ -30,7 +29,7 @@ func probeVPNSsl(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, b
 		)
 		vpnusr = prometheus.NewDesc(
 			"fortigate_vpn_users",
-			"Users of VPN connections",
+			"Number of VPN users connections",
 			[]string{"vdom", "user"}, nil,
 		)
 	)
@@ -51,8 +50,19 @@ func probeVPNSsl(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, b
 			if count > MaxVPNUsers {
 				log.Printf("Error: Received more VPN Users than maximum (%d > %d) allowed, ignoring metric ...", count, MaxVPNUsers)
 			} else {
+				// Structure for summarizing multi VPN per user
+				type VPNUserDesc struct {
+					VDOM     string
+					UserName string
+				}
+				userMap := map[VPNUserDesc]float64{}
+
 				for _, result := range r.Results {
-					m = append(m, prometheus.MustNewConstMetric(vpnusr, prometheus.GaugeValue, float64(1), r.VDOM, result.UserName))
+					userDesc := VPNUserDesc{r.VDOM, result.UserName}
+					userMap[userDesc]++
+				}
+				for userDesc, counter := range userMap {
+					m = append(m, prometheus.MustNewConstMetric(vpnusr, prometheus.GaugeValue, counter, userDesc.VDOM, userDesc.UserName))
 				}
 			}
 		}
