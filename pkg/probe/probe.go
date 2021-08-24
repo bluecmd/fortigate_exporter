@@ -110,6 +110,8 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		{"Firewall/LoadBalance", probeFirewallLoadBalance},
 		{"Firewall/Policies", probeFirewallPolicies},
 		{"License/Status", probeLicenseStatus},
+		{"Log/Fortianalyzer/Status", probeLogAnalyzer},
+		{"Log/Fortianalyzer/Queue", probeLogAnalyzerQueue},
 		{"System/AvailableCertificates", probeSystemAvailableCertificates},
 		{"System/HAStatistics", probeSystemHAStatistics},
 		{"System/Interface", probeSystemInterface},
