@@ -41,6 +41,10 @@ func probeLogAnalyzerQueue(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 	m := []prometheus.Metric{}
 	for _, r := range res {
 		m = append(m, prometheus.MustNewConstMetric(logAnaConn, prometheus.GaugeValue, r.Results.Connected, r.VDOM))
+		// This is assuming the failed and cached are gauges, which without access to API
+		// documentation is too hard to conclusively figure out. If there are data available
+		// that proves that the failed logs (or cached logs) are counters instead, we need
+		// to either just change the metric type - or split these two up.
 		m = append(m, prometheus.MustNewConstMetric(logAnaLogs, prometheus.GaugeValue, r.Results.FailedLogs, r.VDOM, "failed"))
 		m = append(m, prometheus.MustNewConstMetric(logAnaLogs, prometheus.GaugeValue, r.Results.CachedLogs, r.VDOM, "cached"))
 	}
