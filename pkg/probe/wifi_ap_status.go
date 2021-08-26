@@ -1,13 +1,12 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
-func probeWifiAPStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeWifiAPStatus(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		wtpCount = prometheus.NewDesc(
 			"fortigate_wifi_access_points",
@@ -41,7 +40,7 @@ func probeWifiAPStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 	// Consider implementing pagination to remove this limit of 1000 entries
 	var response ApiStatusResponse
 	if err := c.Get("api/v2/monitor/wifi/ap_status", "vdom=*&start=0&count=1000", &response); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

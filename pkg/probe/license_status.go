@@ -1,13 +1,12 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
-func probeLicenseStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeLicenseStatus(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		vdomUsed = prometheus.NewDesc(
 			"fortigate_license_vdom_usage",
@@ -36,7 +35,7 @@ func probeLicenseStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Me
 	var r LicenseResponse
 
 	if err := c.Get("api/v2/monitor/license/status/select", "", &r); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

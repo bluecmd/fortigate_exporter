@@ -3,9 +3,10 @@ package probe
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
+
+	"github.com/bluecmd/fortigate_exporter/internal/logging"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/prometheus/client_golang/prometheus"
@@ -21,6 +22,9 @@ func ProbeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Target parameter missing or empty", http.StatusBadRequest)
 		return
 	}
+
+	log := logging.GetSugar().With("target", target)
+
 	probeSuccessGauge := prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "probe_success",
 		Help: "Whether or not the probe succeeded",
@@ -37,20 +41,20 @@ func ProbeHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	pc := &ProbeCollector{}
 	registry.MustRegister(pc)
-	success, err := pc.Probe(ctx, target, &http.Client{}, savedConfig)
+	success, err := pc.Probe(ctx, target, &http.Client{}, savedConfig, log)
 	if err != nil {
-		log.Printf("Probe request rejected; error is: %v", err)
+		log.Errorf("Probe request rejected; error is: %v", err)
 		http.Error(w, fmt.Sprintf("probe: %v", err), http.StatusBadRequest)
 		return
 	}
-	duration := time.Since(start).Seconds()
-	probeDurationGauge.Set(duration)
+	duration := time.Since(start)
+	probeDurationGauge.Set(duration.Seconds())
 	if success {
 		probeSuccessGauge.Set(1)
-		log.Printf("Probe of %q succeeded, took %.3f seconds", target, duration)
+		log.Debugw("Probe succeeded", "duration", duration)
 	} else {
 		// probeSuccessGauge default is 0
-		log.Printf("Probe of %q failed, took %.3f seconds", target, duration)
+		log.Errorw("Probe failed", "duration", duration)
 	}
 	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})
 	h.ServeHTTP(w, r)

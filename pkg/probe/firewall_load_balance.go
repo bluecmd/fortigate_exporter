@@ -1,15 +1,16 @@
 package probe
 
 import (
-	"log"
 	"math"
 	"strconv"
+
+	"go.uber.org/zap"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeFirewallLoadBalance(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeFirewallLoadBalance(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	if meta.VersionMajor < 6 || (meta.VersionMajor == 6 && meta.VersionMinor < 4) {
 		// not supported version. Before 6.4.0 there is no real_server_id and therefore this will fail
 		return nil, true
@@ -88,7 +89,7 @@ func probeFirewallLoadBalance(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 	// Consider implementing pagination to remove this limit of 1000 entries
 	var rs []LoadBalanceResponse
 	if err := c.Get("api/v2/monitor/firewall/load-balance", "vdom=*&start=0&count=1000", &rs); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 
@@ -131,7 +132,7 @@ func probeFirewallLoadBalance(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 					// NaN
 				} else {
 					if realServerRTTValueInMs, err := strconv.ParseFloat(realServer.RTT, 64); err != nil {
-						log.Printf("Failed to parse RTT value: %v", err)
+						log.Errorf("Failed to parse RTT value: %v", err)
 					} else {
 						realServerRTTValue = realServerRTTValueInMs / 1000
 					}

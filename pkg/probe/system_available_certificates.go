@@ -1,13 +1,12 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
-func probeSystemAvailableCertificates(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemAvailableCertificates(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		certificateInfo = prometheus.NewDesc(
 			"fortigate_certificate_info",
@@ -50,7 +49,7 @@ func probeSystemAvailableCertificates(c http.FortiHTTP, meta *TargetMetadata) ([
 
 	var globalResponse Response
 	if err := c.Get("api/v2/monitor/system/available-certificates", "scope=global", &globalResponse); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 	globalResponse.Scope = "global"
@@ -58,7 +57,7 @@ func probeSystemAvailableCertificates(c http.FortiHTTP, meta *TargetMetadata) ([
 	var vdomResponses []Response
 
 	if err := c.Get("api/v2/monitor/system/available-certificates", "vdom=*", &vdomResponses); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 	for i := range vdomResponses {

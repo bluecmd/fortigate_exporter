@@ -1,13 +1,12 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
-func probeSystemHAStatistics(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemHAStatistics(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		memberInfo = prometheus.NewDesc(
 			"fortigate_ha_member_info",
@@ -84,7 +83,7 @@ func probeSystemHAStatistics(c http.FortiHTTP, meta *TargetMetadata) ([]promethe
 	var r HAResponse
 
 	if err := c.Get("api/v2/monitor/system/ha-statistics", "", &r); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 
@@ -96,7 +95,7 @@ func probeSystemHAStatistics(c http.FortiHTTP, meta *TargetMetadata) ([]promethe
 	var rc HAConfig
 
 	if err := c.Get("api/v2/cmdb/system/ha", "", &rc); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

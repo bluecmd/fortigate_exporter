@@ -1,8 +1,9 @@
 package probe
 
 import (
-	"log"
 	"strconv"
+
+	"go.uber.org/zap"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
@@ -22,7 +23,7 @@ type BGPNeighborResponse struct {
 	Version string        `json:"version"`
 }
 
-func probeBGPNeighborsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeBGPNeighborsIPv4(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	if meta.VersionMajor < 7 {
 		// not supported version. Before 7.0.0 the requested endpoint doesn't exist
 		return nil, true
@@ -38,7 +39,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 	var rs []BGPNeighborResponse
 
 	if err := c.Get("api/v2/monitor/router/bgp/neighbors", "vdom=*", &rs); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 
@@ -53,7 +54,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 	return m, true
 }
 
-func probeBGPNeighborsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeBGPNeighborsIPv6(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	if meta.VersionMajor < 7 {
 		// not supported version. Before 7.0.0 the requested endpoint doesn't exist
 		return nil, true
@@ -70,7 +71,7 @@ func probeBGPNeighborsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 	var rs []BGPNeighborResponse
 
 	if err := c.Get("api/v2/monitor/router/bgp/neighbors6", "vdom=*", &rs); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

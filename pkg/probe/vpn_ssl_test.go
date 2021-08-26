@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"go.uber.org/zap"
+
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
@@ -15,7 +17,7 @@ func TestVPNSsl(t *testing.T) {
 	c.prepare("api/v2/monitor/vpn/ssl", "testdata/vpn.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	flag.Set("max-vpn-users", "10")
-	config.MustReInit()
+	config.MustReInit(zap.S())
 	if !testProbe(probeVPNSsl, c, r) {
 		t.Errorf("probeSystemStatus() returned non-success")
 	}

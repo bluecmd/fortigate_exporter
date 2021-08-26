@@ -4,13 +4,15 @@ import (
 	"strings"
 	"testing"
 
+	"go.uber.org/zap"
+
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 )
 
 func TestBGPNeighborPathsIPv4(t *testing.T) {
-	config.MustReInit()
+	config.MustReInit(zap.S())
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/router/bgp/paths", "testdata/router-bgp-paths-v4.jsonnet")
 	r := prometheus.NewPedanticRegistry()
@@ -36,7 +38,7 @@ func TestBGPNeighborPathsIPv4(t *testing.T) {
 
 func TestBGPNeighborPathsIPv6(t *testing.T) {
 
-	if err := config.Init(); err != nil {
+	if err := config.Init(zap.S()); err != nil {
 		t.Fatalf("config.Init failed: %+v", err)
 	}
 

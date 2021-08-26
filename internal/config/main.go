@@ -3,8 +3,9 @@ package config
 import (
 	"flag"
 	"io/ioutil"
-	"log"
 	"strings"
+
+	"go.uber.org/zap"
 
 	"gopkg.in/yaml.v2"
 )
@@ -67,20 +68,20 @@ var (
 	savedConfig *FortiExporterConfig
 )
 
-func Init() error {
+func Init(log *zap.SugaredLogger) error {
 	// check if already parsed
 	if savedConfig != nil {
 		return nil
 	}
-	return ReInit()
+	return ReInit(log)
 }
 
-func MustReInit() {
-	if err := ReInit(); err != nil {
+func MustReInit(log *zap.SugaredLogger) {
+	if err := ReInit(log); err != nil {
 		log.Fatalf("config.ReInit failed: %+v", err)
 	}
 }
-func ReInit() error {
+func ReInit(log *zap.SugaredLogger) error {
 	flag.Parse()
 
 	savedConfig = &FortiExporterConfig{
@@ -95,16 +96,16 @@ func ReInit() error {
 	// parse AuthKeys
 	af, err := ioutil.ReadFile(*parameter.AuthFile)
 	if err != nil {
-		log.Fatalf("Failed to read API authentication map file: %v", err)
+		log.Errorf("Failed to read API authentication map file: %v", err)
 		return err
 	}
 
 	if err := yaml.Unmarshal(af, &savedConfig.AuthKeys); err != nil {
-		log.Fatalf("Failed to parse API authentication map file: %v", err)
+		log.Errorf("Failed to parse API authentication map file: %v", err)
 		return err
 	}
 
-	log.Printf("Loaded %d API keys", len(savedConfig.AuthKeys))
+	log.Infof("Loaded %d API keys", len(savedConfig.AuthKeys))
 
 	// parse ExtraCAs
 	for _, eca := range strings.Split(*parameter.TlsExtraCAs, ",") {
@@ -114,7 +115,7 @@ func ReInit() error {
 
 		certs, err := ioutil.ReadFile(eca)
 		if err != nil {
-			log.Fatalf("Failed to read extra CA file %q: %v", eca, err)
+			log.Errorf("Failed to read extra CA file %q: %v", eca, err)
 			return err
 		}
 

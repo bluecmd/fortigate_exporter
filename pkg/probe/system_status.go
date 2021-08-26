@@ -2,13 +2,14 @@ package probe
 
 import (
 	"fmt"
-	"log"
+
+	"go.uber.org/zap"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemStatus(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		mVersion = prometheus.NewDesc(
 			"fortigate_version_info",
@@ -26,7 +27,7 @@ func probeSystemStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 	var st systemStatus
 
 	if err := c.Get("api/v2/monitor/system/status", "", &st); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

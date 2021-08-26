@@ -5,10 +5,11 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
 )
@@ -37,7 +38,7 @@ func NewFortiClient(ctx context.Context, tgt url.URL, hc *http.Client, aConfig c
 	return nil, fmt.Errorf("invalid authentication data for %q", tgt.String())
 }
 
-func Configure(config config.FortiExporterConfig) error {
+func Configure(config config.FortiExporterConfig, log *zap.SugaredLogger) error {
 	roots, err := x509.SystemCertPool()
 	if err != nil {
 		log.Fatalf("Unable to fetch system CA store: %v", err)

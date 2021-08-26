@@ -2,13 +2,14 @@ package probe
 
 import (
 	"fmt"
-	"log"
+
+	"go.uber.org/zap"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemResourceUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemResourceUsage(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		mResCPU = prometheus.NewDesc(
 			"fortigate_cpu_usage_ratio",
@@ -54,7 +55,7 @@ func probeSystemResourceUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 	var sr systemResourceUsage
 
 	if err := c.Get("api/v2/monitor/system/resource/usage", "interval=1-min&scope=global", &sr); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 
@@ -70,7 +71,7 @@ func probeSystemResourceUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 	return m, true
 }
 
-func probeSystemVDOMResources(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemVDOMResources(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		mResCPU = prometheus.NewDesc(
 			"fortigate_vdom_cpu_usage_ratio",
@@ -112,7 +113,7 @@ func probeSystemVDOMResources(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 	var sr []systemResourceUsage
 
 	if err := c.Get("api/v2/monitor/system/resource/usage", "interval=1-min&vdom=*", &sr); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 	m := []prometheus.Metric{}

@@ -20,7 +20,9 @@ package probe
 import (
 	"context"
 	"fmt"
-	"log"
+
+	"go.uber.org/zap"
+
 	"net/http"
 	"net/url"
 	"strings"
@@ -40,14 +42,14 @@ type TargetMetadata struct {
 	VersionMinor int
 }
 
-type probeFunc func(fortiHTTP.FortiHTTP, *TargetMetadata) ([]prometheus.Metric, bool)
+type probeFunc func(fortiHTTP.FortiHTTP, *TargetMetadata, *zap.SugaredLogger) ([]prometheus.Metric, bool)
 
 type probeDetailedFunc struct {
 	name     string
 	function probeFunc
 }
 
-func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client, savedConfig config.FortiExporterConfig) (bool, error) {
+func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client, savedConfig config.FortiExporterConfig, log *zap.SugaredLogger) (bool, error) {
 	tgt, err := url.Parse(target)
 	if err != nil {
 		return false, fmt.Errorf("url.Parse failed: %v", err)
@@ -77,18 +79,18 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 	// The "system status" group has access group "any" so it is a good source
 	// to test the authentication as well as fetching the OS version.
 	if err := c.Get("api/v2/monitor/system/status", "", &st); err != nil {
-		log.Printf("Error: API connectivity test failed, %v", err)
+		log.Errorf("API connectivity test failed, %v", err)
 		return false, nil
 	}
 
 	if st.Status != "success" {
-		log.Printf("Error: API connectivity test returned status: %s", st.Status)
+		log.Errorf("API connectivity test returned status: %s", st.Status)
 		return false, nil
 	}
 
 	major, minor, ok := version.ParseVersion(st.Version)
 	if !ok {
-		log.Printf("Error: Failed to parse OS version: %q", st.Version)
+		log.Errorf("Failed to parse OS version: %q", st.Version)
 		return false, nil
 	}
 
@@ -154,7 +156,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 			continue
 		}
 
-		m, ok := aProbe.function(c, meta)
+		m, ok := aProbe.function(c, meta, log)
 		if !ok {
 			success = false
 		}

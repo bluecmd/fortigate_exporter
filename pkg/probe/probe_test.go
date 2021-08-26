@@ -20,6 +20,9 @@ package probe
 import (
 	"encoding/json"
 	"log"
+
+	"go.uber.org/zap"
+
 	"net/url"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
@@ -100,7 +103,7 @@ func testProbe(pf probeFunc, c http.FortiHTTP, r Registry) bool {
 }
 
 func testProbeWithMetadata(pf probeFunc, c http.FortiHTTP, meta *TargetMetadata, r Registry) bool {
-	m, ok := pf(c, meta)
+	m, ok := pf(c, meta, zap.S())
 	if !ok {
 		return false
 	}

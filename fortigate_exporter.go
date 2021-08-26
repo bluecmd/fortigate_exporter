@@ -18,12 +18,12 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"runtime"
 	"runtime/debug"
 	"strings"
 
+	"github.com/bluecmd/fortigate_exporter/internal/logging"
 	"github.com/bluecmd/fortigate_exporter/pkg/probe"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
@@ -78,16 +78,20 @@ func getBuildInfo() BuildInfo {
 
 func main() {
 	buildInfo := getBuildInfo()
-	log.Printf("FortigateExporter %s ( %s )", buildInfo.version, buildInfo.gitHash)
+
+	log := logging.GetSugar()
+	defer log.Sync()
+
+	log.Infof("FortigateExporter %s ( %s )", buildInfo.version, buildInfo.gitHash)
 	setUpMetricsEndpoint(buildInfo)
 
-	if err := config.Init(); err != nil {
+	if err := config.Init(log); err != nil {
 		log.Fatalf("Initialization error: %+v", err)
 	}
 
 	savedConfig := config.GetConfig()
 
-	if err := fortiHTTP.Configure(savedConfig); err != nil {
+	if err := fortiHTTP.Configure(savedConfig, log); err != nil {
 		log.Fatalf("%+v", err)
 	}
 
@@ -98,6 +102,6 @@ func main() {
 			log.Fatalf("Unable to serve: %v", err)
 		}
 	}()
-	log.Printf("Fortigate exporter running, listening on %q", savedConfig.Listen)
+	log.Infof("Fortigate exporter running, listening on %q", savedConfig.Listen)
 	select {}
 }

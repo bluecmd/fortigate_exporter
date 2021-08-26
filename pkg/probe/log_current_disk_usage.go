@@ -1,10 +1,9 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
 type LogResults struct {
@@ -17,7 +16,7 @@ type Log struct {
 	VDOM    string     `json:"vdom"`
 }
 
-func probeLogCurrentDiskUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeLogCurrentDiskUsage(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		logUsed = prometheus.NewDesc(
 			"fortigate_log_disk_used_bytes",
@@ -33,7 +32,7 @@ func probeLogCurrentDiskUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 
 	var res []Log
 	if err := c.Get("api/v2/monitor/log/current-disk-usage", "vdom=*", &res); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

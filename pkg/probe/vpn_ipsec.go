@@ -1,14 +1,15 @@
 package probe
 
 import (
-	"log"
 	"strconv"
+
+	"go.uber.org/zap"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		status = prometheus.NewDesc(
 			"fortigate_ipsec_tunnel_up",
@@ -45,7 +46,7 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 	}
 	var res []ipsecResult
 	if err := c.Get("api/v2/monitor/vpn/ipsec", "vdom=*", &res); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

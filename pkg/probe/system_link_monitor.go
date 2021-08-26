@@ -1,13 +1,12 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
-func probeSystemLinkMonitor(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemLinkMonitor(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		linkStatus = prometheus.NewDesc(
 			"fortigate_link_status",
@@ -91,7 +90,7 @@ func probeSystemLinkMonitor(c http.FortiHTTP, meta *TargetMetadata) ([]prometheu
 	var rs []linkMonitorResponse
 
 	if err := c.Get("api/v2/monitor/system/link-monitor", "vdom=*", &rs); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

@@ -1,10 +1,9 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
 type VPNCurrentResults struct {
@@ -23,7 +22,7 @@ type VPNStats struct {
 	Version string     `json:"version"`
 }
 
-func probeVPNSslStats(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeVPNSslStats(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		vpnCurUsr = prometheus.NewDesc(
 			"fortigate_vpn_ssl_users",
@@ -44,7 +43,7 @@ func probeVPNSslStats(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metr
 
 	var res []VPNStats
 	if err := c.Get("api/v2/monitor/vpn/ssl/stats", "vdom=*", &res); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

@@ -1,10 +1,9 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
 type LogAnaResults struct {
@@ -18,7 +17,7 @@ type LogAna struct {
 	VDOM    string        `json:"vdom"`
 }
 
-func probeLogAnalyzer(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeLogAnalyzer(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		logAnaInfo = prometheus.NewDesc(
 			"fortigate_log_fortianalyzer_registration_info",
@@ -34,7 +33,7 @@ func probeLogAnalyzer(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metr
 
 	var res []LogAna
 	if err := c.Get("api/v2/monitor/log/fortianalyzer", "vdom=*", &res); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 

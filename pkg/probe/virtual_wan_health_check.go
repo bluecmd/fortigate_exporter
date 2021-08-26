@@ -1,13 +1,12 @@
 package probe
 
 import (
-	"log"
-
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
-func probeVirtualWANHealthCheck(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeVirtualWANHealthCheck(c http.FortiHTTP, meta *TargetMetadata, log *zap.SugaredLogger) ([]prometheus.Metric, bool) {
 	var (
 		mLink = prometheus.NewDesc(
 			"fortigate_virtual_wan_status",
@@ -93,7 +92,7 @@ func probeVirtualWANHealthCheck(c http.FortiHTTP, meta *TargetMetadata) ([]prome
 	var rs []VirtualWanMonitorResponse
 
 	if err := c.Get("api/v2/monitor/virtual-wan/health-check", "vdom=*", &rs); err != nil {
-		log.Printf("Error: %v", err)
+		log.Errorf("%v", err)
 		return nil, false
 	}
 	m := []prometheus.Metric{}
