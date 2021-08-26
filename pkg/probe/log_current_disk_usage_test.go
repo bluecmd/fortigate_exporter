@@ -17,9 +17,6 @@ func TestLogCurrentDiskUsage(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_log_disk_free_bytes Disk free bytes for log
-	# TYPE fortigate_log_disk_free_bytes gauge
-	fortigate_log_disk_free_bytes{vdom="root"} 2.93e+10
 	# HELP fortigate_log_disk_total_bytes Disk total bytes for log
 	# TYPE fortigate_log_disk_total_bytes gauge
 	fortigate_log_disk_total_bytes{vdom="root"} 3e+10

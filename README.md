@@ -82,7 +82,6 @@ Per-VDOM:
    * `fortigate_log_fortianalyzer_queue_logs`
  * _Log/DiskUsage_
    * `fortigate_log_disk_used_bytes`
-   * `fortigate_log_disk_free_bytes`
    * `fortigate_log_disk_total_bytes`
 
  Per-HA-Member and VDOM:
