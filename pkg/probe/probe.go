@@ -119,6 +119,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		{"Log/Fortianalyzer/Queue", probeLogAnalyzerQueue},
 		{"Log/DiskUsage", probeLogCurrentDiskUsage},
 		{"System/AvailableCertificates", probeSystemAvailableCertificates},
+		{"System/Fortimanager/Status", probeSystemFortimanagerStatus},
 		{"System/HAStatistics", probeSystemHAStatistics},
 		{"System/Interface", probeSystemInterface},
 		{"System/LinkMonitor", probeSystemLinkMonitor},
