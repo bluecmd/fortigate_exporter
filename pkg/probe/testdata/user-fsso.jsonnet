@@ -98,6 +98,25 @@
     "serial":"FG10000000000000",
     "version":"v6.0.10",
     "build":365
+  },
+  {
+    "http_method":"GET",
+    "results":[
+      {
+        "id":1,
+        "server":"10.11.12.13",
+        "ldap_server":"LDAP_SERVER_NAME",
+        "type":"fsso-polling",
+        "status":"disconnected"
+      }
+    ],
+    "vdom":"vdom5",
+    "path":"user",
+    "name":"fsso",
+    "status":"success",
+    "serial":"FG10000000000000",
+    "version":"v6.0.10",
+    "build":365
   }
 ]
 
