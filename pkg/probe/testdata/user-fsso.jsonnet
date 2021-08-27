@@ -1,4 +1,4 @@
-# api/v2/monitor/router/bgp/neighbors?vdom=*
+# api/v2/monitor/user/fsso?vdom=*
 [
   {
     "http_method":"GET",
