@@ -5,7 +5,7 @@ plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
   - - "@semantic-release/exec"
-    - prepareCmd: "make build-release"
+    - prepareCmd: "make build-release VERSION=${nextRelease.version}"
   - - "@semantic-release/github"
     - assets:
         - path: "fortigate-exporter.linux.amd64"
