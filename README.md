@@ -31,8 +31,7 @@ Supported metrics right now as follows.
 Global:
 
  * _System/Fortimanager/Status_
-   * `fortigate_fortimanager_connection_status`
-   * `fortigate_fortimanager_registration_status`
+   * `fortigate_fortimanager_info`
  * _System/Status_
    * `fortigate_version_info`
  * _System/Time/Clock_
