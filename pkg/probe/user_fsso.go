@@ -25,7 +25,7 @@ func probeUserFsso(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 		FssoUsers = prometheus.NewDesc(
 			"fortigate_user_fsso_info",
 			"Info on Fsso defined connectors",
-			[]string{"vdom", "name", "type", "status"}, nil,
+			[]string{"vdom", "name", "id", "type", "status"}, nil,
 		)
 	)
 
@@ -39,9 +39,9 @@ func probeUserFsso(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 	for _, r := range res {
 		for _, fssoCon := range r.Results {
 			if fssoCon.Type == "fsso" {
-				m = append(m, prometheus.MustNewConstMetric(FssoUsers, prometheus.GaugeValue, float64(1), r.VDOM, fssoCon.Name, fssoCon.Type, fssoCon.Status))
+				m = append(m, prometheus.MustNewConstMetric(FssoUsers, prometheus.GaugeValue, float64(1), r.VDOM, fssoCon.Name, "", fssoCon.Type, fssoCon.Status))
 			} else {
-				m = append(m, prometheus.MustNewConstMetric(FssoUsers, prometheus.GaugeValue, float64(1), r.VDOM, strconv.Itoa(fssoCon.ID), fssoCon.Type, fssoCon.Status))
+				m = append(m, prometheus.MustNewConstMetric(FssoUsers, prometheus.GaugeValue, float64(1), r.VDOM, "", strconv.Itoa(fssoCon.ID), fssoCon.Type, fssoCon.Status))
 			}
 		}
 	}
