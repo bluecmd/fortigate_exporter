@@ -59,6 +59,8 @@ Per-VDOM:
    * `fortigate_interface_receive_bytes_total`
    * `fortigate_interface_transmit_errors_total`
    * `fortigate_interface_receive_errors_total`
+ * _User/Fsso_
+   * `fortigate_user_fsso_info`
  * _VPN/Ssl/Connections_
    * `fortigate_vpn_connections`
    * `fortigate_vpn_users`
