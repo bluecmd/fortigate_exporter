@@ -3,6 +3,7 @@
 ![Go](https://github.com/bluecmd/fortigate_exporter/workflows/Go/badge.svg)
 ![Docker](https://github.com/bluecmd/fortigate_exporter/workflows/Docker/badge.svg)
 [![Docker Repository on Quay](https://quay.io/repository/bluecmd/fortigate_exporter/status "Docker Repository on Quay")](https://quay.io/repository/bluecmd/fortigate_exporter)
+[![Matrix](https://img.shields.io/matrix/fortigate_exporter:matrix.org)](https://matrix.to/#/#fortigate_exporter:matrix.org)
 
 Prometheus exporter for FortiGate® firewalls.
 
