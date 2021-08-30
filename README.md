@@ -32,6 +32,8 @@ Global:
 
  * _System/Status_
    * `fortigate_version_info`
+ * _System/Time_
+   * `fortigate_time`
  * _System/Resource/Usage_
    * `fortigate_cpu_usage_ratio`
    * `fortigate_memory_usage_ratio`
