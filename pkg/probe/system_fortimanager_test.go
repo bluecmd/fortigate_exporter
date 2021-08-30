@@ -17,12 +17,10 @@ func TestSystemFortimanagerStatus(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_fortimanager_connection_status Fortimanager status ID
-        # TYPE fortigate_fortimanager_connection_status gauge
-	fortigate_fortimanager_connection_status{mode="normal",vdom="root"} 2
-	# HELP fortigate_fortimanager_registration_status Fortimanager registration status ID
-	# TYPE fortigate_fortimanager_registration_status gauge
-	fortigate_fortimanager_registration_status{mode="normal",vdom="root"} 2
+	# HELP fortigate_fortimanager_info Fortimanager infos
+	# TYPE fortigate_fortimanager_info gauge
+	fortigate_fortimanager_info{connection_status="2",mode="normal",registration_status="2",vdom="VDOM1"} 1
+	fortigate_fortimanager_info{connection_status="2",mode="normal",registration_status="2",vdom="root"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
