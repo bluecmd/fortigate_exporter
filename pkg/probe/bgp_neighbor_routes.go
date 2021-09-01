@@ -63,7 +63,7 @@ func probeBGPNeighborPathsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 	sr2Map := make(map[PathCount]int)
 	for _, r := range rs {
 
-		if len(r.Results) >= MaxBGPPaths {
+		if len(r.Results) > MaxBGPPaths {
 			log.Printf("Error: Received more BGP Paths than maximum (%d > %d) allowed, ignoring metric ...", len(r.Results), MaxBGPPaths)
 			return nil, false
 		}
@@ -131,7 +131,7 @@ func probeBGPNeighborPathsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 	sr2Map := make(map[PathCount]int)
 	for _, r := range rs {
 
-		if len(r.Results) >= MaxBGPPaths {
+		if len(r.Results) > MaxBGPPaths {
 			log.Printf("Error: Received more BGP Paths than maximum (%d > %d) allowed, ignoring metric ...", len(r.Results), MaxBGPPaths)
 			return nil, false
 		}
