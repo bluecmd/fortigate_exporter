@@ -288,8 +288,6 @@ To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https
 
 ### FortiGate Configuration
 
-The following example Admin Profile describes the permissions that needs to be granted
-to the monitor user in order for all metrics to be available.
 Read permission is enough for Fortigate exporter purpose.
 To improve security, limit permissions to required ones only (least privilege principle).
 
@@ -325,6 +323,9 @@ To improve security, limit permissions to required ones only (least privilege pr
 If you omit to grant some of these permissions you will receive log messages warning about
 403 errors and relevant metrics will be unavailable, but other metrics will still work.
 If you do not need some probes to be run, do not grant permission for them and use `include/exclude` feature (see `Usage` section).
+
+The following example Admin Profile describes the permissions that needs to be granted
+to the monitor user in order for all metrics to be available.
 
 ```
 config system accprofile
