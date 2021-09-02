@@ -290,36 +290,71 @@ To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https
 
 The following example Admin Profile describes the permissions that needs to be granted
 to the monitor user in order for all metrics to be available.
+Read permission is enough for Fortigate exporter purpose.
+To improve security, limit permissions to required ones only (least privilege principle).
+
+| probe name | permission | API URL |
+|---|---|---|
+| *Default Global*            | *any*              |api/v2/monitor/system/status |
+|BGP/NeighborPaths/IPv4       | netgrp.route-cfg   |api/v2/monitor/router/bgp/paths |
+|BGP/NeighborPaths/IPv6       | netgrp.route-cfg   |api/v2/monitor/router/bgp/paths6 |
+|BGP/Neighbors/IPv4           | netgrp.route-cfg   |api/v2/monitor/router/bgp/neighbors |
+|BGP/Neighbors/IPv6           | netgrp.route-cfg   |api/v2/monitor/router/bgp/neighbors6 |
+|Firewall/LoadBalance         | fwgrp.others       |api/v2/monitor/firewall/load-balance |
+|Firewall/Policies            | fwgrp.policy       |api/v2/monitor/firewall/policy/select<br>api/v2/monitor/firewall/policy6/select<br>api/v2/cmdb/firewall/policy<br>api/v2/cmdb/firewall/policy6 |
+|License/Status               | *any*              |api/v2/monitor/license/status/select |
+|Log/Fortianalyzer/Status     | loggrp.config      |api/v2/monitor/log/fortianalyzer |
+|Log/Fortianalyzer/Queue      | loggrp.config      |api/v2/monitor/log/fortianalyzer-queue |
+|Log/DiskUsage                | loggrp.config      |api/v2/monitor/log/current-disk-usage |
+|System/AvailableCertificates | *any*              |api/v2/monitor/system/available-certificates |
+|System/HAStatistics          | sysgrp.cfg         |api/v2/monitor/system/ha-statistics<br>api/v2/cmdb/system/ha |
+|System/Interface             | netgrp.cfg         |api/v2/monitor/system/interface/select |
+|System/LinkMonitor           | sysgrp.cfg         |api/v2/monitor/system/link-monitor |
+|System/Resource/Usage        | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
+|System/Status                | *any*              |api/v2/monitor/system/status |
+|System/VDOMResources         | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
+|User/Fsso                    | authgrp            |api/v2/monitor/user/fsso |
+|VPN/IPSec                    | vpngrp             |api/v2/monitor/vpn/ipsec |
+|VPN/Ssl/Connections          | vpngrp             |api/v2/monitor/vpn/ssl |
+|VPN/Ssl/Stats                | vpngrp             |api/v2/monitor/vpn/ssl/stats |
+|VirtualWAN/HealthCheck       | netgrp.cfg         |api/v2/monitor/virtual-wan/health-check |
+|Wifi/APStatus                | wifi               |api/v2/monitor/wifi/ap_status |
+|Wifi/Clients                 | wifi               |api/v2/monitor/wifi/client |
+|Wifi/ManagedAP               | wifi               |api/v2/monitor/wifi/managed_ap |
+
 If you omit to grant some of these permissions you will receive log messages warning about
 403 errors and relevant metrics will be unavailable, but other metrics will still work.
+If you do not need some probes to be run, do not grant permission for them and use `include/exclude` feature (see `Usage` section).
 
 ```
 config system accprofile
     edit "monitor"
+        # global scope will fail on non multi-VDOM firewall
         set scope global
-        set secfabgrp read
-        set netgrp custom
+        set authgrp read
         # As of FortiOS 6.2.1 it seems `fwgrp-permissions.other` is removed,
         # use 'fwgrp read' to get load balance servers metrics
         set fwgrp custom
+        set loggrp custom
+        set netgrp custom
+        set sysgrp custom
         set vpngrp read
+        set wifi read
+        # will fail for most recent FortiOS
         set system-diagnostics disable
-        config netgrp-permission
-            set cfg read
-        end
-        config sysgrp-permission
-            # Sysgrp.cfg is needed for the following optional functions:
-            # - HA group name
-            # If you do not wish to grant this permission, the relevant
-            # labels/metrics will be absent.
-            set cfg read
-            # If you wish to collect ipv6 bgp neighbours, add this:
-            set route-cfg read
-        end
         config fwgrp-permission
             set policy read
-            # fwgrp.other is need for load balance servers
-            # set other read
+            set others read
+        end
+        config netgrp-permission
+            set cfg read
+            set route-cfg read
+        end
+        config loggrp-permission
+            set config read
+        end
+        config sysgrp-permission
+            set cfg read
         end
     next
 end
