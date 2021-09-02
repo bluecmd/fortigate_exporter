@@ -283,7 +283,7 @@ To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https
 | -https-timeout  | 10     | timeout in seconds for establishment of HTTPS connections  |
 | -insecure       | _not set_  | allows to turn off security validation of TLS certificates  |
 | -extra-ca-certs | (none) | comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store |
-| -max-bgp-paths  | 10000  | Sets maximum amount of BGP paths to fetch, value is per IP stack version (IPv4 a& IPv6) |
+| -max-bgp-paths  | 10000  | Sets maximum amount of BGP paths to fetch, value is per IP stack version (IPv4 & IPv6) |
 | -max-vpn-users  | 0      | Sets maximum amount of VPN users to fetch (0 eq. none by default) |
 
 ### FortiGate Configuration
