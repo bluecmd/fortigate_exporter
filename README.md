@@ -312,6 +312,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |System/LinkMonitor           | sysgrp.cfg         |api/v2/monitor/system/link-monitor |
 |System/Resource/Usage        | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
 |System/Status                | *any*              |api/v2/monitor/system/status |
+|System/Time/Clock            | sysgrp.cfg         |api/v2/monitor/system/time |
 |System/VDOMResources         | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
 |User/Fsso                    | authgrp            |api/v2/monitor/user/fsso |
 |VPN/IPSec                    | vpngrp             |api/v2/monitor/vpn/ipsec |
