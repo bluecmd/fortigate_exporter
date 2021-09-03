@@ -23,9 +23,26 @@ build-release-arm64:
 	CGO_ENABLED=0 GOOS=linux   GOARCH=arm64 go build ${LDFLAGS} -o=fortigate-exporter.linux.arm64 .        && \
  	CGO_ENABLED=0 GOOS=darwin  GOARCH=arm64 go build ${LDFLAGS} -o=fortigate-exporter.darwin.arm64 .
 
+.PHONY: generate-html-coverage
+generate-html-coverage:
+	go tool cover -html=cover.out -o coverage.html
+	@printf "Generated coverage html \n"
+
+.PHONY: print-coverage
+print-coverage:
+	@go tool cover -func cover.out
+
+.PHONY: test-unittests
+test-unittests:
+	go test -v -race -coverprofile cover.out ./...
+
 .PHONY: test
-test:
-	go test -v -race ./...
+test: fmt-check vet test-unittests generate-html-coverage print-coverage
+	@printf "Sucessfully run tests \n"
+
+.PHONY: test-update-snapshots
+test-update-snapshots:
+	UPDATE_SNAPSHOTS=true go test -v -race ./...
 
 .PHONY: get-dependencies
 get-dependencies:
@@ -33,11 +50,19 @@ get-dependencies:
 
 .PHONY: vet
 vet:
-	go vet ./...
+	@go vet ./...
+	@go mod tidy
 
 test-output:
 	$(shell echo $$GO_VERSION_NUMBER)
 
 .PHONY: fmt-fix
 fmt-fix:
-	go run golang.org/x/tools/cmd/goimports -w -l .
+	@go mod download golang.org/x/tools
+	@go run golang.org/x/tools/cmd/goimports -w -l .
+
+.PHONY: fmt-check
+fmt-check:
+	@printf "Check formatting... \n"
+	@go mod download golang.org/x/tools
+	@if [[ $$( go run golang.org/x/tools/cmd/goimports -l . ) ]]; then printf "Files not properly formatted. Run 'make fmt-fix' \n"; exit 1; else printf "Check formatting finished \n"; fi
