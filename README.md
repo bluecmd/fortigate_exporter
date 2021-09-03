@@ -30,6 +30,10 @@ Supported metrics right now as follows.
 
 Global:
 
+ * _System/SensorInfo_
+   * `fortigate_sensor_fan_rpm`
+   * `fortigate_sensor_temperature_celsius`
+   * `fortigate_sensor_voltage_volts`
  * _System/Status_
    * `fortigate_version_info`
  * _System/Resource/Usage_
