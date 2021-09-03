@@ -119,6 +119,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		{"System/LinkMonitor", probeSystemLinkMonitor},
 		{"System/Resource/Usage", probeSystemResourceUsage},
 		{"System/Status", probeSystemStatus},
+		{"System/Time/Clock", probeSystemTime},
 		{"System/VDOMResources", probeSystemVDOMResources},
 		{"User/Fsso", probeUserFsso},
 		{"VPN/IPSec", probeVPNIPSec},
