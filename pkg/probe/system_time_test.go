@@ -17,9 +17,9 @@ func TestSystemTime(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_time System epoq time in seconds
-	# TYPE fortigate_time gauge
-	fortigate_time 1.630313596e+09
+	# HELP fortigate_time_seconds System epoch time in seconds
+	# TYPE fortigate_time_seconds gauge
+	fortigate_time_seconds 1.630313596e+09
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {

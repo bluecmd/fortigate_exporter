@@ -10,8 +10,8 @@ import (
 func probeSystemTime(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		mTime = prometheus.NewDesc(
-			"fortigate_time",
-			"System epoq time in seconds",
+			"fortigate_time_seconds",
+			"System epoch time in seconds",
 			nil, nil,
 		)
 	)
