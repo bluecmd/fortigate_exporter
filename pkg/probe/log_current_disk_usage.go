@@ -3,6 +3,8 @@ package probe
 import (
 	"log"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -17,7 +19,7 @@ type Log struct {
 	VDOM    string     `json:"vdom"`
 }
 
-func probeLogCurrentDiskUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeLogCurrentDiskUsage(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		logUsed = prometheus.NewDesc(
 			"fortigate_log_disk_used_bytes",

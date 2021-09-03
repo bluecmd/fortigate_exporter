@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+
 	"github.com/bluecmd/fortigate_exporter/internal/version"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeFirewallPolicies(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeFirewallPolicies(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		mHitCount = prometheus.NewDesc(
 			"fortigate_policy_hit_count_total",

@@ -17,8 +17,7 @@ type VPNUsers struct {
 	VDOM    string    `json:"vdom"`
 }
 
-func probeVPNSsl(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
-	savedConfig := config.GetConfig()
+func probeVPNSsl(c http.FortiHTTP, _ *TargetMetadata, savedConfig config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	MaxVPNUsers := savedConfig.MaxVPNUsers
 
 	var (

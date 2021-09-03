@@ -12,9 +12,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func ProbeHandler(w http.ResponseWriter, r *http.Request) {
-	savedConfig := config.GetConfig()
+type ProbeHandler struct {
+	SavedConfig config.FortiExporterConfig
+}
 
+func (p ProbeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 	target := params.Get("target")
 	if target == "" {
@@ -29,7 +31,7 @@ func ProbeHandler(w http.ResponseWriter, r *http.Request) {
 		Name: "probe_duration_seconds",
 		Help: "How many seconds the probe took to complete",
 	})
-	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(savedConfig.ScrapeTimeout)*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(p.SavedConfig.ScrapeTimeout)*time.Second)
 	defer cancel()
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(probeSuccessGauge)
@@ -37,7 +39,7 @@ func ProbeHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	pc := &ProbeCollector{}
 	registry.MustRegister(pc)
-	success, err := pc.Probe(ctx, target, &http.Client{}, savedConfig)
+	success, err := pc.Probe(ctx, target, &http.Client{}, p.SavedConfig)
 	if err != nil {
 		log.Printf("Probe request rejected; error is: %v", err)
 		http.Error(w, fmt.Sprintf("probe: %v", err), http.StatusBadRequest)

@@ -12,7 +12,7 @@ func TestSystemInterfaces(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/interface/select", "testdata/interface.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemInterface, c, r) {
+	if !testProbeWithDefaults(probeSystemInterface, c, r) {
 		t.Errorf("probeSystemInterface() returned non-success")
 	}
 

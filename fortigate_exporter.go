@@ -81,18 +81,18 @@ func main() {
 	log.Printf("FortigateExporter %s ( %s )", buildInfo.version, buildInfo.gitHash)
 	setUpMetricsEndpoint(buildInfo)
 
-	if err := config.Init(); err != nil {
-		log.Fatalf("Initialization error: %+v", err)
-	}
-
-	savedConfig := config.GetConfig()
+	savedConfig := config.Init()
 
 	if err := fortiHTTP.Configure(savedConfig); err != nil {
 		log.Fatalf("%+v", err)
 	}
 
+	probeHandler := probe.ProbeHandler{
+		SavedConfig: savedConfig,
+	}
+
 	http.Handle("/metrics", promhttp.Handler())
-	http.HandleFunc("/probe", probe.ProbeHandler)
+	http.Handle("/probe", probeHandler)
 	go func() {
 		if err := http.ListenAndServe(savedConfig.Listen, nil); err != nil {
 			log.Fatalf("Unable to serve: %v", err)

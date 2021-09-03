@@ -4,11 +4,12 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeWifiManagedAP(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeWifiManagedAP(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		managedAPInfo = prometheus.NewDesc(
 			"fortigate_wifi_managed_ap_info",

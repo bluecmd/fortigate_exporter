@@ -12,7 +12,7 @@ func TestBGPNeighborsIPv4(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/router/bgp/neighbors", "testdata/router-bgp-neighbors-v4.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeBGPNeighborsIPv4, c, r) {
+	if !testProbeWithDefaults(probeBGPNeighborsIPv4, c, r) {
 		t.Errorf("probeBGPNeighborsIPv4() returned non-success")
 	}
 
@@ -31,7 +31,7 @@ func TestBGPNeighborsIPv6(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/router/bgp/neighbors6", "testdata/router-bgp-neighbors-v6.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeBGPNeighborsIPv6, c, r) {
+	if !testProbeWithDefaults(probeBGPNeighborsIPv6, c, r) {
 		t.Errorf("probeBGPNeighborsIPv6() returned non-success")
 	}
 

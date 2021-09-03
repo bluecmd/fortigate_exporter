@@ -13,7 +13,7 @@ func TestHAStatistics(t *testing.T) {
 	c.prepare("api/v2/monitor/system/ha-statistics", "testdata/ha-statistics.jsonnet")
 	c.prepare("api/v2/cmdb/system/ha", "testdata/ha-config.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemHAStatistics, c, r) {
+	if !testProbeWithDefaults(probeSystemHAStatistics, c, r) {
 		t.Errorf("probeSystemHAStatistics() returned non-success")
 	}
 
@@ -67,7 +67,7 @@ func TestHAStatisticsNoConfigAccess(t *testing.T) {
 	c.prepare("api/v2/monitor/system/ha-statistics", "testdata/ha-statistics.jsonnet")
 	c.prepare("api/v2/cmdb/system/ha", "testdata/ha-config-no-access.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemHAStatistics, c, r) {
+	if !testProbeWithDefaults(probeSystemHAStatistics, c, r) {
 		t.Errorf("probeSystemHAStatistics() returned non-success")
 	}
 

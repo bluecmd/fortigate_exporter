@@ -1,0 +1,10 @@
+(config.FortiExporterConfig) {
+  AuthKeys: (config.AuthKeys) <nil>,
+  Listen: (string) (len=5) ":9710",
+  ScrapeTimeout: (int) 30,
+  TLSTimeout: (int) 10,
+  TLSInsecure: (bool) false,
+  TlsExtraCAs: ([]config.LocalCert) <nil>,
+  MaxBGPPaths: (int) 10000,
+  MaxVPNUsers: (int) 0
+}

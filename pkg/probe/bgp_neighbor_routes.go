@@ -25,8 +25,7 @@ type PathCount struct {
 	VDOM   string
 }
 
-func probeBGPNeighborPathsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
-	savedConfig := config.GetConfig()
+func probeBGPNeighborPathsIPv4(c http.FortiHTTP, meta *TargetMetadata, savedConfig config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	MaxBGPPaths := savedConfig.MaxBGPPaths
 
 	if MaxBGPPaths == 0 {
@@ -93,8 +92,7 @@ func probeBGPNeighborPathsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]promet
 	return m, true
 }
 
-func probeBGPNeighborPathsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
-	savedConfig := config.GetConfig()
+func probeBGPNeighborPathsIPv6(c http.FortiHTTP, meta *TargetMetadata, savedConfig config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	MaxBGPPaths := savedConfig.MaxBGPPaths
 
 	if MaxBGPPaths == 0 {

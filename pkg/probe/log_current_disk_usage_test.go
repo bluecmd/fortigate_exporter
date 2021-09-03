@@ -12,7 +12,7 @@ func TestLogCurrentDiskUsage(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/log/current-disk-usage", "testdata/log-current-disk-usage.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeLogCurrentDiskUsage, c, r) {
+	if !testProbeWithDefaults(probeLogCurrentDiskUsage, c, r) {
 		t.Errorf("probeLogCurrentDiskUsage() returned non-success")
 	}
 

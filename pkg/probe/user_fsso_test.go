@@ -12,7 +12,7 @@ func TestUserFsso(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/user/fsso", "testdata/user-fsso.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeUserFsso, c, r) {
+	if !testProbeWithDefaults(probeUserFsso, c, r) {
 		t.Errorf("probeUserFsso() returned non-success")
 	}
 

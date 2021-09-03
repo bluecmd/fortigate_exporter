@@ -3,6 +3,7 @@ package probe
 import (
 	"log"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -23,7 +24,7 @@ type VPNStats struct {
 	Version string     `json:"version"`
 }
 
-func probeVPNSslStats(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeVPNSslStats(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		vpnCurUsr = prometheus.NewDesc(
 			"fortigate_vpn_ssl_users",

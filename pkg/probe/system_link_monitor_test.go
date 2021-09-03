@@ -12,7 +12,7 @@ func TestLinkStatus(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemLinkMonitor, c, r) {
+	if !testProbeWithDefaults(probeSystemLinkMonitor, c, r) {
 		t.Errorf("probeSystemLinkMonitor() returned non-success")
 	}
 
@@ -62,7 +62,7 @@ func TestLinkStatusFailure(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor-error.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemLinkMonitor, c, r) {
+	if !testProbeWithDefaults(probeSystemLinkMonitor, c, r) {
 		t.Errorf("probeSystemLinkMonitor() returned non-success")
 	}
 
@@ -88,7 +88,7 @@ func TestLinkStatusUnknown(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/link-monitor", "testdata/link-monitor-unknown.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemLinkMonitor, c, r) {
+	if !testProbeWithDefaults(probeSystemLinkMonitor, c, r) {
 		t.Errorf("probeSystemLinkMonitor() returned non-success")
 	}
 

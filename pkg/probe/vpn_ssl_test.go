@@ -1,7 +1,6 @@
 package probe
 
 import (
-	"flag"
 	"strings"
 	"testing"
 
@@ -14,9 +13,9 @@ func TestVPNSsl(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/vpn/ssl", "testdata/vpn.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	flag.Set("max-vpn-users", "10")
-	config.MustReInit()
-	if !testProbe(probeVPNSsl, c, r) {
+	if !testProbe(probeVPNSsl, c, new(TargetMetadata), config.FortiExporterConfig{
+		MaxVPNUsers: 10,
+	}, r) {
 		t.Errorf("probeSystemStatus() returned non-success")
 	}
 

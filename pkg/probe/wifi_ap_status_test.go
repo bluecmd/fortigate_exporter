@@ -12,7 +12,7 @@ func TestProbeWifiAPStatus(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/wifi/ap_status", "testdata/wifi-ap-status.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeWifiAPStatus, c, r) {
+	if !testProbeWithDefaults(probeWifiAPStatus, c, r) {
 		t.Errorf("probeWifiAPStatus() returned non-success")
 	}
 

@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeSystemResourceUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemResourceUsage(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		mResCPU = prometheus.NewDesc(
 			"fortigate_cpu_usage_ratio",
@@ -70,7 +71,7 @@ func probeSystemResourceUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 	return m, true
 }
 
-func probeSystemVDOMResources(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemVDOMResources(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		mResCPU = prometheus.NewDesc(
 			"fortigate_vdom_cpu_usage_ratio",

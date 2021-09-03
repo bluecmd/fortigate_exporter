@@ -12,7 +12,7 @@ func TestVirtualWANHealthCheck(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/virtual-wan/health-check", "testdata/virtual_wan_health_check.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeVirtualWANHealthCheck, c, r) {
+	if !testProbeWithDefaults(probeVirtualWANHealthCheck, c, r) {
 		t.Errorf("probeVirtualWANHealthCheck() returned non-success")
 	}
 

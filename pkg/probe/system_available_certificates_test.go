@@ -13,7 +13,7 @@ func TestCertificates(t *testing.T) {
 	c.prepare("api/v2/monitor/system/available-certificates?scope=global", "testdata/available-certificates-scope-global.jsonnet")
 	c.prepare("api/v2/monitor/system/available-certificates?vdom=*", "testdata/available-certificates-vdom.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemAvailableCertificates, c, r) {
+	if !testProbeWithDefaults(probeSystemAvailableCertificates, c, r) {
 		t.Errorf("testCertificates() returned non-success")
 	}
 

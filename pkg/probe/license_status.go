@@ -3,11 +3,13 @@ package probe
 import (
 	"log"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeLicenseStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeLicenseStatus(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		vdomUsed = prometheus.NewDesc(
 			"fortigate_license_vdom_usage",

@@ -12,7 +12,7 @@ func TestLogAnalyzer(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/log/fortianalyzer", "testdata/log-fortianalyzer.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeLogAnalyzer, c, r) {
+	if !testProbeWithDefaults(probeLogAnalyzer, c, r) {
 		t.Errorf("probeSystemStatus() returned non-success")
 	}
 

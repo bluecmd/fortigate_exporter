@@ -5,11 +5,13 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func probeFirewallLoadBalance(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeFirewallLoadBalance(c http.FortiHTTP, meta *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	if meta.VersionMajor < 6 || (meta.VersionMajor == 6 && meta.VersionMinor < 4) {
 		// not supported version. Before 6.4.0 there is no real_server_id and therefore this will fail
 		return nil, true

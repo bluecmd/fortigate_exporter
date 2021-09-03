@@ -40,6 +40,10 @@ test-unittests:
 test: fmt-check vet test-unittests generate-html-coverage print-coverage
 	@printf "Sucessfully run tests \n"
 
+.PHONY: test-update-snapshots
+test-update-snapshots:
+	UPDATE_SNAPSHOTS=true go test -v -race ./...
+
 .PHONY: get-dependencies
 get-dependencies:
 	go get -v -t -d ./...

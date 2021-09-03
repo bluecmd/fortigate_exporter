@@ -15,7 +15,7 @@ func TestFirewallPoliciesPre64(t *testing.T) {
 	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config-pre64.jsonnet")
 	c.prepare("api/v2/cmdb/firewall/policy6", "testdata/fw-policy6-config-pre64.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeFirewallPolicies, c, r) {
+	if !testProbeWithDefaults(probeFirewallPolicies, c, r) {
 		t.Errorf("probeFirewallPolicies() returned non-success")
 	}
 
@@ -68,7 +68,7 @@ func TestFirewallPolicies(t *testing.T) {
 	c.prepare("api/v2/monitor/firewall/policy/select?ip_version=ipv6", "testdata/fw-policy-v6.jsonnet")
 	c.prepare("api/v2/cmdb/firewall/policy", "testdata/fw-policy-config.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeFirewallPolicies, c, r) {
+	if !testProbeWithDefaults(probeFirewallPolicies, c, r) {
 		t.Errorf("probeFirewallPolicies() returned non-success")
 	}
 

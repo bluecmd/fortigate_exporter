@@ -3,6 +3,8 @@ package probe
 import (
 	"log"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -18,7 +20,7 @@ type LogAnaQueue struct {
 	VDOM    string             `json:"vdom"`
 }
 
-func probeLogAnalyzerQueue(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeLogAnalyzerQueue(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		logAnaConn = prometheus.NewDesc(
 			"fortigate_log_fortianalyzer_queue_connections",

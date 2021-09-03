@@ -12,7 +12,7 @@ func TestVPNIPSec(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/vpn/ipsec", "testdata/ipsec.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeVPNIPSec, c, r) {
+	if !testProbeWithDefaults(probeVPNIPSec, c, r) {
 		t.Errorf("probeVPNIPSec() returned non-success")
 	}
 
@@ -41,7 +41,7 @@ func TestVPNIPSecWithCommonP2Names(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/vpn/ipsec", "testdata/ipsec-common-p2.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeVPNIPSec, c, r) {
+	if !testProbeWithDefaults(probeVPNIPSec, c, r) {
 		t.Errorf("probeVPNIPSec() returned non-success")
 	}
 

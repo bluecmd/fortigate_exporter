@@ -12,7 +12,7 @@ func TestSystemResourceUsage(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemResourceUsage, c, r) {
+	if !testProbeWithDefaults(probeSystemResourceUsage, c, r) {
 		t.Errorf("probeSystemResourceUsage() returned non-success")
 	}
 
@@ -36,7 +36,7 @@ func TestSystemVDOMResources(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage-vdom.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemVDOMResources, c, r) {
+	if !testProbeWithDefaults(probeSystemVDOMResources, c, r) {
 		t.Errorf("probeSystemVDOMResources() returned non-success")
 	}
 

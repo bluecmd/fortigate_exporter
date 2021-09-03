@@ -5,16 +5,20 @@ import (
 	"testing"
 
 	"github.com/bluecmd/fortigate_exporter/internal/config"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 )
 
 func TestBGPNeighborPathsIPv4(t *testing.T) {
-	config.MustReInit()
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/router/bgp/paths", "testdata/router-bgp-paths-v4.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeBGPNeighborPathsIPv4, c, r) {
+	if !testProbe(probeBGPNeighborPathsIPv4, c, &TargetMetadata{
+		VersionMajor: 7,
+	}, config.FortiExporterConfig{
+		MaxBGPPaths: 10,
+	}, r) {
 		t.Errorf("probeBGPNeighborPathsIPv4() returned non-success")
 	}
 
@@ -35,15 +39,14 @@ func TestBGPNeighborPathsIPv4(t *testing.T) {
 }
 
 func TestBGPNeighborPathsIPv6(t *testing.T) {
-
-	if err := config.Init(); err != nil {
-		t.Fatalf("config.Init failed: %+v", err)
-	}
-
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/router/bgp/paths6", "testdata/router-bgp-paths-v6.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeBGPNeighborPathsIPv6, c, r) {
+	if !testProbe(probeBGPNeighborPathsIPv6, c, &TargetMetadata{
+		VersionMajor: 7,
+	}, config.FortiExporterConfig{
+		MaxBGPPaths: 10,
+	}, r) {
 		t.Errorf("probeBGPNeighborPathsIPv6() returned non-success")
 	}
 

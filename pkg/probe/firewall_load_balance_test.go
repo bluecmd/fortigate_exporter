@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 )
@@ -12,7 +14,7 @@ func TestFirewallLoadBalance(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/firewall/load-balance?vdom=*&start=0&count=1000", "testdata/fw-loadbalancers.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeFirewallLoadBalance, c, r) {
+	if !testProbeWithDefaults(probeFirewallLoadBalance, c, r) {
 		t.Errorf("testLoadBalanceServers() returned non-success")
 	}
 
@@ -87,7 +89,7 @@ func TestLoadBalanceServers_6_0_5(t *testing.T) {
 		VersionMajor: 6,
 		VersionMinor: 0,
 	}
-	if !testProbeWithMetadata(probeFirewallLoadBalance, c, meta, r) {
+	if !testProbe(probeFirewallLoadBalance, c, meta, config.FortiExporterConfig{}, r) {
 		t.Errorf("TestLoadBalanceServers_6_0_5() failed, but should have succeeded")
 	}
 }

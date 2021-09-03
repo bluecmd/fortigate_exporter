@@ -4,6 +4,7 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -20,7 +21,7 @@ type UserFsso struct {
 	VDOM    string            `json:"vdom"`
 }
 
-func probeUserFsso(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeUserFsso(c http.FortiHTTP, _ *TargetMetadata, _ config.FortiExporterConfig) ([]prometheus.Metric, bool) {
 	var (
 		FssoUsers = prometheus.NewDesc(
 			"fortigate_user_fsso_info",

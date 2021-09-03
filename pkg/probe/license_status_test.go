@@ -12,7 +12,7 @@ func TestLicenseStatus(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/license/status/select", "testdata/license-status.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeLicenseStatus, c, r) {
+	if !testProbeWithDefaults(probeLicenseStatus, c, r) {
 		t.Errorf("probeLicenseStatus() returned non-success")
 	}
 

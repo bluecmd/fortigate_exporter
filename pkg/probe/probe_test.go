@@ -22,6 +22,8 @@ import (
 	"log"
 	"net/url"
 
+	"github.com/bluecmd/fortigate_exporter/internal/config"
+
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/google/go-jsonnet"
 	"github.com/prometheus/client_golang/prometheus"
@@ -91,16 +93,17 @@ func (p *testProbeCollector) Collect(c chan<- prometheus.Metric) {
 func (p *testProbeCollector) Describe(c chan<- *prometheus.Desc) {
 }
 
-func testProbe(pf probeFunc, c http.FortiHTTP, r Registry) bool {
+func testProbeWithDefaults(pf probeFunc, c http.FortiHTTP, r Registry) bool {
 	meta := &TargetMetadata{
 		VersionMajor: 7,
 		VersionMinor: 0,
 	}
-	return testProbeWithMetadata(pf, c, meta, r)
+	conf := config.FortiExporterConfig{}
+	return testProbe(pf, c, meta, conf, r)
 }
 
-func testProbeWithMetadata(pf probeFunc, c http.FortiHTTP, meta *TargetMetadata, r Registry) bool {
-	m, ok := pf(c, meta)
+func testProbe(pf probeFunc, c http.FortiHTTP, meta *TargetMetadata, conf config.FortiExporterConfig, r Registry) bool {
+	m, ok := pf(c, meta, conf)
 	if !ok {
 		return false
 	}

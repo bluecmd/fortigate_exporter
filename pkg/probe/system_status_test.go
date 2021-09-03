@@ -12,7 +12,7 @@ func TestSystemStatus(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/status", "testdata/status.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemStatus, c, r) {
+	if !testProbeWithDefaults(probeSystemStatus, c, r) {
 		t.Errorf("probeSystemStatus() returned non-success")
 	}
 

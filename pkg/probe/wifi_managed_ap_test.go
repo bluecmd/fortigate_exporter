@@ -12,7 +12,7 @@ func TestProbeWifiManagedAP(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/wifi/managed_ap", "testdata/wifi-managed-ap.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeWifiManagedAP, c, r) {
+	if !testProbeWithDefaults(probeWifiManagedAP, c, r) {
 		t.Errorf("probeWifiAPStatus() returned non-success")
 	}
 

@@ -40,7 +40,7 @@ type TargetMetadata struct {
 	VersionMinor int
 }
 
-type probeFunc func(fortiHTTP.FortiHTTP, *TargetMetadata) ([]prometheus.Metric, bool)
+type probeFunc func(fortiHTTP.FortiHTTP, *TargetMetadata, config.FortiExporterConfig) ([]prometheus.Metric, bool)
 
 type probeDetailedFunc struct {
 	name     string
@@ -156,7 +156,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 			continue
 		}
 
-		m, ok := aProbe.function(c, meta)
+		m, ok := aProbe.function(c, meta, savedConfig)
 		if !ok {
 			success = false
 		}

@@ -12,7 +12,7 @@ func TestLogAnalyzerQueue(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/log/fortianalyzer-queue", "testdata/log-fortianalyzer-queue.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeLogAnalyzerQueue, c, r) {
+	if !testProbeWithDefaults(probeLogAnalyzerQueue, c, r) {
 		t.Errorf("probeLogAnalyzerQueue() returned non-success")
 	}
 

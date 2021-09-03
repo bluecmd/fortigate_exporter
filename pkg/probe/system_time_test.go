@@ -12,7 +12,7 @@ func TestSystemTime(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/time", "testdata/system-time.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemTime, c, r) {
+	if !testProbeWithDefaults(probeSystemTime, c, r) {
 		t.Errorf("probeSystemTime() returned non-success")
 	}
 
