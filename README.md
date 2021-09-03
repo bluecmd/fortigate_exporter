@@ -313,6 +313,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |System/Interface             | netgrp.cfg         |api/v2/monitor/system/interface/select |
 |System/LinkMonitor           | sysgrp.cfg         |api/v2/monitor/system/link-monitor |
 |System/Resource/Usage        | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
+|System/SensorInfo            | sysgrp.cfg         |api/v2/monitor/system/sensor-info |
 |System/Status                | *any*              |api/v2/monitor/system/status |
 |System/VDOMResources         | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
 |User/Fsso                    | authgrp            |api/v2/monitor/user/fsso |
