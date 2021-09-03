@@ -32,7 +32,7 @@ Global:
 
  * _System/Status_
    * `fortigate_version_info`
- * _System/Time_
+ * _System/Time/Clock_
    * `fortigate_time_seconds`
  * _System/Resource/Usage_
    * `fortigate_cpu_usage_ratio`
