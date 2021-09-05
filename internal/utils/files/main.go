@@ -3,7 +3,7 @@ package files
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"runtime"
 )
 
@@ -11,7 +11,7 @@ import (
 func GetCallerDir(stacktraceStep int) (string, error) {
 	_, filename, _, ok := runtime.Caller(stacktraceStep)
 	if ok {
-		return path.Dir(filename), nil
+		return filepath.Dir(filename), nil
 	}
 	return "", fmt.Errorf("could not retrieve current dir")
 }
@@ -23,7 +23,7 @@ func ReadRelativeFile(relativePath string) ([]byte, error) {
 		return nil, callErr
 	}
 
-	filepath := path.Join(sourceDir, relativePath)
+	filePath := filepath.Join(sourceDir, relativePath)
 
-	return os.ReadFile(filepath)
+	return os.ReadFile(filePath)
 }

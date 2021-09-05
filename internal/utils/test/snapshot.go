@@ -1,10 +1,10 @@
 package test
 
 import (
-	"path"
+	"path/filepath"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
 )
 
 var Snapshotting = cupaloy.New(
-	cupaloy.SnapshotSubdirectory(path.Join("testdata", "snapshots")))
+	cupaloy.SnapshotSubdirectory(filepath.Join("testdata", "snapshots")))

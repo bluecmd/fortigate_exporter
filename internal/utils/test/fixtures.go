@@ -1,42 +1,34 @@
 package test
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"path"
-	"runtime"
+	"path/filepath"
 	"strings"
+
+	"github.com/bluecmd/fortigate_exporter/internal/utils/files"
 )
 
-func GetCallerFilePath(stackLevel int) (string, error) {
-	_, filename, _, ok := runtime.Caller(stackLevel)
-	if !ok {
-		return "", fmt.Errorf("no caller information")
-	}
-	return filename, nil
-}
-
 func GetFixturePath(fixtureFileName string) (string, error) {
-	filename, err := GetCallerFilePath(2)
+	callerDir, err := files.GetCallerDir(2)
 	if err != nil {
 		return "", err
 	}
-	fixturePath := path.Join(path.Dir(filename), "testdata", "fixtures", fixtureFileName)
+	fixturePath := filepath.Join(callerDir, "testdata", "fixtures", fixtureFileName)
 	return fixturePath, nil
 }
 
 func GetFixturePathPanic(fixtureFileName string) string {
-	filename, err := GetCallerFilePath(2)
+	callerDir, err := files.GetCallerDir(2)
 	if err != nil {
 		log.Panicf("failed to get caller stack %v", err)
 	}
-	fixturePath := path.Join(path.Dir(filename), "testdata", "fixtures", fixtureFileName)
+	fixturePath := filepath.Join(callerDir, "testdata", "fixtures", fixtureFileName)
 	return fixturePath
 }
 
 func GetRelativeFixturePathPanic(fixtureFileName string) string {
-	filename, err := GetCallerFilePath(2)
+	callerDir, err := files.GetCallerDir(2)
 	if err != nil {
 		log.Panicf("failed to get caller stack %v", err)
 	}
@@ -44,7 +36,7 @@ func GetRelativeFixturePathPanic(fixtureFileName string) string {
 	if err != nil {
 		log.Panicf("failed to get workdir %v", err)
 	}
-	relDir := strings.TrimPrefix(path.Dir(filename), workDir)
-	fixturePath := path.Join(relDir, "testdata", "fixtures", fixtureFileName)
+	relDir := strings.TrimPrefix(callerDir, workDir)
+	fixturePath := filepath.Join(relDir, "testdata", "fixtures", fixtureFileName)
 	return fixturePath
 }
