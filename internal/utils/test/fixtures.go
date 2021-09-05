@@ -22,7 +22,7 @@ func GetFixturePath(fixtureFileName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fixturePath := path.Dir(filename) + "/.fixtures/" + fixtureFileName
+	fixturePath := path.Join(path.Dir(filename), "testdata", "fixtures", fixtureFileName)
 	return fixturePath, nil
 }
 
@@ -31,7 +31,7 @@ func GetFixturePathPanic(fixtureFileName string) string {
 	if err != nil {
 		log.Panicf("failed to get caller stack %v", err)
 	}
-	fixturePath := path.Dir(filename) + "/.fixtures/" + fixtureFileName
+	fixturePath := path.Join(path.Dir(filename), "testdata", "fixtures", fixtureFileName)
 	return fixturePath
 }
 
@@ -45,6 +45,6 @@ func GetRelativeFixturePathPanic(fixtureFileName string) string {
 		log.Panicf("failed to get workdir %v", err)
 	}
 	relDir := strings.TrimPrefix(path.Dir(filename), workDir)
-	fixturePath := path.Join(relDir, ".fixtures", fixtureFileName)
+	fixturePath := path.Join(relDir, "testdata", "fixtures", fixtureFileName)
 	return fixturePath
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/bluecmd/fortigate_exporter/internal/utils/test"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,7 +24,7 @@ func TestInit(t *testing.T) {
 		flag.CommandLine = flag.NewFlagSet("fortigate_exporter", flag.ExitOnError)
 		os.Args = []string{"fortigate_exporter"}
 		defaultConfig := Init()
-		cupaloy.SnapshotT(t, defaultConfig)
+		test.Snapshotting.SnapshotT(t, defaultConfig)
 	})
 
 	// auth file test
@@ -87,7 +86,7 @@ func TestInit(t *testing.T) {
 			} else {
 				config := Init()
 				req.Equal(aTest.expected, config.AuthKeys)
-				cupaloy.SnapshotT(t, config)
+				test.Snapshotting.SnapshotT(t, config)
 			}
 
 		})
@@ -154,7 +153,7 @@ func TestInit(t *testing.T) {
 				req.NotNil(config.TlsExtraCAs)
 				req.Exactly(len(config.TlsExtraCAs), aTest.numberOfCerts)
 			}
-			cupaloy.SnapshotT(t, config)
+			test.Snapshotting.SnapshotT(t, config)
 		})
 	}
 }

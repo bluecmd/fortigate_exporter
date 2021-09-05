@@ -14,7 +14,7 @@
   TLSInsecure: (bool) false,
   TlsExtraCAs: ([]config.LocalCert) (len=2) {
     (config.LocalCert) {
-      Path: (string) (len=18) ".fixtures/cert.pem",
+      Path: (string) (len=26) "testdata/fixtures/cert.pem",
       Content: ([]uint8) (len=184) {
         00000000  2d 2d 2d 2d 2d 42 45 47  49 4e 20 43 45 52 54 49  |-----BEGIN CERTI|
         00000010  46 49 43 41 54 45 2d 2d  2d 2d 2d 0a 4d 49 49 46  |FICATE-----.MIIF|
@@ -31,7 +31,7 @@
       }
     },
     (config.LocalCert) {
-      Path: (string) (len=18) ".fixtures/cert.pem",
+      Path: (string) (len=26) "testdata/fixtures/cert.pem",
       Content: ([]uint8) (len=184) {
         00000000  2d 2d 2d 2d 2d 42 45 47  49 4e 20 43 45 52 54 49  |-----BEGIN CERTI|
         00000010  46 49 43 41 54 45 2d 2d  2d 2d 2d 0a 4d 49 49 46  |FICATE-----.MIIF|
