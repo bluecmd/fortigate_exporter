@@ -5,7 +5,7 @@ Fortigate exporter uses GitHub to manage reviews of pull requests.
 * If you are a new contributor see: [Steps to Contribute](#steps-to-contribute)
 
 * If you have a trivial fix or improvement, go ahead and create a pull request,
-  addressing it to @bluecmd
+  addressing it to @bluecmd or @secustor.
 
 * If you plan to do something more impacting, first discuss your ideas
   on our [IRC](https://matrix.to/#/#fortigate_exporter:matrix.org)
