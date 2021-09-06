@@ -26,7 +26,7 @@ Fortigate exporter uses GitHub to manage reviews of pull requests.
 Should you wish to work on an issue, please claim it first by commenting on the GitHub issue that you want to work on it. This is to prevent duplicated efforts from contributors on the same issue.
 
 To setup your dev environment you need:
-- makefile binaries (we recommand you use linux or [cygwin](https://cygwin.com/install.html) to make things easier and freer)
+- A way to run Makefiles, either Linux or WSL is recommended
 - latest golang binaries (see [Golang Install](https://golang.org/doc/install))
 
 For compiling and testing your changes do:
