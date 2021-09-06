@@ -8,7 +8,7 @@ Fortigate exporter uses GitHub to manage reviews of pull requests.
   addressing it to @bluecmd or @secustor.
 
 * If you plan to do something more impacting, first discuss your ideas
-  on our [IRC](https://matrix.to/#/#fortigate_exporter:matrix.org)
+  in our [chat room](https://matrix.to/#/#fortigate_exporter:matrix.org) or the [discussions](https://github.com/bluecmd/fortigate_exporter/discussions/landing) page.
   This will avoid unnecessary work and surely give you and us a good deal
   of inspiration.
 
@@ -48,7 +48,7 @@ make test         # Make sure all the tests pass before you commit and push :)
 
 * Commits should be as small as possible, while ensuring that each commit is correct independently (i.e., each commit should compile and pass tests).
 
-* If your patch is not getting reviewed or you need a specific person to review it, you can @-reply a reviewer asking for a review in the pull request or a comment, or you can ask for a review on IRC channel [IRC](https://matrix.to/#/#fortigate_exporter:matrix.org).
+* If your patch is not getting reviewed or you need a specific person to review it, you can @-reply a reviewer asking for a review in the pull request or a comment, or you can ask for a review in our [chat room](https://matrix.to/#/#fortigate_exporter:matrix.org).
 
 * Add tests relevant to the fixed bug or new feature.
 
