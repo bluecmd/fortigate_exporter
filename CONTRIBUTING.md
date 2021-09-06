@@ -56,6 +56,8 @@ make test         # Make sure all the tests pass before you commit and push :)
 
 New metrics name should follow the [Prometheus naming guidelines](https://prometheus.io/docs/practices/naming/) and [Prometheus implementation guidelines](https://prometheus.io/docs/practices/instrumentation/#things-to-watch-out-for)
 
+**NEVER** change the metric format in a backwards incompatible way (e.g. rename metrics, remove labels) if the metric has been merged to main. Once a metric has been merged to main, it will stay there unless some extraordinary happens and we need to remove it. Our users rely on that the metrics remain stable, so we strive to keep it that way. If we need to drop metrics or do larger refactors those should be queued to the next major version bump (i.e. v2.0.0 or equivalent).
+
 Category name used to include/exclude probes in the exporter configuration file should, as much as possible, follow those rules:
 - By default, probe category name should be derived from the API URL path following the `api/v2/monitor` part (ex: `api/v2/monitor/user/fsso` become `User/Fsso`)
 - A probe category name should never be a subpart of another probe category name, in order to keep inclusion/exclusion declaration simple and usable.
