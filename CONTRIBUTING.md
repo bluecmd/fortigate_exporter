@@ -14,9 +14,6 @@ Fortigate exporter uses GitHub to manage reviews of pull requests.
 
 * Relevant coding style guidelines are the [Go Code Review
   Comments](https://code.google.com/p/go-wiki/wiki/CodeReviewComments)
-  and the _Formatting and style_ section of Peter Bourgon's [Go: Best
-  Practices for Production
-  Environments](https://peter.bourgon.org/go-in-production/#formatting-and-style).
 
 * Make sure you understand how Prometheus works [Prometheus Getting started](https://prometheus.io/docs/prometheus/latest/getting_started/)
 
