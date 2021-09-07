@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	validAuthFile      = test.GetFixturePathPanic("validAuthFile.yaml")
-	otherValidAuthFile = test.GetFixturePathPanic("otherValidAuthFile.yaml")
-	invalidAuthFile    = test.GetFixturePathPanic("invalidAuthFile.yaml")
-	certFile           = test.GetRelativeFixturePathPanic("cert.pem")
+	validAuthFile      = test.GetRelativeFixturePath("validAuthFile.yaml")
+	otherValidAuthFile = test.GetRelativeFixturePath("otherValidAuthFile.yaml")
+	invalidAuthFile    = test.GetRelativeFixturePath("invalidAuthFile.yaml")
+	certFile           = test.GetRelativeFixturePath("cert.pem")
 )
 
 func TestInit(t *testing.T) {
