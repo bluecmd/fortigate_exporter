@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"os"
 	"testing"
 
 	"github.com/bluecmd/fortigate_exporter/internal/utils/test"
@@ -18,16 +17,13 @@ var (
 	certFile           = test.GetRelativeFixturePath("cert.pem")
 )
 
-func TestInit(t *testing.T) {
-	// default values
-	t.Run("default values", func(t *testing.T) {
-		flag.CommandLine = flag.NewFlagSet("fortigate_exporter", flag.ExitOnError)
-		os.Args = []string{"fortigate_exporter"}
-		defaultConfig := Init()
-		test.Snapshotting.SnapshotT(t, defaultConfig)
-	})
+func TestInitDefaultValues(t *testing.T) {
+	defaultConfig, err := Init(flag.NewFlagSet("fortigate_exporter", flag.ExitOnError), []string{"fortigate_exporter"})
+	assert.NoError(t, err)
+	test.Snapshotting.SnapshotT(t, defaultConfig)
+}
 
-	// auth file test
+func TestInitAuthFile(t *testing.T) {
 	authFileTests := []struct {
 		name          string
 		authFileFlags []string
@@ -77,22 +73,22 @@ func TestInit(t *testing.T) {
 		t.Run(aTest.name, func(t *testing.T) {
 			req := require.New(t)
 
-			// reset flags
-			flag.CommandLine = flag.NewFlagSet("fortigate_exporter", flag.PanicOnError)
+			flagSet := flag.NewFlagSet("fortigate_exporter", flag.PanicOnError)
+			args := append([]string{"fortigate_exporter"}, aTest.authFileFlags...)
 
-			os.Args = append([]string{"fortigate_exporter"}, aTest.authFileFlags...)
 			if aTest.expectToFail {
-				assert.Panics(t, func() { Init() })
+				assert.Panics(t, func() { _, _ = Init(flagSet, args) })
 			} else {
-				config := Init()
+				config, err := Init(flagSet, args)
+				req.NoError(err)
 				req.Equal(aTest.expected, config.AuthKeys)
 				test.Snapshotting.SnapshotT(t, config)
 			}
-
 		})
 	}
+}
 
-	// caCerts
+func TestInitCaCerts(t *testing.T) {
 	caCertFlagTests := []struct {
 		name          string
 		certFlag      []string
@@ -137,16 +133,16 @@ func TestInit(t *testing.T) {
 		t.Run(aTest.name, func(t *testing.T) {
 			req := require.New(t)
 
-			// reset flags
-			flag.CommandLine = flag.NewFlagSet("fortigate_exporter", flag.PanicOnError)
+			flagSet := flag.NewFlagSet("fortigate_exporter", flag.PanicOnError)
+			args := append([]string{"fortigate_exporter", "-auth-file=" + validAuthFile}, aTest.certFlag...)
 
-			os.Args = append([]string{"fortigate_exporter", "-auth-file=" + validAuthFile}, aTest.certFlag...)
 			if aTest.expectToFail {
-				assert.Panics(t, func() { Init() })
+				assert.Panics(t, func() { _, _ = Init(flagSet, args) })
 				return
 			}
 
-			config := Init()
+			config, err := Init(flagSet, args)
+			req.NoError(err)
 			if aTest.shouldBeNil {
 				req.Nil(config.TlsExtraCAs)
 			} else {

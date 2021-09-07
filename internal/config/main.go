@@ -66,19 +66,19 @@ type LocalCert struct {
 	Content []byte
 }
 
-func setParameterFlags() *FortiExporterParameter {
+func setParameterFlags(flagSet *flag.FlagSet) *FortiExporterParameter {
 	localParameter := FortiExporterParameter{
-		Listen:        flag.String("listen", ":9710", "address to listen on"),
-		ScrapeTimeout: flag.Int("scrape-timeout", 30, "max seconds to allow a scrape to take"),
-		TLSTimeout:    flag.Int("https-timeout", 10, "TLS Handshake timeout in seconds"),
-		TLSInsecure:   flag.Bool("insecure", false, "Allow insecure certificates"),
-		MaxBGPPaths:   flag.Int("max-bgp-paths", 10000, "How many BGP Paths to receive when counting routes, needs to be higher then the number of routes or metrics will not be generated"),
-		MaxVPNUsers:   flag.Int("max-vpn-users", 0, "How many VPN Users to receive when counting users, needs to be greater than or equal the number of users or metrics will not be generated (0 eq. none by default)"),
+		Listen:        flagSet.String("listen", ":9710", "address to listen on"),
+		ScrapeTimeout: flagSet.Int("scrape-timeout", 30, "max seconds to allow a scrape to take"),
+		TLSTimeout:    flagSet.Int("https-timeout", 10, "TLS Handshake timeout in seconds"),
+		TLSInsecure:   flagSet.Bool("insecure", false, "Allow insecure certificates"),
+		MaxBGPPaths:   flagSet.Int("max-bgp-paths", 10000, "How many BGP Paths to receive when counting routes, needs to be higher then the number of routes or metrics will not be generated"),
+		MaxVPNUsers:   flagSet.Int("max-vpn-users", 0, "How many VPN Users to receive when counting users, needs to be greater than or equal the number of users or metrics will not be generated (0 eq. none by default)"),
 		// defaults
 		TlsExtraCAs: new([]LocalCert),
 		AuthKeys:    new(AuthKeys),
 	}
-	flag.Func("extra-ca-certs", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store. Multiple flags will be concatenated", func(s string) error {
+	flagSet.Func("extra-ca-certs", "comma-separated files containing extra PEMs to trust for TLS connections in addition to the system trust store. Multiple flags will be concatenated", func(s string) error {
 		// parse ExtraCAs
 		for _, eca := range strings.Split(s, ",") {
 			if eca == "" {
@@ -100,7 +100,7 @@ func setParameterFlags() *FortiExporterParameter {
 		return nil
 	})
 
-	flag.Func("auth-file", "file containing the authentication map to use when connecting to a Fortigate device", func(s string) error {
+	flagSet.Func("auth-file", "file containing the authentication map to use when connecting to a Fortigate device", func(s string) error {
 		// parse AuthKeys
 		af, err := ioutil.ReadFile(s)
 		if err != nil {
@@ -116,8 +116,11 @@ func setParameterFlags() *FortiExporterParameter {
 	return &localParameter
 }
 
-func Init() FortiExporterConfig {
-	parameters := setParameterFlags()
-	flag.Parse()
-	return parameters.ParseToConfig()
+func Init(flagSet *flag.FlagSet, args []string) (FortiExporterConfig, error) {
+	parameters := setParameterFlags(flagSet)
+	err := flagSet.Parse(args[1:])
+	if err != nil {
+		return FortiExporterConfig{}, err
+	}
+	return parameters.ParseToConfig(), nil
 }

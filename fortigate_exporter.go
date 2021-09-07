@@ -18,8 +18,10 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -81,8 +83,10 @@ func main() {
 	log.Printf("FortigateExporter %s ( %s )", buildInfo.version, buildInfo.gitHash)
 	setUpMetricsEndpoint(buildInfo)
 
-	savedConfig := config.Init()
-
+	savedConfig, parseErr := config.Init(flag.CommandLine, os.Args)
+	if parseErr != nil {
+		log.Fatal(parseErr)
+	}
 	if err := fortiHTTP.Configure(savedConfig); err != nil {
 		log.Fatalf("%+v", err)
 	}
