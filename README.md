@@ -30,8 +30,6 @@ Supported metrics right now as follows.
 
 Global:
 
- * _System/Fortimanager/Status_
-   * `fortigate_fortimanager_info`
  * _System/Status_
    * `fortigate_version_info`
  * _System/Time/Clock_
@@ -55,6 +53,9 @@ Per-VDOM:
    * `fortigate_policy_bytes_total`
    * `fortigate_policy_hit_count_total`
    * `fortigate_policy_packets_total`
+ * _System/Fortimanager/Status_
+   * `fortigate_fortimanager_connection_status`
+   * `fortigate_fortimanager_registration_status`
  * _System/Interface_
    * `fortigate_interface_link_up`
    * `fortigate_interface_speed_bps`
@@ -309,6 +310,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |Log/Fortianalyzer/Queue      | loggrp.config      |api/v2/monitor/log/fortianalyzer-queue |
 |Log/DiskUsage                | loggrp.config      |api/v2/monitor/log/current-disk-usage |
 |System/AvailableCertificates | *any*              |api/v2/monitor/system/available-certificates |
+|System/Fortimanager/Status   | sysgrp.cfg         |api/v2/monitor/system/fortimanager/status |
 |System/HAStatistics          | sysgrp.cfg         |api/v2/monitor/system/ha-statistics<br>api/v2/cmdb/system/ha |
 |System/Interface             | netgrp.cfg         |api/v2/monitor/system/interface/select |
 |System/LinkMonitor           | sysgrp.cfg         |api/v2/monitor/system/link-monitor |

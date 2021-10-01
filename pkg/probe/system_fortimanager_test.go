@@ -17,10 +17,24 @@ func TestSystemFortimanagerStatus(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_fortimanager_info Fortimanager infos
-	# TYPE fortigate_fortimanager_info gauge
-	fortigate_fortimanager_info{connection_status="2",mode="normal",registration_status="2",vdom="VDOM1"} 1
-	fortigate_fortimanager_info{connection_status="2",mode="normal",registration_status="2",vdom="root"} 1
+	# HELP fortigate_fortimanager_connection_status Fortimanager status ID
+	# TYPE fortigate_fortimanager_connection_status gauge
+	fortigate_fortimanager_connection_status{mode="normal",status="down",vdom="VDOM1"} 0
+	fortigate_fortimanager_connection_status{mode="normal",status="down",vdom="root"} 0
+	fortigate_fortimanager_connection_status{mode="normal",status="handshake",vdom="VDOM1"} 0
+	fortigate_fortimanager_connection_status{mode="normal",status="handshake",vdom="root"} 0
+	fortigate_fortimanager_connection_status{mode="normal",status="up",vdom="VDOM1"} 1
+	fortigate_fortimanager_connection_status{mode="normal",status="up",vdom="root"} 1
+	# HELP fortigate_fortimanager_registration_status Fortimanager registration status ID
+	# TYPE fortigate_fortimanager_registration_status gauge
+	fortigate_fortimanager_registration_status{mode="normal",status="inprogress",vdom="VDOM1"} 0
+	fortigate_fortimanager_registration_status{mode="normal",status="inprogress",vdom="root"} 0
+	fortigate_fortimanager_registration_status{mode="normal",status="registered",vdom="VDOM1"} 1
+	fortigate_fortimanager_registration_status{mode="normal",status="registered",vdom="root"} 1
+	fortigate_fortimanager_registration_status{mode="normal",status="unknown",vdom="VDOM1"} 0
+	fortigate_fortimanager_registration_status{mode="normal",status="unknown",vdom="root"} 0
+	fortigate_fortimanager_registration_status{mode="normal",status="unregistered",vdom="VDOM1"} 0
+	fortigate_fortimanager_registration_status{mode="normal",status="unregistered",vdom="root"} 0
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
