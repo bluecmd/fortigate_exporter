@@ -428,6 +428,13 @@ An alternative to using this exporter is to use generic SNMP polling, e.g. using
 Note that there are limitations (e.g. [1](https://kb.fortinet.com/kb/documentLink.do?externalID=FD47703))
 in what FortiGate supports querying via SNMP.
 
+## Dashboards for Grafana and Fortigate Exporter
+
+* https://grafana.com/grafana/dashboards/14011
+* https://grafana.com/grafana/dashboards/13681
+* https://grafana.com/grafana/dashboards/12906
+
+
 ## Legal
 
 Fortinet®, and FortiGate® are registered trademarks of Fortinet, Inc.
