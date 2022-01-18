@@ -10,3 +10,6 @@ fortigate_exporter
 # coverage
 cover.out
 coverage.html
+
+# vars
+fortigate-key.yaml
