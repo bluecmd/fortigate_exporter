@@ -25,6 +25,16 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 			"Total number of bytes received over the IPsec tunnel",
 			[]string{"vdom", "name", "p2serial", "parent"}, nil,
 		)
+		user_received = prometheus.NewDesc(
+			"fortigate_ipsec_user_receive",
+			"Total number of bytes received by user",
+			[]string{"vdom", "name", "auth", "gw", "create"}, nil,
+		)
+		user_transmitted = prometheus.NewDesc(
+			"fortigate_ipsec_user_transmitted",
+			"Total number of bytes transmitted by user",
+			[]string{"vdom", "name", "auth", "gw", "create"}, nil,
+		)
 	)
 
 	type proxyid struct {
@@ -35,15 +45,24 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 		Outgoing float64 `json:"outgoing_bytes"`
 	}
 	type tunnel struct {
-		Name    string    `json:"name"`
-		Type    string    `json:"type"`
+		Name    string   `json:"name"`
+		Type    string   `json:"type"`
+		Auth    string   `json:"xauth_user"`
+		Gw    string     `json:"rgwy"`
+		Wizard    string `json:"wizard-type"`
+		Incoming float64 `json:"incoming_bytes"`
+		Outgoing float64 `json:"outgoing_bytes"`
+		Create int `json:"creation_time"`
+		
 		ProxyID []proxyid `json:"proxyid"`
 	}
 	type ipsecResult struct {
 		Results []tunnel `json:"results"`
 		VDOM    string
 	}
+
 	var res []ipsecResult
+
 	if err := c.Get("api/v2/monitor/vpn/ipsec", "vdom=*", &res); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
@@ -52,14 +71,21 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 	m := []prometheus.Metric{}
 	for _, v := range res {
 		for _, i := range v.Results {
+
+			if i.Wizard == "dialup-forticlient" && i.Auth != "" {
+				m = append(m, prometheus.MustNewConstMetric(user_received, prometheus.CounterValue, i.Incoming, v.VDOM, i.Name, i.Auth, i.Gw, strconv.Itoa(i.Create)))
+				m = append(m, prometheus.MustNewConstMetric(user_transmitted, prometheus.CounterValue, i.Outgoing, v.VDOM, i.Name, i.Auth, i.Gw, strconv.Itoa(i.Create)))
+			}
+
 			/*
 			  type 'dialup' seems to be client vpn.
 			  Not sure exactly what the difference is between probeVPNSsl
 			*/
+
 			if i.Type == "dialup" {
 				continue
 			}
-			for _, t := range i.ProxyID {
+			for _, t := range i.ProxyID  {
 				s := 0.0
 				if t.Status == "up" {
 					s = 1.0
