@@ -7,4 +7,5 @@ services:
       - 9710:9710
     volumes:
       - ./fortigate-key.yaml:/config/fortigate-key.yaml
+    command: ["-auth-file", "/config/fortigate-key.yaml", "-insecure"]
     restart: unless-stopped
