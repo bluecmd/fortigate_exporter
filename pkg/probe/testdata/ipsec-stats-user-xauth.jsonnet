@@ -1,7 +1,9 @@
-# api/v2/monitor/vpn/ssl?vdom=*
-{
+#api/v2/monitor/vpn/ipsec?vdom=*
+[
+  {
     "http_method":"GET",
     "results":[
+      
       {
         "proxyid":[
         ],
@@ -14,6 +16,7 @@
         "outgoing_bytes":179312968110,
         "rgwy":"0.0.0.0"
       },
+
       {
         "proxyid":[
           {
@@ -46,7 +49,7 @@
         "comments":"VPN: VPN_Intri (Created by VPN wizard)",
         "wizard-type":"dialup-forticlient",
         "creation_time":200,
-        "xauth_user":"bgil",
+        "xauth_user":"PACO",
         "type":"dialup",
         "incoming_bytes":1197254,
         "outgoing_bytes":8696650,
@@ -63,3 +66,4 @@
     "version":"v6.0.12",
     "build":419
   }
+]
