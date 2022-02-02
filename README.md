@@ -75,6 +75,8 @@ Per-VDOM:
    * `fortigate_ipsec_tunnel_receive_bytes_total`
    * `fortigate_ipsec_tunnel_transmit_bytes_total`
    * `fortigate_ipsec_tunnel_up`
+   * `fortigate_ipsec_user_transmitted`
+   * `fortigate_ipsec_user_receive`
  * _Wifi/APStatus_
    * `fortigate_wifi_access_points`
    * `fortigate_wifi_fabric_clients`
