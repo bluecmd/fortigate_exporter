@@ -225,6 +225,12 @@ Where `fortigate-key.yaml` contains pairs of FortiGate targets and API keys in t
 ```
 "https://my-fortigate":
   token: api-key-goes-here
+  # If you have a smaller fortigate unit you might want
+  # to exclude sensors as they do not have any
+  probes:
+    exclude:
+      - System/SensorInfo
+
 "https://my-other-fortigate:8443":
   token: api-key-goes-here
 ```
