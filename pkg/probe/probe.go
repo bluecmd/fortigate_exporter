@@ -124,6 +124,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		{"System/Interface", probeSystemInterface},
 		{"System/LinkMonitor", probeSystemLinkMonitor},
 		{"System/Resource/Usage", probeSystemResourceUsage},
+		{"System/SensorInfo", probeSystemSensorInfo},
 		{"System/Status", probeSystemStatus},
 		{"System/VDOMResources", probeSystemVDOMResources},
 		{"User/Fsso", probeUserFsso},
