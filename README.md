@@ -30,6 +30,10 @@ Supported metrics right now as follows.
 
 Global:
 
+ * _System/SensorInfo_
+   * `fortigate_sensor_fan_rpm`
+   * `fortigate_sensor_temperature_celsius`
+   * `fortigate_sensor_voltage_volts`
  * _System/Status_
    * `fortigate_version_info`
  * _System/Time/Clock_
@@ -311,6 +315,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |System/Interface             | netgrp.cfg         |api/v2/monitor/system/interface/select |
 |System/LinkMonitor           | sysgrp.cfg         |api/v2/monitor/system/link-monitor |
 |System/Resource/Usage        | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
+|System/SensorInfo            | sysgrp.cfg         |api/v2/monitor/system/sensor-info |
 |System/Status                | *any*              |api/v2/monitor/system/status |
 |System/Time/Clock            | sysgrp.cfg         |api/v2/monitor/system/time |
 |System/VDOMResources         | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
