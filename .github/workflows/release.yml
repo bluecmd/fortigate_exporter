@@ -15,7 +15,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: ^1.16
+          go-version: ^1.18
         id: go
 
       - name: Get dependencies
@@ -43,7 +43,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 13
+          node-version: 16
       - name: Add execution plugin
         run: npm install @semantic-release/exec
       - name: Release to GitHub
