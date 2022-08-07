@@ -103,6 +103,11 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 	// TODO: Make parallel
 	success := true
 	for _, aProbe := range []probeDetailedFunc{
+		// Always keep probeSystemTime on top of the list to have the probe processed first.
+		// Therefore time returned is more accurate when integrated in Prometheus because
+		// timestamp for the metrics probe, in Prometheus, is obtained from the query time, not the reply time.
+		// This is especially important when running all the probes takes many seconds.
+		{"System/Time/Clock", probeSystemTime},
 		{"BGP/NeighborPaths/IPv4", probeBGPNeighborPathsIPv4},
 		{"BGP/NeighborPaths/IPv6", probeBGPNeighborPathsIPv6},
 		{"BGP/Neighbors/IPv4", probeBGPNeighborsIPv4},

@@ -36,6 +36,8 @@ Global:
    * `fortigate_sensor_voltage_volts`
  * _System/Status_
    * `fortigate_version_info`
+ * _System/Time/Clock_
+   * `fortigate_time_seconds`
  * _System/Resource/Usage_
    * `fortigate_cpu_usage_ratio`
    * `fortigate_memory_usage_ratio`
@@ -315,6 +317,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |System/Resource/Usage        | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
 |System/SensorInfo            | sysgrp.cfg         |api/v2/monitor/system/sensor-info |
 |System/Status                | *any*              |api/v2/monitor/system/status |
+|System/Time/Clock            | sysgrp.cfg         |api/v2/monitor/system/time |
 |System/VDOMResources         | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
 |User/Fsso                    | authgrp            |api/v2/monitor/user/fsso |
 |VPN/IPSec                    | vpngrp             |api/v2/monitor/vpn/ipsec |
