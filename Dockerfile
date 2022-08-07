@@ -1,6 +1,6 @@
 # Use Prometheus' Golang Builder to avoid depending on Docker Hub
 # See https://github.com/bluecmd/fortigate_exporter/issues/75 for more details
-FROM quay.io/prometheus/golang-builder:1.16.2-base as builder
+FROM quay.io/prometheus/golang-builder:1.18-base as builder
 
 WORKDIR /build
 
