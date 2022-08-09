@@ -38,9 +38,8 @@ Global:
    * `fortigate_cpu_usage_ratio`
    * `fortigate_memory_usage_ratio`
    * `fortigate_current_sessions`
- * _System/ha-checksums_
-   * `fortigate_is_master`
-   * `fortigate_serial_no`
+ * _System/HAChecksums_
+   * `fortigate_ha_member_has_role`
  * _License/Status_
    * `fortigate_license_vdom_usage`
    * `fortigate_license_vdom_max`
