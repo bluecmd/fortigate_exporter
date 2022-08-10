@@ -45,6 +45,9 @@ Global:
  * _License/Status_
    * `fortigate_license_vdom_usage`
    * `fortigate_license_vdom_max`
+ * _WebUI/State_
+   * `fortigate_last_reboot_seconds`
+   * `fortigate_last_snapshot_seconds`
 
 Per-VDOM:
 
