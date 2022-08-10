@@ -30,16 +30,16 @@ func probeWebUIState(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metri
 		Results WebUIState
 	}
 
-	var sstate webuiState
+	var state webuiState
 
-	if err := c.Get("api/v2/monitor/web-ui/state", "", &sstate); err != nil {
+	if err := c.Get("api/v2/monitor/web-ui/state", "", &state); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
 
 	m := []prometheus.Metric{
-		prometheus.MustNewConstMetric(mRebootTime, prometheus.GaugeValue, sstate.Results.UTCLastReboot/1000),
-		prometheus.MustNewConstMetric(mSnapshotTime, prometheus.GaugeValue, sstate.Results.SnapshotUTCTime/1000),
+		prometheus.MustNewConstMetric(mRebootTime, prometheus.GaugeValue, state.Results.UTCLastReboot/1000),
+		prometheus.MustNewConstMetric(mSnapshotTime, prometheus.GaugeValue, state.Results.SnapshotUTCTime/1000),
 	}
 	return m, true
 }
