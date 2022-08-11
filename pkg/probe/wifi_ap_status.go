@@ -38,9 +38,8 @@ func probeWifiAPStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 		VDOM string `json:"vdom"`
 	}
 
-	// Consider implementing pagination to remove this limit of 1000 entries
 	var response ApiStatusResponse
-	if err := c.Get("api/v2/monitor/wifi/ap_status", "vdom=*&start=0&count=1000", &response); err != nil {
+	if err := c.Get("api/v2/monitor/wifi/ap_status", "vdom=*", &response); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}

@@ -30,6 +30,10 @@ Supported metrics right now as follows.
 
 Global:
 
+ * _System/SensorInfo_
+   * `fortigate_sensor_fan_rpm`
+   * `fortigate_sensor_temperature_celsius`
+   * `fortigate_sensor_voltage_volts`
  * _System/Status_
    * `fortigate_version_info`
  * _System/Time/Clock_
@@ -43,6 +47,9 @@ Global:
  * _License/Status_
    * `fortigate_license_vdom_usage`
    * `fortigate_license_vdom_max`
+ * _WebUI/State_
+   * `fortigate_last_reboot_seconds`
+   * `fortigate_last_snapshot_seconds`
 
 Per-VDOM:
 
@@ -55,6 +62,9 @@ Per-VDOM:
    * `fortigate_policy_bytes_total`
    * `fortigate_policy_hit_count_total`
    * `fortigate_policy_packets_total`
+ * _System/Fortimanager/Status_
+   * `fortigate_fortimanager_connection_status`
+   * `fortigate_fortimanager_registration_status`
  * _System/Interface_
    * `fortigate_interface_link_up`
    * `fortigate_interface_speed_bps`
@@ -220,6 +230,12 @@ Where `fortigate-key.yaml` contains pairs of FortiGate targets and API keys in t
 ```
 "https://my-fortigate":
   token: api-key-goes-here
+  # If you have a smaller fortigate unit you might want
+  # to exclude sensors as they do not have any
+  probes:
+    exclude:
+      - System/SensorInfo
+
 "https://my-other-fortigate:8443":
   token: api-key-goes-here
 ```
@@ -309,10 +325,12 @@ To improve security, limit permissions to required ones only (least privilege pr
 |Log/Fortianalyzer/Queue      | loggrp.config      |api/v2/monitor/log/fortianalyzer-queue |
 |Log/DiskUsage                | loggrp.config      |api/v2/monitor/log/current-disk-usage |
 |System/AvailableCertificates | *any*              |api/v2/monitor/system/available-certificates |
+|System/Fortimanager/Status   | sysgrp.cfg         |api/v2/monitor/system/fortimanager/status |
 |System/HAStatistics          | sysgrp.cfg         |api/v2/monitor/system/ha-statistics<br>api/v2/cmdb/system/ha |
 |System/Interface             | netgrp.cfg         |api/v2/monitor/system/interface/select |
 |System/LinkMonitor           | sysgrp.cfg         |api/v2/monitor/system/link-monitor |
 |System/Resource/Usage        | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
+|System/SensorInfo            | sysgrp.cfg         |api/v2/monitor/system/sensor-info |
 |System/Status                | *any*              |api/v2/monitor/system/status |
 |System/Time/Clock            | sysgrp.cfg         |api/v2/monitor/system/time |
 |System/VDOMResources         | sysgrp.cfg         |api/v2/monitor/system/resource/usage |

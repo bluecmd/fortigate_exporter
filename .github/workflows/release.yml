@@ -10,12 +10,12 @@ jobs:
     name: 'Release to GitHub'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         # Go setup
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: ^1.16
+          go-version: ^1.18
         id: go
 
       - name: Get dependencies
@@ -24,7 +24,7 @@ jobs:
         # Go test
       - name: Ensure that all files are properly formatted
         run: |
-          FILES=$(go run golang.org/x/tools/cmd/goimports -w -l .)
+          FILES=$(go run golang.org/x/tools/cmd/goimports@latest -w -l .)
           if [ -n "${FILES}" ]; then
               printf "Following files are not formatted: \n%s" "$FILES"
               exit 1
@@ -41,9 +41,9 @@ jobs:
 
         # Prepare release
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 13
+          node-version: 16
       - name: Add execution plugin
         run: npm install @semantic-release/exec
       - name: Release to GitHub
