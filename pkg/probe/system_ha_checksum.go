@@ -20,9 +20,9 @@ type HAChecksum struct {
 func probeSystemHAChecksum(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		IsMaster = prometheus.NewDesc(
-			"fortigate_ha_role",
+			"fortigate_ha_member_has_role",
 			"Master/Slave information",
-			[]string{"name", "serial_no"}, nil,
+			[]string{"role", "serial"}, nil,
 		)
 	)
 
@@ -34,8 +34,8 @@ func probeSystemHAChecksum(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 
 	m := []prometheus.Metric{}
 	for _, response := range res.Results {
-		m = append(m, prometheus.MustNewConstMetric(IsMaster, prometheus.GaugeValue, float64(response.IsManageMaster), "is_manage_master", response.SerialNo))
-		m = append(m, prometheus.MustNewConstMetric(IsMaster, prometheus.GaugeValue, float64(response.IsRootMaster), "is_root_master", response.SerialNo))
+		m = append(m, prometheus.MustNewConstMetric(IsMaster, prometheus.GaugeValue, float64(response.IsManageMaster), "manage_master", response.SerialNo))
+		m = append(m, prometheus.MustNewConstMetric(IsMaster, prometheus.GaugeValue, float64(response.IsRootMaster), "root_master", response.SerialNo))
 	}
 
 	return m, true
