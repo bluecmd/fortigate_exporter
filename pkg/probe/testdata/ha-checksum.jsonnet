@@ -1,0 +1,35 @@
+# /api/v2/monitor/system/ha-checksums
+{
+  "http_method":"GET",
+  "revision":"1652165894",
+  "results":[
+    {
+      "is_manage_master":1,
+      "is_root_master":1,
+      "checksum":{
+        "global":"b6b3f51996c7da2d8adcbb44baa39750",
+        "root":"74cc1c60799e0a786ac7094b532f01b1",
+        "all":"4df9cc121afe1c00de4e9e396af4cdb1"
+      },
+      "serial_no":"SERIAL111111111"
+                   
+    },
+    {
+      "is_manage_master":0,
+      "is_root_master":0,
+      "checksum":{
+        "global":"b6b3f51996c7da2d8adcbb44baa39750",
+        "root":"74cc1c60799e0a786ac7094b532f01b1",
+        "all":"4df9cc121afe1c00de4e9e396af4cdb1"
+      },
+      "serial_no":"SERIAL222222222"
+    }
+  ],
+  "vdom":"root",
+  "path":"system",
+  "name":"ha-checksums",
+  "status":"success",
+  "serial":"SERIAL1111111111",
+  "version":"v6.0.9",
+  "build":335
+}
