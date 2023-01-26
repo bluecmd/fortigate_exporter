@@ -51,6 +51,27 @@ Global:
  * _WebUI/State_
    * `fortigate_last_reboot_seconds`
    * `fortigate_last_snapshot_seconds`
+ * _SwitchController/ManageSwitch/PortStats  
+   * `fortiswitch_status`
+   * `fortiswitch_port_status`
+   * `fortiswitch_port_speed_bps`
+   * `fortiswitch_port_transmit_packets_total`
+   * `fortiswitch_port_transmit_bytes_total`
+   * `fortiswitch_port_transmit_unicast_packets_total`
+   * `fortiswitch_port_transmit_multicast_packets_total`
+   * `fortiswitch_port_transmit_broadcast_packets_total`
+   * `fortiswitch_port_transmit_errors_total`
+   * `fortiswitch_port_transmit_drops_total`
+   * `fortiswitch_port_transmit_oversized_packets_total`
+   * `fortiswitch_port_receive_packets_total`
+   * `fortiswitch_port_receive_bytes_total`
+   * `fortiswitch_port_receive_unicast_packets_total`
+   * `fortiswitch_port_receive_multicast_packets_total`
+   * `fortiswitch_port_receive_broadcast_packets_total`
+   * `fortiswitch_port_receive_errors_total`
+   * `fortiswitch_port_receive_drops_total`
+   * `fortiswitch_port_receive_oversized_packets_total`   
+   
 
 Per-VDOM:
 
