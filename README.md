@@ -51,7 +51,7 @@ Global:
  * _WebUI/State_
    * `fortigate_last_reboot_seconds`
    * `fortigate_last_snapshot_seconds`
- * _SwitchController/ManageSwitch/PortStats  
+ * _SwitchController/ManageSwitch/PortStats_  
    * `fortiswitch_status`
    * `fortiswitch_port_status`
    * `fortiswitch_port_speed_bps`
