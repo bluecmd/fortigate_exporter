@@ -71,8 +71,17 @@ Global:
    * `fortiswitch_port_receive_errors_total`
    * `fortiswitch_port_receive_drops_total`
    * `fortiswitch_port_receive_oversized_packets_total`   
-   
-
+ * _SwitchController/ManageSwitch/Health_
+   * `fortiswitch_health_summary_cpu`
+   * `fortiswitch_health_summary_mem`
+   * `fortiswitch_health_summary_uptime`
+   * `fortiswitch_health_summary_temp`
+   * `fortiswitch_health_temperature`
+   * `fortiswitch_health_performance_stats_cpu_user`
+   * `fortiswitch_health_performance_stats_cpu_system`
+   * `fortiswitch_health_performance_stats_cpu_idle`
+   * `fortiswitch_health_performance_stats_cpu_nice`
+      
 Per-VDOM:
 
  * _System/VDOMResources_
@@ -423,6 +432,8 @@ To improve security, limit permissions to required ones only (least privilege pr
 |System/Status                | *any*              |api/v2/monitor/system/status |
 |System/Time/Clock            | sysgrp.cfg         |api/v2/monitor/system/time |
 |System/VDOMResources         | sysgrp.cfg         |api/v2/monitor/system/resource/usage |
+|SwitchController/ManageSwitch/PortStats |         |api/v2/monitor/switch-controller/managed-switch?port_stats=true |
+|SwitchController/ManageSwitch/Health |            |api/v2/monitor/switch-controller/managed-switch/health |
 |User/Fsso                    | authgrp            |api/v2/monitor/user/fsso |
 |VPN/IPSec                    | vpngrp             |api/v2/monitor/vpn/ipsec |
 |VPN/Ssl/Connections          | vpngrp             |api/v2/monitor/vpn/ssl |
