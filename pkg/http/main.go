@@ -19,8 +19,14 @@ type FortiHTTP interface {
 
 func NewFortiClient(ctx context.Context, tgt url.URL, hc *http.Client, aConfig config.FortiExporterConfig) (FortiHTTP, error) {
 
-	auth, ok := aConfig.AuthKeys[config.Target(tgt.Host)]
-	if !ok {
+	auth, hostFound := aConfig.AuthKeys[config.Target(tgt.Host)]
+	fallbackFound := true
+
+	if !hostFound {
+		// fallback to catchall
+		auth, fallbackFound = aConfig.AuthKeys[config.Target("*")]
+	}
+	if !fallbackFound {
 		return nil, fmt.Errorf("no API authentication registered for %q", tgt.Host)
 	}
 
