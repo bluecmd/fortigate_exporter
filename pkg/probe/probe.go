@@ -48,7 +48,7 @@ type probeDetailedFunc struct {
 }
 
 func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Client, savedConfig config.FortiExporterConfig) (bool, error) {
-	tgt, err := url.Parse(target)
+	tgt, err := url.Parse("https://" + target)
 	if err != nil {
 		return false, fmt.Errorf("url.Parse failed: %v", err)
 	}

@@ -19,9 +19,9 @@ type FortiHTTP interface {
 
 func NewFortiClient(ctx context.Context, tgt url.URL, hc *http.Client, aConfig config.FortiExporterConfig) (FortiHTTP, error) {
 
-	auth, ok := aConfig.AuthKeys[config.Target(tgt.String())]
+	auth, ok := aConfig.AuthKeys[config.Target(tgt.Host)]
 	if !ok {
-		return nil, fmt.Errorf("no API authentication registered for %q", tgt.String())
+		return nil, fmt.Errorf("no API authentication registered for %q", tgt.Host)
 	}
 
 	if auth.Token != "" {
@@ -34,7 +34,7 @@ func NewFortiClient(ctx context.Context, tgt url.URL, hc *http.Client, aConfig c
 		}
 		return c, nil
 	}
-	return nil, fmt.Errorf("invalid authentication data for %q", tgt.String())
+	return nil, fmt.Errorf("invalid authentication data for %q", tgt.Host)
 }
 
 func Configure(config config.FortiExporterConfig) error {
