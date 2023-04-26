@@ -137,6 +137,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target string, hc *http.Clie
 		{"Wifi/APStatus", probeWifiAPStatus},
 		{"Wifi/Clients", probeWifiClients},
 		{"Wifi/ManagedAP", probeWifiManagedAP},
+		{"Switch/ManagedSwitch", probeManagedSwitch},
 	} {
 		wanted := false
 

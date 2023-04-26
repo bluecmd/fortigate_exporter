@@ -215,6 +215,37 @@ Per-VDOM, managed access point and interface:
    * `fortigate_wifi_managed_ap_interface_rx_dropped_packets_total`
    * `fortigate_wifi_managed_ap_interface_tx_dropped_packets_total`
 
+Per-VDOM, managed switch and interface:
+* _Switch/ManagedSwitch_
+  * `fortigate_managed_switch_collisions_total`
+  * `fortigate_managed_switch_crc_alignments_total`
+  * `fortigate_managed_switch_fragments_total`
+  * `fortigate_managed_switch_info`
+  * `fortigate_managed_switch_jabbers_total`
+  * `fortigate_managed_switch_l3_packets_total`
+  * `fortigate_managed_switch_max_poe_budget_watt`
+  * `fortigate_managed_switch_port_info`
+  * `fortigate_managed_switch_port_power_status`
+  * `fortigate_managed_switch_port_power_watt`
+  * `fortigate_managed_switch_port_status`
+  * `fortigate_managed_switch_rx_bcast_packets_total`
+  * `fortigate_managed_switch_rx_bytes_total`
+  * `fortigate_managed_switch_rx_drops_total`
+  * `fortigate_managed_switch_rx_errors_total`
+  * `fortigate_managed_switch_rx_mcast_packets_total`
+  * `fortigate_managed_switch_rx_oversize_total`
+  * `fortigate_managed_switch_rx_packets_total`
+  * `fortigate_managed_switch_rx_ucast_packets_total`
+  * `fortigate_managed_switch_tx_bcast_packets_total`
+  * `fortigate_managed_switch_tx_bytes_total`
+  * `fortigate_managed_switch_tx_drops_total`
+  * `fortigate_managed_switch_tx_errors_total`
+  * `fortigate_managed_switch_tx_mcast_packets_total`
+  * `fortigate_managed_switch_tx_oversize_total`
+  * `fortigate_managed_switch_tx_packets_total`
+  * `fortigate_managed_switch_tx_ucast_packets_total`
+  * `fortigate_managed_switch_under_size_total`
+    
 ## Usage
 
 Example:
@@ -342,7 +373,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |Wifi/APStatus                | wifi               |api/v2/monitor/wifi/ap_status |
 |Wifi/Clients                 | wifi               |api/v2/monitor/wifi/client |
 |Wifi/ManagedAP               | wifi               |api/v2/monitor/wifi/managed_ap |
-
+|Switch/ManagedSwitch         | switch	           |api/v2/monitor/switch-controller/managed-switch|
 If you omit to grant some of these permissions you will receive log messages warning about
 403 errors and relevant metrics will be unavailable, but other metrics will still work.
 If you do not need some probes to be run, do not grant permission for them and use `include/exclude` feature (see `Usage` section).
