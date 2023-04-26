@@ -1,10 +1,11 @@
 package probe
 
 import (
-	"github.com/bluecmd/fortigate_exporter/pkg/http"
-	"github.com/prometheus/client_golang/prometheus"
 	"log"
 	"strconv"
+
+	"github.com/bluecmd/fortigate_exporter/pkg/http"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func probeManagedSwitch(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
