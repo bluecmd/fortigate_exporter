@@ -494,7 +494,8 @@ If using [Dynamic configuration](#dynamic-configuration):
     - action: labeldrop
       regex: token
 ```
-Make sure to use the last labeldrop on the `token` label so that the tokens is not be part of your time series.
+> Make sure to use the last labeldrop on the `token` label so that the tokens is not be part of your time series.
+
 > Since `token` is a label it will be shown in the Prometheus webgui at `http://<your prometheus>:9090/targets`.
 > 
 > **Make sure you protect your Prometheus if you add the token part of your prometheus config** 
@@ -502,7 +503,7 @@ Make sure to use the last labeldrop on the `token` label so that the tokens is n
 > Some options to protect Prometheus:
 > - Only expose UI to localhost --web.listen-address="127.0.0.1:9090"
 > - Basic authentication access - https://prometheus.io/docs/guides/basic-auth/
-> - It is your responsibility!
+> - **It is your responsibility!**
 
 ### Docker
 
