@@ -16,7 +16,16 @@ func ProbeHandler(w http.ResponseWriter, r *http.Request) {
 	savedConfig := config.GetConfig()
 
 	params := r.URL.Query()
+	paramMap := make(map[string]string)
 	target := params.Get("target")
+	paramMap["target"] = params.Get("target")
+	if params.Get("token") != "" {
+		paramMap["token"] = params.Get("token")
+	}
+	if params.Get("profile") != "" {
+		paramMap["profile"] = params.Get("profile")
+	}
+
 	if target == "" {
 		http.Error(w, "Target parameter missing or empty", http.StatusBadRequest)
 		return
@@ -37,7 +46,7 @@ func ProbeHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	pc := &ProbeCollector{}
 	registry.MustRegister(pc)
-	success, err := pc.Probe(ctx, target, &http.Client{}, savedConfig)
+	success, err := pc.Probe(ctx, paramMap, &http.Client{}, savedConfig)
 	if err != nil {
 		log.Printf("Probe request rejected; error is: %v", err)
 		http.Error(w, fmt.Sprintf("probe: %v", err), http.StatusBadRequest)
