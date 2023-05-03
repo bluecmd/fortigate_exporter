@@ -11,6 +11,7 @@ Prometheus exporter for FortiGate® firewalls.
 
   * [Supported Metrics](#supported-metrics)
   * [Usage](#usage)
+    + [Dynamic configuration](#dynamic-configuration)
     + [Available CLI parameters](#available-cli-parameters)
     + [Fortigate Configuration](#fortigate-configuration)
     + [Prometheus Configuration](#prometheus-configuration)
@@ -324,6 +325,39 @@ Special cases:
 
 To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
+### Dynamic configuration
+In use cases where the Fortigates that is to be scraped through the fortigate-exporter is configured in 
+Prometheus using some discovery method it becomes problematic that the `fortigate-key.yaml` configuration also
+has to be updated for each fortigate, and that the fortigate-exporter needs to be restarted on each change. 
+For that scenario the token can be passed as a query parameter, `token`, to the fortigate. 
+
+Example:
+```bash
+curl 'localhost:9710/probe?target=https://192.168.2.31&token=ghi6eItWzWewgbrFMsazvBVwDjZzzb'
+```
+It is also possible to pass a `profile` query parameter. The value will match an entry in the `fortigate-key.yaml` 
+file, but only to use the `probes` section for include/exclude directives.
+
+Example:
+```bash
+curl 'localhost:9710/probe?target=https://192.168.2.31&token=ghi6eItWzWewgbrFMsazvBVwDjZzzb&profile=fs124e'
+```
+The `profile=fs124e` would match the following entry in `fortigate-key.yaml`.
+
+Example:
+```yaml
+fs124e:
+  # token: not used 
+  probes:
+    include:
+      - System
+      - Firewall
+    exclude:
+      - System/LinkMonitor
+```
+
+
+
 ### Available CLI parameters
 
 | flag  | default value  |  description  |
@@ -436,6 +470,40 @@ An example configuration for Prometheus looks something like this:
       - target_label: __address__
         replacement: '[::1]:9710'
 ```
+
+If using [Dynamic configuration](#dynamic-configuration):
+```yaml
+  - job_name: 'fortigate_exporter'
+    metrics_path: /probe
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/file_sd/fws/*.yml
+    params:
+      profile:
+      - fs124e
+    relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [token]
+      target_label: __param_token
+    - source_labels: [__param_target]
+      regex: '(?:.+)(?::\/\/)([^:]*).*'
+      target_label: instance
+    - target_label: __address__
+      replacement: '[::1]:9710'
+    - action: labeldrop
+      regex: token
+```
+> Make sure to use the last labeldrop on the `token` label so that the tokens is not be part of your time series.
+
+> Since `token` is a label it will be shown in the Prometheus webgui at `http://<your prometheus>:9090/targets`.
+> 
+> **Make sure you protect your Prometheus if you add the token part of your prometheus config** 
+> 
+> Some options to protect Prometheus:
+> - Only expose UI to localhost --web.listen-address="127.0.0.1:9090"
+> - Basic authentication access - https://prometheus.io/docs/guides/basic-auth/
+> - **It is your responsibility!**
 
 ### Docker
 
