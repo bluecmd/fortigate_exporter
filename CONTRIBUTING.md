@@ -48,6 +48,10 @@ make test         # Make sure all the tests pass before you commit and push :)
 
 * Commits should be as small as possible, while ensuring that each commit is correct independently (i.e., each commit should compile and pass tests).
 
+* Commits messages have to adhere to the [conventional commits specification](https://www.conventionalcommits.org/en/v1.0.0/#summary).
+
+* If multiple commits address independent things, use multiple PRs - avoid creating one PR that fix two or more things. 
+
 * If your patch is not getting reviewed or you need a specific person to review it, you can @-reply a reviewer asking for a review in the pull request or a comment, or you can ask for a review in our [chat room](https://matrix.to/#/#fortigate_exporter:matrix.org).
 
 * Add tests relevant to the fixed bug or new feature.
