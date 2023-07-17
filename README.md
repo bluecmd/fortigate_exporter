@@ -11,6 +11,7 @@ Prometheus exporter for FortiGate® firewalls.
 
   * [Supported Metrics](#supported-metrics)
   * [Usage](#usage)
+    + [Dynamic configuration](#dynamic-configuration)
     + [Available CLI parameters](#available-cli-parameters)
     + [Fortigate Configuration](#fortigate-configuration)
     + [Prometheus Configuration](#prometheus-configuration)
@@ -215,6 +216,37 @@ Per-VDOM, managed access point and interface:
    * `fortigate_wifi_managed_ap_interface_rx_dropped_packets_total`
    * `fortigate_wifi_managed_ap_interface_tx_dropped_packets_total`
 
+Per-VDOM, managed switch and interface:
+* _Switch/ManagedSwitch_
+  * `fortigate_managed_switch_collisions_total`
+  * `fortigate_managed_switch_crc_alignments_total`
+  * `fortigate_managed_switch_fragments_total`
+  * `fortigate_managed_switch_info`
+  * `fortigate_managed_switch_jabbers_total`
+  * `fortigate_managed_switch_l3_packets_total`
+  * `fortigate_managed_switch_max_poe_budget_watt`
+  * `fortigate_managed_switch_port_info`
+  * `fortigate_managed_switch_port_power_status`
+  * `fortigate_managed_switch_port_power_watt`
+  * `fortigate_managed_switch_port_status`
+  * `fortigate_managed_switch_rx_bcast_packets_total`
+  * `fortigate_managed_switch_rx_bytes_total`
+  * `fortigate_managed_switch_rx_drops_total`
+  * `fortigate_managed_switch_rx_errors_total`
+  * `fortigate_managed_switch_rx_mcast_packets_total`
+  * `fortigate_managed_switch_rx_oversize_total`
+  * `fortigate_managed_switch_rx_packets_total`
+  * `fortigate_managed_switch_rx_ucast_packets_total`
+  * `fortigate_managed_switch_tx_bcast_packets_total`
+  * `fortigate_managed_switch_tx_bytes_total`
+  * `fortigate_managed_switch_tx_drops_total`
+  * `fortigate_managed_switch_tx_errors_total`
+  * `fortigate_managed_switch_tx_mcast_packets_total`
+  * `fortigate_managed_switch_tx_oversize_total`
+  * `fortigate_managed_switch_tx_packets_total`
+  * `fortigate_managed_switch_tx_ucast_packets_total`
+  * `fortigate_managed_switch_under_size_total`
+    
 ## Usage
 
 Example:
@@ -293,6 +325,39 @@ Special cases:
 
 To probe a FortiGate, do something like `curl 'localhost:9710/probe?target=https://my-fortigate'`
 
+### Dynamic configuration
+In use cases where the Fortigates that is to be scraped through the fortigate-exporter is configured in 
+Prometheus using some discovery method it becomes problematic that the `fortigate-key.yaml` configuration also
+has to be updated for each fortigate, and that the fortigate-exporter needs to be restarted on each change. 
+For that scenario the token can be passed as a query parameter, `token`, to the fortigate. 
+
+Example:
+```bash
+curl 'localhost:9710/probe?target=https://192.168.2.31&token=ghi6eItWzWewgbrFMsazvBVwDjZzzb'
+```
+It is also possible to pass a `profile` query parameter. The value will match an entry in the `fortigate-key.yaml` 
+file, but only to use the `probes` section for include/exclude directives.
+
+Example:
+```bash
+curl 'localhost:9710/probe?target=https://192.168.2.31&token=ghi6eItWzWewgbrFMsazvBVwDjZzzb&profile=fs124e'
+```
+The `profile=fs124e` would match the following entry in `fortigate-key.yaml`.
+
+Example:
+```yaml
+fs124e:
+  # token: not used 
+  probes:
+    include:
+      - System
+      - Firewall
+    exclude:
+      - System/LinkMonitor
+```
+
+
+
 ### Available CLI parameters
 
 | flag  | default value  |  description  |
@@ -342,7 +407,7 @@ To improve security, limit permissions to required ones only (least privilege pr
 |Wifi/APStatus                | wifi               |api/v2/monitor/wifi/ap_status |
 |Wifi/Clients                 | wifi               |api/v2/monitor/wifi/client |
 |Wifi/ManagedAP               | wifi               |api/v2/monitor/wifi/managed_ap |
-
+|Switch/ManagedSwitch         | switch	           |api/v2/monitor/switch-controller/managed-switch|
 If you omit to grant some of these permissions you will receive log messages warning about
 403 errors and relevant metrics will be unavailable, but other metrics will still work.
 If you do not need some probes to be run, do not grant permission for them and use `include/exclude` feature (see `Usage` section).
@@ -405,6 +470,41 @@ An example configuration for Prometheus looks something like this:
       - target_label: __address__
         replacement: '[::1]:9710'
 ```
+In above configuration only the targets and the replacement values needs to be changed as per your environment. Where target is URL of the Fortigate firewall and the replacement (at the bottom) will be the FQDN of system where the node exporter is running, example ```replacement: 'YourSystem.public.corp.com:9710'```
+
+If using [Dynamic configuration](#dynamic-configuration):
+```yaml
+  - job_name: 'fortigate_exporter'
+    metrics_path: /probe
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/file_sd/fws/*.yml
+    params:
+      profile:
+      - fs124e
+    relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [token]
+      target_label: __param_token
+    - source_labels: [__param_target]
+      regex: '(?:.+)(?::\/\/)([^:]*).*'
+      target_label: instance
+    - target_label: __address__
+      replacement: '[::1]:9710'
+    - action: labeldrop
+      regex: token
+```
+> Make sure to use the last labeldrop on the `token` label so that the tokens is not be part of your time series.
+
+> Since `token` is a label it will be shown in the Prometheus webgui at `http://<your prometheus>:9090/targets`.
+> 
+> **Make sure you protect your Prometheus if you add the token part of your prometheus config** 
+> 
+> Some options to protect Prometheus:
+> - Only expose UI to localhost --web.listen-address="127.0.0.1:9090"
+> - Basic authentication access - https://prometheus.io/docs/guides/basic-auth/
+> - **It is your responsibility!**
 
 ### Docker
 
