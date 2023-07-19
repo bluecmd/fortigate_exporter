@@ -1,0 +1,43 @@
+# api/v2/system/sdn-connector/status?vdom=*
+[
+  {
+    "http_method":"GET",
+    "results":[
+      {
+        "name":"AWS Infra",
+        "type":"aws",
+        "status":"Up",
+        "updating":false,
+        "last_update":1680708575
+      }
+    ],
+    "vdom":"root",
+    "path":"system",
+    "name":"sdn-connector",
+    "action":"status",
+    "status":"success",
+    "serial":"FGABCDEF12345678",
+    "version":"v7.0.9",
+    "build":444
+  },
+  {
+    "http_method":"GET",
+    "results":[
+      {
+        "name":"GCP Infra",
+        "type":"gcp",
+        "status":"Down",
+        "updating":false,
+        "last_update":1680708001
+      }
+    ],
+    "vdom":"google",
+    "path":"system",
+    "name":"sdn-connector",
+    "action":"status",
+    "status":"success",
+    "serial":"FGABCDEF12345678",
+    "version":"v7.0.9",
+    "build":444
+  }
+]
