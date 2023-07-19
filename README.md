@@ -75,6 +75,9 @@ Per-VDOM:
    * `fortigate_interface_receive_bytes_total`
    * `fortigate_interface_transmit_errors_total`
    * `fortigate_interface_receive_errors_total`
+ * _System/SDNConnector_
+   * `fortigate_system_sdn_connector_status`
+   * `fortigate_system_sdn_connector_last_update_seconds`
  * _User/Fsso_
    * `fortigate_user_fsso_info`
  * _VPN/Ssl/Connections_
