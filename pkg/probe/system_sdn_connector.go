@@ -8,16 +8,16 @@ import (
 )
 
 type SystemSdnConnectorResults struct {
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-	Status string `json:"status"`
-	Updating bool `json:"updating"`
-	LastUpdate int `json:"last_update"`
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	Status     string `json:"status"`
+	Updating   bool   `json:"updating"`
+	LastUpdate int    `json:"last_update"`
 }
 
 type SystemSdnConnector struct {
 	Results []SystemSdnConnectorResults `json:"results"`
-	VDOM    string            `json:"vdom"`
+	VDOM    string                      `json:"vdom"`
 }
 
 func probeSystemSdnConnector(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
