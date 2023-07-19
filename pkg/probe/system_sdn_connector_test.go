@@ -8,12 +8,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/testutil"
 )
 
-func TestSystemSdnConnector(t *testing.T) {
+func TestSystemSDNConnector(t *testing.T) {
 	c := newFakeClient()
 	c.prepare("api/v2/monitor/system/sdn-connector/status", "testdata/system-sdn-connector.jsonnet")
 	r := prometheus.NewPedanticRegistry()
-	if !testProbe(probeSystemSdnConnector, c, r) {
-		t.Errorf("probeSystemSdnConnector() returned non-success")
+	if !testProbe(probeSystemSDNConnector, c, r) {
+		t.Errorf("probeSystemSDNConnector() returned non-success")
 	}
 
 	em := `
