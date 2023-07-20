@@ -31,7 +31,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 		mBGPNeighbor = prometheus.NewDesc(
 			"fortigate_bgp_neighbor_ipv4_info",
 			"Configured bgp neighbor over ipv4, return state as value (1 - Idle, 2 - Connect, 3 - Active, 4 - Open sent, 5 - Open confirm, 6 - Established)",
-			[]string{"vdom", "remote_as", "admin_status", "local_ip", "neighbor_ip"}, nil,
+			[]string{"vdom", "remote_as", "state", "admin_status", "local_ip", "neighbor_ip"}, nil,
 		)
 	)
 
@@ -46,7 +46,7 @@ func probeBGPNeighborsIPv4(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 
 	for _, r := range rs {
 		for _, peer := range r.Results {
-			m = append(m, prometheus.MustNewConstMetric(mBGPNeighbor, prometheus.GaugeValue, bgpStateToNumber(peer.State), r.VDOM, strconv.Itoa(peer.RemoteAS), strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
+			m = append(m, prometheus.MustNewConstMetric(mBGPNeighbor, prometheus.GaugeValue, bgpStateToNumber(peer.State), r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
 		}
 	}
 
@@ -63,7 +63,7 @@ func probeBGPNeighborsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 		mBGPNeighbor = prometheus.NewDesc(
 			"fortigate_bgp_neighbor_ipv6_info",
 			"Configured bgp neighbor over ipv6, return state as value (1 - Idle, 2 - Connect, 3 - Active, 4 - Open sent, 5 - Open confirm, 6 - Established)",
-			[]string{"vdom", "remote_as", "admin_status", "local_ip", "neighbor_ip"}, nil,
+			[]string{"vdom", "remote_as", "admin_status", "state", "local_ip", "neighbor_ip"}, nil,
 		)
 	)
 
@@ -78,7 +78,7 @@ func probeBGPNeighborsIPv6(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus
 
 	for _, r := range rs {
 		for _, peer := range r.Results {
-			m = append(m, prometheus.MustNewConstMetric(mBGPNeighbor, prometheus.GaugeValue, bgpStateToNumber(peer.State), r.VDOM, strconv.Itoa(peer.RemoteAS), strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
+			m = append(m, prometheus.MustNewConstMetric(mBGPNeighbor, prometheus.GaugeValue, bgpStateToNumber(peer.State), r.VDOM, strconv.Itoa(peer.RemoteAS), peer.State, strconv.FormatBool(peer.AdminStatus), peer.LocalIP, peer.NeighborIP))
 		}
 	}
 
