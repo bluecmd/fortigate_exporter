@@ -15,7 +15,7 @@ func TestSwitchHealth(t *testing.T) {
 	if !testProbe(probeSwitchHealth, c, r) {
 		t.Errorf("probeSwitchHealth() returned non-success")
 	}
-        
+
 	em := `
 	# HELP fortiswitch_health_performance_stats_cpu_idle Fortiswitch CPU idle
 	# TYPE fortiswitch_health_performance_stats_cpu_idle gauge

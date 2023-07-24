@@ -5,7 +5,6 @@ import (
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
-
 )
 
 func probeSwitchHealth(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
@@ -57,17 +56,17 @@ func probeSwitchHealth(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 		)
 	)
 	type Sum struct {
-		Value  	float64	 `json:"value"`
-		Rating	 string	 `json:"rating"`
+		Value  float64 `json:"value"`
+		Rating string  `json:"rating"`
 	}
 	type Status struct {
 		Value float64 `json:"value"`
 		Unit  string  `json:"unit"`
-	}	
+	}
 	type Uptime struct {
-		Days    Status   `json:"days"`
-		Hours   Status	 `json:"hours"`
-		Minutes Status	 `json:"minutes"`
+		Days    Status `json:"days"`
+		Hours   Status `json:"hours"`
+		Minutes Status `json:"minutes"`
 	}
 	type Network struct {
 		In1Min  Status `json:"in-1min"`
@@ -90,15 +89,15 @@ func probeSwitchHealth(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 		Uptime  Uptime  `json:"uptime"`
 	}
 	type Temperature struct {
-		Module	string
-		Status 	Status
+		Module string
+		Status Status
 	}
 	type Summary struct {
-		Overall	string	 `json:"overall"`
-		CPU	Sum
-		Memory	Sum
-		Uptime	Sum
-		Temperature	Sum
+		Overall     string `json:"overall"`
+		CPU         Sum
+		Memory      Sum
+		Uptime      Sum
+		Temperature Sum
 	}
 	type Poe struct {
 		Value    int    `json:"value"`
@@ -111,10 +110,10 @@ func probeSwitchHealth(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 		Summary           Summary           `json:"summary"`
 		Poe               Poe               `json:"poe"`
 	}
-	
+
 	type swResponse struct {
-		Results		map[string]Results	`json:"results"`
-		VDOM 		string
+		Results map[string]Results `json:"results"`
+		VDOM    string
 	}
 	var r swResponse
 	//var r map[string]swResponse
@@ -126,27 +125,27 @@ func probeSwitchHealth(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Met
 	}
 	m := []prometheus.Metric{}
 	//for _, sw := range r {
-		for fswitch, hr := range r.Results {
-			
-			m = append(m, prometheus.MustNewConstMetric(mSumCPU, prometheus.GaugeValue, hr.Summary.CPU.Value, hr.Summary.CPU.Rating, fswitch, r.VDOM))
-			m = append(m, prometheus.MustNewConstMetric(mSumMem, prometheus.GaugeValue, hr.Summary.Memory.Value, hr.Summary.Memory.Rating, fswitch, r.VDOM))
-			m = append(m, prometheus.MustNewConstMetric(mSumUpTime, prometheus.GaugeValue, hr.Summary.Uptime.Value, hr.Summary.Uptime.Rating, fswitch, r.VDOM))
-			m = append(m, prometheus.MustNewConstMetric(mSumTemp, prometheus.GaugeValue, hr.Summary.Temperature.Value, hr.Summary.Temperature.Rating, fswitch, r.VDOM))
+	for fswitch, hr := range r.Results {
 
-			for _, ts := range hr.Temperature {
-				m = append(m, prometheus.MustNewConstMetric(mTemp, prometheus.GaugeValue, ts.Status.Value, ts.Status.Unit, ts.Module, fswitch, r.VDOM))
-                        }
-		
-			CpuUnit := hr.PerformanceStatus.CPU.System.Unit
-			/*if CpuUnit == "%" {
-				CpuUnit = "%%"
-			}*/
+		m = append(m, prometheus.MustNewConstMetric(mSumCPU, prometheus.GaugeValue, hr.Summary.CPU.Value, hr.Summary.CPU.Rating, fswitch, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(mSumMem, prometheus.GaugeValue, hr.Summary.Memory.Value, hr.Summary.Memory.Rating, fswitch, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(mSumUpTime, prometheus.GaugeValue, hr.Summary.Uptime.Value, hr.Summary.Uptime.Rating, fswitch, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(mSumTemp, prometheus.GaugeValue, hr.Summary.Temperature.Value, hr.Summary.Temperature.Rating, fswitch, r.VDOM))
 
-			m = append(m, prometheus.MustNewConstMetric(mCpuUser, prometheus.GaugeValue, hr.PerformanceStatus.CPU.User.Value, CpuUnit, fswitch, r.VDOM))
-			m = append(m, prometheus.MustNewConstMetric(mCpuNice, prometheus.GaugeValue, hr.PerformanceStatus.CPU.Nice.Value, CpuUnit, fswitch, r.VDOM))
-			m = append(m, prometheus.MustNewConstMetric(mCpuSystem, prometheus.GaugeValue, hr.PerformanceStatus.CPU.System.Value, CpuUnit, fswitch, r.VDOM))
-			m = append(m, prometheus.MustNewConstMetric(mCpuIdle, prometheus.GaugeValue, hr.PerformanceStatus.CPU.Idle.Value, CpuUnit, fswitch, r.VDOM))
+		for _, ts := range hr.Temperature {
+			m = append(m, prometheus.MustNewConstMetric(mTemp, prometheus.GaugeValue, ts.Status.Value, ts.Status.Unit, ts.Module, fswitch, r.VDOM))
 		}
+
+		CpuUnit := hr.PerformanceStatus.CPU.System.Unit
+		/*if CpuUnit == "%" {
+			CpuUnit = "%%"
+		}*/
+
+		m = append(m, prometheus.MustNewConstMetric(mCpuUser, prometheus.GaugeValue, hr.PerformanceStatus.CPU.User.Value, CpuUnit, fswitch, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(mCpuNice, prometheus.GaugeValue, hr.PerformanceStatus.CPU.Nice.Value, CpuUnit, fswitch, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(mCpuSystem, prometheus.GaugeValue, hr.PerformanceStatus.CPU.System.Value, CpuUnit, fswitch, r.VDOM))
+		m = append(m, prometheus.MustNewConstMetric(mCpuIdle, prometheus.GaugeValue, hr.PerformanceStatus.CPU.Idle.Value, CpuUnit, fswitch, r.VDOM))
+	}
 	//}
 	return m, true
 }
