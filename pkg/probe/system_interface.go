@@ -11,7 +11,7 @@ func probeSystemInterface(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.
 	var (
 		mLink = prometheus.NewDesc(
 			"fortigate_interface_link_up",
-			"Whether the link is up or not",
+			"Whether the link is up or not (not taking into account admin status)",
 			[]string{"vdom", "name", "alias", "parent"}, nil,
 		)
 		mSpeed = prometheus.NewDesc(
