@@ -26,7 +26,7 @@ type IpPoolResponse struct {
 func probeFirewallIpPool(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		mAvailable = prometheus.NewDesc(
-			"fortigate_ippool_available",
+			"fortigate_ippool_available_ratio",
 			"Percentage available in ippool",
 			[]string{"vdom", "name"}, nil,
 		)

@@ -64,7 +64,7 @@ Per-VDOM:
    * `fortigate_policy_hit_count_total`
    * `fortigate_policy_packets_total`
  * _Firewall/IpPool_
-   * `fortigate_ippool_available`
+   * `fortigate_ippool_available_ratio`
    * `fortigate_ippool_used_ips`
    * `fortigate_ippool_total_ips`
    * `fortigate_ippool_clients`
