@@ -65,11 +65,11 @@ Per-VDOM:
    * `fortigate_policy_packets_total`
  * _Firewall/IpPool_
    * `fortigate_ippool_available`
-   * `fortigate_ippool_ip_used`
-   * `fortigate_ippool_ip_total`
+   * `fortigate_ippool_used_ips`
+   * `fortigate_ippool_total_ips`
    * `fortigate_ippool_clients`
-   * `fortigate_ippool_used`
-   * `fortigate_ippool_total`
+   * `fortigate_ippool_used_items`
+   * `fortigate_ippool_total_items`
  * _System/Fortimanager/Status_
    * `fortigate_fortimanager_connection_status`
    * `fortigate_fortimanager_registration_status`

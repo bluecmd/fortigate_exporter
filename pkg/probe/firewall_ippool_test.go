@@ -23,15 +23,15 @@ func TestFirewallIpPool(t *testing.T) {
 	# HELP fortigate_ippool_clients Amount of clients using ippool
 	# TYPE fortigate_ippool_clients gauge
 	fortigate_ippool_clients{name="ippool_name",vdom="FG-traffic"} 0
-	# HELP fortigate_ippool_total_ip Ip addresses total in ippool
-	# TYPE fortigate_ippool_total_ip gauge
-	fortigate_ippool_total_ip{name="ippool_name",vdom="FG-traffic"} 1
+	# HELP fortigate_ippool_total_ips Ip addresses total in ippool
+	# TYPE fortigate_ippool_total_ips gauge
+	fortigate_ippool_total_ips{name="ippool_name",vdom="FG-traffic"} 1
 	# HELP fortigate_ippool_total_items Amount of items total in ippool
 	# TYPE fortigate_ippool_total_items gauge
 	fortigate_ippool_total_items{name="ippool_name",vdom="FG-traffic"} 472
-	# HELP fortigate_ippool_used_ip Ip addresses in use in ippool
-	# TYPE fortigate_ippool_used_ip gauge
-	fortigate_ippool_used_ip{name="ippool_name",vdom="FG-traffic"} 0
+	# HELP fortigate_ippool_used_ips Ip addresses in use in ippool
+	# TYPE fortigate_ippool_used_ips gauge
+	fortigate_ippool_used_ips{name="ippool_name",vdom="FG-traffic"} 0
 	# HELP fortigate_ippool_used_items Amount of items used in ippool
 	# TYPE fortigate_ippool_used_items gauge
 	fortigate_ippool_used_items{name="ippool_name",vdom="FG-traffic"} 0

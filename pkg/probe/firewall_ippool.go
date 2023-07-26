@@ -33,14 +33,14 @@ func probeFirewallIpPool(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.M
 	)
 	var (
 		mIpUsed = prometheus.NewDesc(
-			"fortigate_ippool_used_ip",
+			"fortigate_ippool_used_ips",
 			"Ip addresses in use in ippool",
 			[]string{"vdom", "name"}, nil,
 		)
 	)
 	var (
 		mIpTotal = prometheus.NewDesc(
-			"fortigate_ippool_total_ip",
+			"fortigate_ippool_total_ips",
 			"Ip addresses total in ippool",
 			[]string{"vdom", "name"}, nil,
 		)
