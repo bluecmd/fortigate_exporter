@@ -17,9 +17,9 @@ func TestBGPNeighborsIPv4(t *testing.T) {
 	}
 
 	em := `
-    # HELP fortigate_bgp_neighbor_ipv4_info Configured bgp neighbor over ipv4
+    # HELP fortigate_bgp_neighbor_ipv4_info Configured bgp neighbor over ipv4, return state as value (1 - Idle, 2 - Connect, 3 - Active, 4 - Open sent, 5 - Open confirm, 6 - Established)
     # TYPE fortigate_bgp_neighbor_ipv4_info gauge
-    fortigate_bgp_neighbor_ipv4_info{admin_status="true",local_ip="10.0.0.0",neighbor_ip="10.0.0.1",remote_as="1337",state="Established",vdom="root"} 1
+    fortigate_bgp_neighbor_ipv4_info{admin_status="true",local_ip="10.0.0.0",neighbor_ip="10.0.0.1",remote_as="1337",state="Established",vdom="root"} 6
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
@@ -36,9 +36,9 @@ func TestBGPNeighborsIPv6(t *testing.T) {
 	}
 
 	em := `
-    # HELP fortigate_bgp_neighbor_ipv6_info Configured bgp neighbor over ipv6
+    # HELP fortigate_bgp_neighbor_ipv6_info Configured bgp neighbor over ipv6, return state as value (1 - Idle, 2 - Connect, 3 - Active, 4 - Open sent, 5 - Open confirm, 6 - Established)
     # TYPE fortigate_bgp_neighbor_ipv6_info gauge
-    fortigate_bgp_neighbor_ipv6_info{admin_status="true",local_ip="fd00::1",neighbor_ip="fd00::2",remote_as="1337",state="Established",vdom="root"} 1
+    fortigate_bgp_neighbor_ipv6_info{admin_status="true",local_ip="fd00::1",neighbor_ip="fd00::2",remote_as="1337",state="Established",vdom="root"} 6
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {

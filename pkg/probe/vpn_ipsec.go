@@ -12,7 +12,7 @@ func probeVPNIPSec(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric,
 	var (
 		status = prometheus.NewDesc(
 			"fortigate_ipsec_tunnel_up",
-			"Status of IPsec tunnel",
+			"Status of IPsec tunnel (0 - Down, 1 - Up)",
 			[]string{"vdom", "name", "p2serial", "parent"}, nil,
 		)
 		transmitted = prometheus.NewDesc(

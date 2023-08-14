@@ -17,7 +17,7 @@ func TestSystemInterfaces(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_interface_link_up Whether the link is up or not
+	# HELP fortigate_interface_link_up Whether the link is up or not (not taking into account admin status)
 	# TYPE fortigate_interface_link_up gauge
 	fortigate_interface_link_up{alias="",name="b",parent="",vdom="root"} 0
 	fortigate_interface_link_up{alias="",name="internal1",parent="",vdom="infra"} 1
