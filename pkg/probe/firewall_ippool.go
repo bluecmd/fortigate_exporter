@@ -27,7 +27,7 @@ func probeFirewallIpPool(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.M
 	var (
 		mAvailable = prometheus.NewDesc(
 			"fortigate_ippool_available_ratio",
-			"Percentage available in ippool",
+			"Percentage available in ippool (0 - 1.0)",
 			[]string{"vdom", "name"}, nil,
 		)
 	)
@@ -78,7 +78,7 @@ func probeFirewallIpPool(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.M
 
 	for _, r := range rs {
 		for _, ippool := range r.Results {
-			m = append(m, prometheus.MustNewConstMetric(mAvailable, prometheus.GaugeValue, ippool.Available, r.VDOM, ippool.Name))
+			m = append(m, prometheus.MustNewConstMetric(mAvailable, prometheus.GaugeValue, ippool.Available/100, r.VDOM, ippool.Name))
 			m = append(m, prometheus.MustNewConstMetric(mIpUsed, prometheus.GaugeValue, float64(ippool.IPInUse), r.VDOM, ippool.Name))
 			m = append(m, prometheus.MustNewConstMetric(mIpTotal, prometheus.GaugeValue, float64(ippool.IPTotal), r.VDOM, ippool.Name))
 			m = append(m, prometheus.MustNewConstMetric(mClients, prometheus.GaugeValue, float64(ippool.Clients), r.VDOM, ippool.Name))

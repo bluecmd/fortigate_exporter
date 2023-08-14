@@ -17,9 +17,9 @@ func TestFirewallIpPool(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_ippool_available_ratio Percentage available in ippool
+	# HELP fortigate_ippool_available_ratio Percentage available in ippool (0 - 1.0)
 	# TYPE fortigate_ippool_available_ratio gauge
-	fortigate_ippool_available_ratio{name="ippool_name",vdom="FG-traffic"} 100
+	fortigate_ippool_available_ratio{name="ippool_name",vdom="FG-traffic"} 1
 	# HELP fortigate_ippool_clients Amount of clients using ippool
 	# TYPE fortigate_ippool_clients gauge
 	fortigate_ippool_clients{name="ippool_name",vdom="FG-traffic"} 0
