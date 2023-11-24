@@ -162,6 +162,10 @@ Per-VDOM:
    * `fortigate_bgp_neighbor_ipv6_paths`
    * `fortigate_bgp_neighbor_ipv6_best_paths`
 
+ Per-OSPF-Neighbor and VDOM:
+ * _OSPF/Neighbors_
+   * `fortigate_ospf_neighbor_info`
+
  Per-VirtualServer and VDOM:
  * _Firewall/LoadBalance_
    * `fortigate_lb_virtual_server_info`
