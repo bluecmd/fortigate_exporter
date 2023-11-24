@@ -1,0 +1,22 @@
+# api/v2/monitor/router/ospf/neighbors?vdom=*
+[
+  {
+    "http_method":"GET",
+     "results":[
+      {
+        "neighbor_ip":"10.0.0.1",
+        "priority":3,
+        "state":"Full",
+        "router_id":"12345"
+      }
+    ],
+    "vdom":"root",
+    "path":"router",
+    "name":"ospf",
+    "action":"neighbors",
+    "status":"success",
+    "serial":"FGT61FT000000000",
+    "version":"v7.0.0",
+    "build":66
+  }
+]
