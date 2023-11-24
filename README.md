@@ -58,6 +58,7 @@ Per-VDOM:
    * `fortigate_vdom_cpu_usage_ratio`
    * `fortigate_vdom_memory_usage_ratio`
    * `fortigate_vdom_current_sessions`
+   * `fortigate_vdom_resources`
  * _Firewall/Policies_
    * `fortigate_policy_active_sessions`
    * `fortigate_policy_bytes_total`
