@@ -1,0 +1,7 @@
+"https://hk-tel-fw-lo.hessenkom.net:7443":
+  token: dqwds6t6jhbwcHrkf6H09GymhrNqf8
+  # If you have a smaller fortigate unit you might want
+  # to exclude sensors as they do not have any
+  probes:
+    exclude:
+      - System/SensorInfo
