@@ -54,21 +54,23 @@ func probeOSPFNeighbors(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Me
 
 func ospfStateToNumber(ospfState string) float64 {
 	switch ospfState {
-	case "Attempt":
+	case "Down":
 		return 1
-	case "Init":
+	case "Attempt":
 		return 2
-	case "Two way":
+	case "Init":
 		return 3
-	case "Exchange start":
+	case "Two way":
 		return 4
-	case "Exchange":
+	case "Exchange start":
 		return 5
-	case "Loading":
+	case "Exchange":
 		return 6
-	case "Full":
+	case "Loading":
 		return 7
+	case "Full":
+		return 8
 	default: // Down
-		return 0
+		return 1
 	}
 }
