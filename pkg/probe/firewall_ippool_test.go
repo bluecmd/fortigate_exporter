@@ -35,6 +35,9 @@ func TestFirewallIpPool(t *testing.T) {
 	# HELP fortigate_ippool_used_items Amount of items used in ippool
 	# TYPE fortigate_ippool_used_items gauge
 	fortigate_ippool_used_items{name="ippool_name",vdom="FG-traffic"} 0
+	# HELP fortigate_ippool_pba_per_ip Amount of available port block allocations per ip
+    # TYPE fortigate_ippool_pba_per_ip gauge
+    fortigate_ippool_pba_per_ip{name="ippool_name",vdom="FG-traffic"} 472
 	`
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
 		t.Fatalf("metric compare: err %v", err)
