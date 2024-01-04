@@ -70,6 +70,7 @@ Per-VDOM:
    * `fortigate_ippool_clients`
    * `fortigate_ippool_used_items`
    * `fortigate_ippool_total_items`
+   * `fortigate_ippool_pba_per_ip`
  * _System/Fortimanager/Status_
    * `fortigate_fortimanager_connection_status`
    * `fortigate_fortimanager_registration_status`
