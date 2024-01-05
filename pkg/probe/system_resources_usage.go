@@ -3,6 +3,7 @@ package probe
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
@@ -53,8 +54,23 @@ func probeSystemResourceUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 	}
 	var sr systemResourceUsage
 
-	if err := c.Get("api/v2/monitor/system/resource/usage", "interval=1-min&scope=global", &sr); err != nil {
-		log.Printf("Error: %v", err)
+	attempts := 3
+	for ; attempts > 0; attempts-- {
+		if err := c.Get("api/v2/monitor/system/resource/usage", "interval=1-min&scope=global", &sr); err != nil {
+			log.Printf("Error: %v", err)
+			return nil, false
+		}
+		// See https://github.com/bluecmd/fortigate_exporter/issues/266, sometimes FortiOS
+		// returns an empty resource document. If this happens, we try to fetch it up to three times.
+		if len(sr.Results.CPU) == 0 {
+			log.Printf("Got system resources, will retry fetch..")
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+		break
+	}
+	if attempts == 0 {
+		log.Printf("Error: Out of attempts to fetch system resources, giving up")
 		return nil, false
 	}
 

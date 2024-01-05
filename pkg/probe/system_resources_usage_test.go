@@ -60,3 +60,12 @@ func TestSystemVDOMResources(t *testing.T) {
 		t.Fatalf("metric compare: err %v", err)
 	}
 }
+
+func TestBrokenSystemResourceUsage(t *testing.T) {
+	c := newFakeClient()
+	c.prepare("api/v2/monitor/system/resource/usage", "testdata/usage-empty.jsonnet")
+	r := prometheus.NewPedanticRegistry()
+	if testProbe(probeSystemResourceUsage, c, r) {
+		t.Errorf("probeSystemResourceUsage() returned success, should have failed")
+	}
+}
