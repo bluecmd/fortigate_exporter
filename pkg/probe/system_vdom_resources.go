@@ -3,7 +3,6 @@ package probe
 import (
 	"encoding/json"
 	"log"
-	"strconv"
 
 	"github.com/bluecmd/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
@@ -75,12 +74,12 @@ func (o *HAResults) SystemVDOMResourcesUnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func probeSystemVDOMResourcesAll(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+func probeSystemVDOMResourceUsage(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
-		vdomResources = prometheus.NewDesc(
-			"fortigate_vdom_resources",
-			"Metrics of current usage of vdom resources as well as both the default and user configured maximum values.",
-			[]string{"vdom", "if_name", "custom_max", "min_custom_value", "max_custom_value", "guaranteed", "global_max", "min_guaranteed_value", "max_guaranteed_value", "current_usage", "usage_percent"}, nil,
+		mUsageSession = prometheus.NewDesc(
+			"fortigate_vdom_current_session_usage_percent",
+			"Current percent usage of sessions, per VDOM",
+			[]string{"vdom", "if_name"}, nil,
 		)
 	)
 
@@ -109,11 +108,9 @@ func probeSystemVDOMResourcesAll(c http.FortiHTTP, meta *TargetMetadata) ([]prom
 			log.Printf("Error: %v", err)
 			continue
 		}
-		for name, result := range f.Interfaces {
-			m = append(m, prometheus.MustNewConstMetric(vdomResources, prometheus.GaugeValue, result.ID, r.VDOM, name, strconv.Itoa(result.CustomMax),
-				strconv.Itoa(result.MinCustomValue), strconv.Itoa(result.MaxCustomValue), strconv.Itoa(result.Guaranteed), strconv.Itoa(result.GlobalMax),
-				strconv.Itoa(result.MinGuaranteedValue), strconv.Itoa(result.MaxGuaranteedValue), strconv.Itoa(result.CurrentUsage),
-				strconv.Itoa(result.UsagePercent)))
+		if result, found := f.Interfaces["session"]; found {
+			m = append(m, prometheus.MustNewConstMetric(mUsageSession, prometheus.GaugeValue, float64(result.UsagePercent), r.VDOM, "session"))
+
 		}
 	}
 	return m, true
