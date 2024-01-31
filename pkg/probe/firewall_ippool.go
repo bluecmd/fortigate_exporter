@@ -15,6 +15,7 @@ type IpPool struct {
 	Available float64 `json:"available"`
 	Used      int     `json:"used"`
 	Total     int     `json:"total"`
+	PbaPerIp  int     `json:"pba_per_ip"`
 }
 
 type IpPoolResponse struct {
@@ -67,6 +68,14 @@ func probeFirewallIpPool(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.M
 		)
 	)
 
+	var (
+		mPbaPerIp = prometheus.NewDesc(
+			"fortigate_ippool_pba_per_ip",
+			"Amount of available port block allocations per ip",
+			[]string{"vdom", "name"}, nil,
+		)
+	)
+
 	var rs []IpPoolResponse
 
 	if err := c.Get("api/v2/monitor/firewall/ippool", "vdom=*", &rs); err != nil {
@@ -84,6 +93,7 @@ func probeFirewallIpPool(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.M
 			m = append(m, prometheus.MustNewConstMetric(mClients, prometheus.GaugeValue, float64(ippool.Clients), r.VDOM, ippool.Name))
 			m = append(m, prometheus.MustNewConstMetric(mUsed, prometheus.GaugeValue, float64(ippool.Used), r.VDOM, ippool.Name))
 			m = append(m, prometheus.MustNewConstMetric(mTotal, prometheus.GaugeValue, float64(ippool.Total), r.VDOM, ippool.Name))
+			m = append(m, prometheus.MustNewConstMetric(mPbaPerIp, prometheus.GaugeValue, float64(ippool.PbaPerIp), r.VDOM, ippool.Name))
 		}
 	}
 

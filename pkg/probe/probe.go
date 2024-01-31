@@ -148,6 +148,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target map[string]string, hc
 		{"Wifi/Clients", probeWifiClients},
 		{"Wifi/ManagedAP", probeWifiManagedAP},
 		{"Switch/ManagedSwitch", probeManagedSwitch},
+		{"OSPF/Neighbors", probeOSPFNeighbors},
 		{"System/VDOM/Resource/Usage", probeSystemVDOMResourceUsage},
 	} {
 		wanted := false

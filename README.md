@@ -72,6 +72,7 @@ Per-VDOM:
    * `fortigate_ippool_clients`
    * `fortigate_ippool_used_items`
    * `fortigate_ippool_total_items`
+   * `fortigate_ippool_pba_per_ip`
  * _System/Fortimanager/Status_
    * `fortigate_fortimanager_connection_status`
    * `fortigate_fortimanager_registration_status`
@@ -163,6 +164,10 @@ Per-VDOM:
  * _BGP/NeighborPaths/IPv6_
    * `fortigate_bgp_neighbor_ipv6_paths`
    * `fortigate_bgp_neighbor_ipv6_best_paths`
+
+ Per-OSPF-Neighbor and VDOM:
+ * _OSPF/Neighbors_
+   * `fortigate_ospf_neighbor_info`
 
  Per-VirtualServer and VDOM:
  * _Firewall/LoadBalance_
