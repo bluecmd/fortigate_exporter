@@ -1,5 +1,5 @@
 # Build using the minimum supported Golang version (match go.mod)
-FROM golang:1.18 as builder
+FROM golang:1.22 as builder
 
 WORKDIR /build
 
