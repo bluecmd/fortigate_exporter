@@ -1,4 +1,4 @@
-# api/v2/monitor/switch-controller/managed-switch?vdom=*
+# api/v2/monitor/switch-controller/managed-switch/status?vdom=*
 [
   {
     "http_method":"GET",
