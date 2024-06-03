@@ -1,4 +1,4 @@
-# api/v2/monitor/switch-controller/managed-switch?vdom=*
+# api/v2/monitor/switch-controller/managed-switch/status?vdom=*
 [
   {
     "http_method":"GET",
@@ -6,7 +6,7 @@
     ],
     "vdom":"dhcp-relay",
     "path":"switch-controller",
-    "name":"managed-switch",
+    "switch-id":"managed-switch",
     "status":"success",
     "serial":"FGT40FTK210XXXX",
     "version":"v6.4.6",
@@ -16,7 +16,7 @@
     "http_method":"GET",
     "results":[
       {
-        "name":"FOO-SW-01",
+        "switch-id":"FOO-SW-01",
         "serial":"S124EF5920010260",
         "fgt_peer_intf_name":"fortilink",
         "state":"Authorized",
@@ -1325,7 +1325,7 @@
     ],
     "vdom":"root",
     "path":"switch-controller",
-    "name":"managed-switch",
+    "switch-id":"managed-switch",
     "status":"success",
     "serial":"FGT40FTK210XXXX",
     "version":"v6.4.6",
