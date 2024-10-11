@@ -74,6 +74,9 @@ Per-VDOM:
  * _System/Fortimanager/Status_
    * `fortigate_fortimanager_connection_status`
    * `fortigate_fortimanager_registration_status`
+ * _System/CentralManagement/Status_
+   * `fortigate_central_management_connection_status`
+   * `fortigate_central_management_status`
  * _System/Interface_
    * `fortigate_interface_link_up`
    * `fortigate_interface_speed_bps`

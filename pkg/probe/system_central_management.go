@@ -7,38 +7,38 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type SystemFortimanagerResults struct {
-	Mode            string `json:"mode"`
-	Status_ID       int    `json:"fortimanager_status_id"`
-	Registration_ID int    `json:"fortimanager_registration_status_id"`
+type SystemCentralManagementResults struct {
+	Mode         string `json:"mode"`
+	Status       string `json:"status"`
+	Registration string `json:"registration_status"`
 }
 
-type SystemFortimanagerStatus struct {
-	Results SystemFortimanagerResults `json:"results"`
-	VDOM    string                    `json:"vdom"`
+type SystemCentralManagementStatus struct {
+	Results SystemCentralManagementResults `json:"results"`
+	VDOM    string                         `json:"vdom"`
 }
 
-func probeSystemFortimanagerStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
-	// Deprecated API call in FortiOS v7.6.0
-	if meta.VersionMajor > 7 || (meta.VersionMajor == 7 && meta.VersionMinor >= 6) {
-		log.Printf("Deprecated probe in FortiOS 7.6+ System/Fortimanager/Status - replaced by System/CentralManagement/Status")
+func probeSystemCentralManagementStatus(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
+	// New API in FortiOS v7.4.0+
+	if meta.VersionMajor < 7 || (meta.VersionMajor == 7 && meta.VersionMinor < 4) {
+		log.Printf("Unsupported probe System/CentralManagement/Status - requires minimum FortiOS v7.4.0")
 		return []prometheus.Metric{}, false
 	}
 	var (
 		FortimanStat_id = prometheus.NewDesc(
-			"fortigate_fortimanager_connection_status",
-			"Fortimanager status ID",
+			"fortigate_central_management_connection_status",
+			"Fortimanager status",
 			[]string{"vdom", "mode", "status"}, nil,
 		)
 		FortimanReg_id = prometheus.NewDesc(
-			"fortigate_fortimanager_registration_status",
-			"Fortimanager registration status ID",
+			"fortigate_central_management_registration_status",
+			"Fortimanager registration status",
 			[]string{"vdom", "mode", "status"}, nil,
 		)
 	)
 
-	var res []SystemFortimanagerStatus
-	if err := c.Get("api/v2/monitor/system/fortimanager/status", "vdom=*", &res); err != nil {
+	var res []SystemCentralManagementStatus
+	if err := c.Get("api/v2/monitor/system/central-management/status", "vdom=*", &res); err != nil {
 		log.Printf("Error: %v", err)
 		return nil, false
 	}
@@ -46,39 +46,32 @@ func probeSystemFortimanagerStatus(c http.FortiHTTP, meta *TargetMetadata) ([]pr
 	m := []prometheus.Metric{}
 	for _, r := range res {
 		StatusDown, StatusHandshake, StatusUp := 0.0, 0.0, 0.0
-		switch r.Results.Status_ID {
-		case 0:
+		switch r.Results.Status {
+		case "down":
 			// No management Tunnel
 			StatusDown = 1.0
-			break
-		case 1:
+		case "handshake":
 			// Management tunnel establishment in progress
 			StatusHandshake = 1.0
-			break
-		case 2:
+		case "up":
 			// Management tunnel is establised
 			StatusUp = 1.0
-			break
 		}
 
 		RegistrationUnknown, RegistrationInProgress, RegistrationRegistered, RegistrationUnregistered := 0.0, 0.0, 0.0, 0.0
-		switch r.Results.Registration_ID {
-		case 0:
+		switch r.Results.Registration {
+		case "unknown":
 			// FMG does not know about the device
 			RegistrationUnknown = 1.0
-			break
-		case 1:
+		case "in_progress":
 			// FMG does know the device, but it is not yet fully saved in the list of unregistered devices
 			RegistrationInProgress = 1.0
-			break
-		case 2:
+		case "registered":
 			// FMG does know the device, and device is authorized
 			RegistrationRegistered = 1.0
-			break
-		case 3:
+		case "unregistered ":
 			// FMG does know the device, but it is not yet authorized
 			RegistrationUnregistered = 1.0
-			break
 		}
 
 		m = append(m, prometheus.MustNewConstMetric(FortimanStat_id, prometheus.GaugeValue, StatusDown, r.VDOM, r.Results.Mode, "down"))
