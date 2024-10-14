@@ -21,10 +21,10 @@ func TestHAPeer(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_ha_member_info Info metrics regarding cluster HA peers
-	# TYPE fortigate_ha_member_info gauge
-	fortigate_ha_member_info{hostname="member-name-1",primary="Unsupported",priority="200",serial="FGT61E4QXXXXXXXX1",vcluster_id="0",vdom="root"} 1
-	fortigate_ha_member_info{hostname="member-name-2",primary="Unsupported",priority="100",serial="FGT61E4QXXXXXXXX2",vcluster_id="0",vdom="root"} 1
+	# HELP fortigate_ha_peer_info Info metrics regarding cluster HA peers
+	# TYPE fortigate_ha_peer_info gauge
+	fortigate_ha_peer_info{hostname="member-name-1",primary="Unsupported",priority="200",serial="FGT61E4QXXXXXXXX1",vcluster_id="0",vdom="root"} 1
+	fortigate_ha_peer_info{hostname="member-name-2",primary="Unsupported",priority="100",serial="FGT61E4QXXXXXXXX2",vcluster_id="0",vdom="root"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {
@@ -45,10 +45,10 @@ func TestHAPeer74(t *testing.T) {
 	}
 
 	em := `
-	# HELP fortigate_ha_member_info Info metrics regarding cluster HA peers
-	# TYPE fortigate_ha_member_info gauge
-	fortigate_ha_member_info{hostname="member-name-1",primary="true",priority="200",serial="FGT61E4QXXXXXXXX1",vcluster_id="0",vdom="root"} 1
-	fortigate_ha_member_info{hostname="member-name-2",primary="false",priority="100",serial="FGT61E4QXXXXXXXX2",vcluster_id="0",vdom="root"} 1
+	# HELP fortigate_ha_peer_info Info metrics regarding cluster HA peers
+	# TYPE fortigate_ha_peer_info gauge
+	fortigate_ha_peer_info{hostname="member-name-1",primary="true",priority="200",serial="FGT61E4QXXXXXXXX1",vcluster_id="0",vdom="root"} 1
+	fortigate_ha_peer_info{hostname="member-name-2",primary="false",priority="100",serial="FGT61E4QXXXXXXXX2",vcluster_id="0",vdom="root"} 1
 	`
 
 	if err := testutil.GatherAndCompare(r, strings.NewReader(em)); err != nil {

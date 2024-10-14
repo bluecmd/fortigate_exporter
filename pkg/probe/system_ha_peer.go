@@ -11,7 +11,7 @@ import (
 func probeSystemHAPeer(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		memberInfo = prometheus.NewDesc(
-			"fortigate_ha_member_info",
+			"fortigate_ha_peer_info",
 			"Info metrics regarding cluster HA peers",
 			[]string{"vdom", "hostname", "serial", "priority", "vcluster_id", "primary"}, nil,
 		)
