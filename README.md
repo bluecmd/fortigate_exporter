@@ -37,6 +37,8 @@ Global:
    * `fortigate_sensor_voltage_volts`
  * _System/Status_
    * `fortigate_version_info`
+ * _System/Transceivers_
+   * `fortigate_interface_transceivers`
  * _System/Time/Clock_
    * `fortigate_time_seconds`
  * _System/Resource/Usage_
