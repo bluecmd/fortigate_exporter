@@ -10,7 +10,7 @@ import (
 func probeSystemInterfaceTransceivers(c http.FortiHTTP, meta *TargetMetadata) ([]prometheus.Metric, bool) {
 	var (
 		mVersion = prometheus.NewDesc(
-			"fortigate_interface_transceivers",
+			"fortigate_interface_transceivers_info",
 			"List of transceivers being used by the FortiGate",
 			[]string{"name", "type", "vendor", "partnumber", "description"}, nil,
 		)
