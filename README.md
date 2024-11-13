@@ -57,6 +57,8 @@ Global:
  * _WebUI/State_
    * `fortigate_last_reboot_seconds`
    * `fortigate_last_snapshot_seconds`
+ * _System/HAPeerStatus_
+   * `fortigate_ha_member_info`
 
 Per-VDOM:
 

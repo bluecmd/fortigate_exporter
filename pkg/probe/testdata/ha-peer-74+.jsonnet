@@ -1,0 +1,27 @@
+# api/v2/monitor/system/ha-peer
+{
+  "http_method":"GET",
+  "results":[
+    {
+      "serial_no":"FGT61E4QXXXXXXXX1",
+      "vcluster_id":0,
+      "priority":200,
+      "hostname":"member-name-1",
+      "primary":true
+    },
+    {
+      "serial_no":"FGT61E4QXXXXXXXX2",
+      "vcluster_id":0,
+      "priority":100,
+      "hostname":"member-name-2"
+    }
+  ],
+  "vdom":"root",
+  "path":"system",
+  "name":"ha-peer",
+  "action":"",
+  "status":"success",
+  "serial":"FGT61E4QXXXXXXXX1",
+  "version":"v7.4.0",
+  "build":700
+}
