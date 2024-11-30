@@ -80,6 +80,9 @@ Per-VDOM:
  * _System/Fortimanager/Status_
    * `fortigate_fortimanager_connection_status`
    * `fortigate_fortimanager_registration_status`
+   * `fortigate_ippool_total_items`
+ * _System/Network/Arp
+   * `fortigate_arp_entry_age_seconds`
  * _System/Interface_
    * `fortigate_interface_link_up`
    * `fortigate_interface_speed_bps`
