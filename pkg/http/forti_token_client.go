@@ -34,7 +34,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -80,7 +80,7 @@ func (c *fortiTokenClient) Get(path string, query string, obj interface{}) error
 		return fmt.Errorf("Response code was %d, expected 200 (path: %q)", resp.StatusCode, path)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}

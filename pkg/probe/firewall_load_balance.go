@@ -116,23 +116,18 @@ func probeFirewallLoadBalance(c http.FortiHTTP, meta *TargetMetadata) ([]prometh
 				switch realServer.Mode {
 				case "active":
 					realServerModeActive = 1.0
-					break
 				case "standby":
 					realServerModeStandby = 1.0
-					break
 				case "disabled":
 					realServerModeDisabled = 1.0
-					break
 				}
 
 				realServerStatusUp, realServerStatusDown, realServerStatusUnknown := 0.0, 0.0, 0.0
 				switch realServer.Status {
 				case "up":
 					realServerStatusUp = 1.0
-					break
 				case "down":
 					realServerStatusDown = 1.0
-					break
 				default:
 					realServerStatusUnknown = 1.0
 				}

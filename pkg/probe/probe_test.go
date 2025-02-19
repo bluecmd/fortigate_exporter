@@ -35,8 +35,8 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/prometheus-community/fortigate_exporter/pkg/http"
 	"github.com/google/go-jsonnet"
+	"github.com/prometheus-community/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

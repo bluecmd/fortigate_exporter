@@ -58,15 +58,12 @@ func probeSystemFortimanagerStatus(c http.FortiHTTP, meta *TargetMetadata) ([]pr
 		case 0:
 			// No management Tunnel
 			StatusDown = 1.0
-			break
 		case 1:
 			// Management tunnel establishment in progress
 			StatusHandshake = 1.0
-			break
 		case 2:
 			// Management tunnel is establised
 			StatusUp = 1.0
-			break
 		}
 
 		RegistrationUnknown, RegistrationInProgress, RegistrationRegistered, RegistrationUnregistered := 0.0, 0.0, 0.0, 0.0
@@ -74,19 +71,15 @@ func probeSystemFortimanagerStatus(c http.FortiHTTP, meta *TargetMetadata) ([]pr
 		case 0:
 			// FMG does not know about the device
 			RegistrationUnknown = 1.0
-			break
 		case 1:
 			// FMG does know the device, but it is not yet fully saved in the list of unregistered devices
 			RegistrationInProgress = 1.0
-			break
 		case 2:
 			// FMG does know the device, and device is authorized
 			RegistrationRegistered = 1.0
-			break
 		case 3:
 			// FMG does know the device, but it is not yet authorized
 			RegistrationUnregistered = 1.0
-			break
 		}
 
 		m = append(m, prometheus.MustNewConstMetric(FortimanStat_id, prometheus.GaugeValue, StatusDown, r.VDOM, r.Results.Mode, "down"))

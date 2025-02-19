@@ -15,8 +15,8 @@ package config
 
 import (
 	"flag"
-	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -106,7 +106,7 @@ func ReInit() error {
 	}
 
 	// parse AuthKeys
-	af, err := ioutil.ReadFile(*parameter.AuthFile)
+	af, err := os.ReadFile(*parameter.AuthFile)
 	if err != nil {
 		log.Fatalf("Failed to read API authentication map file: %v", err)
 		return err
@@ -125,7 +125,7 @@ func ReInit() error {
 			continue
 		}
 
-		certs, err := ioutil.ReadFile(eca)
+		certs, err := os.ReadFile(eca)
 		if err != nil {
 			log.Fatalf("Failed to read extra CA file %q: %v", eca, err)
 			return err

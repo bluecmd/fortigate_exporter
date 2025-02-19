@@ -117,13 +117,10 @@ func probeSystemLinkMonitor(c http.FortiHTTP, meta *TargetMetadata) ([]prometheu
 				switch link.Status {
 				case "up":
 					wanStatusUp = 1.0
-					break
 				case "down":
 					wanStatusDown = 1.0
-					break
 				case "error":
 					wanStatusError = 1.0
-					break
 				default:
 					wanStatusUnknown = 1.0
 				}

@@ -1,11 +1,11 @@
-.*.sw?
+# Build
+/.build
+/.release
+/.tarballs
 
-# IDEs
-.idea
-
-# artifacts
-target
+# Artifacts
 fortigate_exporter
+*.exe
 
 # coverage
 cover.out

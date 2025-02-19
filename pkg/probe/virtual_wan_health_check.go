@@ -117,16 +117,12 @@ func probeVirtualWANHealthCheck(c http.FortiHTTP, meta *TargetMetadata) ([]prome
 				switch Member.Status {
 				case "up":
 					MemberStatusUp = 1.0
-					break
 				case "down":
 					MemberStatusDown = 1.0
-					break
 				case "error":
 					MemberStatusError = 1.0
-					break
 				case "disable":
 					MemberStatusDisable = 1.0
-					break
 				default:
 					MemberStatusUnknown = 1.0
 				}
