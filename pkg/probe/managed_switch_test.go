@@ -10,7 +10,7 @@ import (
 
 func TestProbeManagedSwitch(t *testing.T) {
 	c := newFakeClient()
-	c.prepare("api/v2/monitor/switch-controller/managed-switch", "testdata/managed-switch.jsonnet")
+	c.prepare("api/v2/monitor/switch-controller/managed-switch/status", "testdata/managed-switch.jsonnet")
 	r := prometheus.NewPedanticRegistry()
 	if !testProbe(probeManagedSwitch, c, r) {
 		t.Errorf("probeManagedSwitchStatus() returned non-success")
