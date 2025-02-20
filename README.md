@@ -1,3 +1,12 @@
+# CMCS info
+
+build new images by adding version tags:
+
+```bash
+git tag v1.0.0 
+git push origin v1.0.0
+```
+
 # fortigate_exporter
 
 ![Go](https://github.com/bluecmd/fortigate_exporter/workflows/Go/badge.svg)
