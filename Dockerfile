@@ -1,19 +1,12 @@
-# Build using the minimum supported Golang version (match go.mod)
-FROM golang:1.18 as builder
+ARG ARCH="amd64"
+ARG OS="linux"
+FROM quay.io/prometheus/busybox-${OS}-${ARCH}:glibc
+LABEL maintainer="The Prometheus Authors <prometheus-developers@googlegroups.com>"
 
-WORKDIR /build
+ARG ARCH="amd64"
+ARG OS="linux"
+COPY .build/${OS}-${ARCH}/fortigate_exporter /bin/fortigate_exporter
 
-COPY . .
-RUN go get -v -t -d ./...
-RUN make build
-
-FROM scratch
-WORKDIR /opt/fortigate_exporter
-
-COPY --from=builder /build/target/fortigate-exporter .
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt .
-ENV SSL_CERT_DIR=/opt/fortigate_exporter
-
-EXPOSE 9710
-ENTRYPOINT ["./fortigate-exporter"]
-CMD ["-auth-file", "/config/fortigate-key.yaml"]
+EXPOSE      9710
+USER        nobody
+ENTRYPOINT  [ "/bin/fortigate_exporter" ]

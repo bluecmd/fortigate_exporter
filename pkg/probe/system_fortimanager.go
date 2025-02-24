@@ -1,9 +1,22 @@
+// Copyright 2025 The Prometheus Authors
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package probe
 
 import (
 	"log"
 
-	"github.com/bluecmd/fortigate_exporter/pkg/http"
+	"github.com/prometheus-community/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -45,15 +58,12 @@ func probeSystemFortimanagerStatus(c http.FortiHTTP, meta *TargetMetadata) ([]pr
 		case 0:
 			// No management Tunnel
 			StatusDown = 1.0
-			break
 		case 1:
 			// Management tunnel establishment in progress
 			StatusHandshake = 1.0
-			break
 		case 2:
 			// Management tunnel is establised
 			StatusUp = 1.0
-			break
 		}
 
 		RegistrationUnknown, RegistrationInProgress, RegistrationRegistered, RegistrationUnregistered := 0.0, 0.0, 0.0, 0.0
@@ -61,19 +71,15 @@ func probeSystemFortimanagerStatus(c http.FortiHTTP, meta *TargetMetadata) ([]pr
 		case 0:
 			// FMG does not know about the device
 			RegistrationUnknown = 1.0
-			break
 		case 1:
 			// FMG does know the device, but it is not yet fully saved in the list of unregistered devices
 			RegistrationInProgress = 1.0
-			break
 		case 2:
 			// FMG does know the device, and device is authorized
 			RegistrationRegistered = 1.0
-			break
 		case 3:
 			// FMG does know the device, but it is not yet authorized
 			RegistrationUnregistered = 1.0
-			break
 		}
 
 		m = append(m, prometheus.MustNewConstMetric(FortimanStat_id, prometheus.GaugeValue, StatusDown, r.VDOM, r.Results.Mode, "down"))

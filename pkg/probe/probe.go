@@ -1,3 +1,16 @@
+// Copyright 2025 The Prometheus Authors
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // All currently supported probes
 //
 // Copyright (C) 2020  Christian Svensson
@@ -25,9 +38,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/bluecmd/fortigate_exporter/internal/config"
-	"github.com/bluecmd/fortigate_exporter/internal/version"
-	fortiHTTP "github.com/bluecmd/fortigate_exporter/pkg/http"
+	"github.com/prometheus-community/fortigate_exporter/internal/config"
+	"github.com/prometheus-community/fortigate_exporter/internal/version"
+	fortiHTTP "github.com/prometheus-community/fortigate_exporter/pkg/http"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -65,7 +78,7 @@ func (p *ProbeCollector) Probe(ctx context.Context, target map[string]string, hc
 
 	if target["token"] != "" && savedConfig.AuthKeys[config.Target(target["target"])].Token == "" {
 		// Add the target and its apikey to the savedConfig and use, if exists, a target entry as a template for include/exclude
-		// This will only happend the "first" time
+		// This will only happened the "first" time
 		savedConfig.AuthKeys[config.Target(target["target"])] = config.TargetAuth{Token: config.Token(target["token"]),
 			Probes: savedConfig.AuthKeys[config.Target(target["profile"])].Probes}
 	}
